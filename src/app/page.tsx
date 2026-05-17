@@ -8,32 +8,32 @@ const features = [
   {
     title: "AI Workflows",
     description: "Learn how modern AI systems improve productivity and execution.",
-    icon: <Bot className="w-7 h-7" />
+    image: "/features/ai-workflows.png"
   },
   {
     title: "Build Real Projects",
     description: "Create portfolio-ready systems instead of consuming endless theory.",
-    icon: <Laptop className="w-7 h-7" />
+    image: "/features/build-projects.png"
   },
   {
     title: "Automation Systems",
     description: "Design workflows that reduce manual work and scale operations.",
-    icon: <Settings className="w-7 h-7" />
+    image: "/features/automation.png"
   },
   {
     title: "Community Learning",
     description: "Learn alongside builders, creators, and future-focused learners.",
-    icon: <Users className="w-7 h-7" />
+    image: "/features/community.png"
   },
   {
     title: "Startup Execution",
     description: "Understand how modern digital products and ventures are built.",
-    icon: <Rocket className="w-7 h-7" />
+    image: "/features/startup.png"
   },
   {
     title: "Creator Economy Tools",
     description: "Build systems for content, audience growth, and monetization.",
-    icon: <PlayCircle className="w-7 h-7" />
+    image: "/features/creator-tools.png"
   }
 ];
 
@@ -48,7 +48,7 @@ const learningPaths = [
       { icon: <Settings className="w-4 h-4" />, text: "Smart Workflow System" }
     ],
     tags: ["AI Tools", "Prompting", "Productivity"],
-    illustration: <div className="w-full h-40 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 border border-orange-100 relative overflow-hidden group-hover:bg-orange-100/50 transition-colors"><Bot className="w-20 h-20 text-orange-400 group-hover:scale-110 transition-transform duration-500" /></div>
+    image: "/learning-paths/ai-foundations.png"
   },
   {
     id: "02",
@@ -60,7 +60,7 @@ const learningPaths = [
       { icon: <Layers className="w-4 h-4" />, text: "End-to-End Workflow System" }
     ],
     tags: ["No-Code", "Workflows", "Integrations"],
-    illustration: <div className="w-full h-40 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 border border-orange-100 relative overflow-hidden group-hover:bg-orange-100/50 transition-colors"><Settings className="w-20 h-20 text-orange-400 group-hover:scale-110 transition-transform duration-500" /></div>
+    image: "/learning-paths/automation-systems.png"
   },
   {
     id: "03",
@@ -73,7 +73,7 @@ const learningPaths = [
       { icon: <Cloud className="w-4 h-4" />, text: "Cloud Deployment Pipeline" }
     ],
     tags: ["MERN", "DSA", "AWS", "AI Apps", "Portfolio"],
-    illustration: <div className="w-full h-40 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 border border-orange-100 relative overflow-hidden group-hover:bg-orange-100/50 transition-colors"><Laptop className="w-20 h-20 text-orange-400 group-hover:scale-110 transition-transform duration-500" /></div>
+    image: "/learning-paths/build-ai-projects.png"
   },
   {
     id: "04",
@@ -86,7 +86,7 @@ const learningPaths = [
       { icon: <Users className="w-4 h-4" />, text: "Audience Growth Pipeline" }
     ],
     tags: ["Digital Marketing", "Entrepreneurship", "Growth", "Creator Tools"],
-    illustration: <div className="w-full h-40 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 border border-orange-100 relative overflow-hidden group-hover:bg-orange-100/50 transition-colors"><Target className="w-20 h-20 text-orange-400 group-hover:scale-110 transition-transform duration-500" /></div>
+    image: "/learning-paths/startup-os.png"
   }
 ];
 
@@ -98,14 +98,14 @@ const featureStrip = [
 ];
 
 const industrialPrograms = [
-  { title: "Data Analytics", description: "Analyze data, uncover insights, and make data-driven decisions using modern tools.", tags: ["SQL", "Power BI", "Visualization"], icon: <PieChart className="w-8 h-8" /> },
-  { title: "Advanced Excel", description: "Master advanced Excel techniques for reporting, dashboards, and business intelligence.", tags: ["Advanced Excel", "Dashboards", "Reporting"], icon: <FileSpreadsheet className="w-8 h-8" /> },
-  { title: "Full Stack Development", description: "Build dynamic web applications using modern front-end and back-end technologies.", tags: ["HTML", "CSS", "JavaScript", "Node.js"], icon: <Code2 className="w-8 h-8" /> },
-  { title: "Cloud Computing (AWS)", description: "Learn cloud services, architecture and deployment on AWS platform.", tags: ["AWS", "EC2", "S3", "CloudOps"], icon: <Cloud className="w-8 h-8" /> },
-  { title: "AI Automation", description: "Automate workflows using AI tools and no-code/low-code automation platforms.", tags: ["Make", "Zapier", "n8n", "AI Agents"], icon: <Cpu className="w-8 h-8" /> },
-  { title: "Digital Marketing", description: "Grow brands, run campaigns and build digital presence across multiple channels.", tags: ["SEO", "Social Media", "Ads", "Analytics"], icon: <Target className="w-8 h-8" /> },
-  { title: "Entrepreneurship", description: "Validate ideas, build MVPs and scale your business with modern execution strategies.", tags: ["Validation", "MVP", "Growth", "Business"], icon: <Lightbulb className="w-8 h-8" /> },
-  { title: "DSA (Industry Ready)", description: "Master data structures and algorithms with problem solving for interviews and real world applications.", tags: ["DSA", "Algorithms", "Problem Solving", "Interviews"], icon: <Binary className="w-8 h-8" /> }
+  { title: "Data Analytics", description: "Analyze data, uncover insights, and make data-driven decisions using modern tools.", tags: ["SQL", "Power BI", "Visualization"], image: "/courses/data-analytics.png" },
+  { title: "Advanced Excel", description: "Master advanced Excel techniques for reporting, dashboards, and business intelligence.", tags: ["Advanced Excel", "Dashboards", "Reporting"], image: "/courses/advanced-excel.png" },
+  { title: "Full Stack Development", description: "Build dynamic web applications using modern front-end and back-end technologies.", tags: ["HTML", "CSS", "JavaScript", "Node.js"], image: "/courses/fullstack.png" },
+  { title: "Cloud Computing (AWS)", description: "Learn cloud services, architecture and deployment on AWS platform.", tags: ["AWS", "EC2", "S3", "CloudOps"], image: "/courses/aws.png" },
+  { title: "AI Automation", description: "Automate workflows using AI tools and no-code/low-code automation platforms.", tags: ["Make", "Zapier", "n8n", "AI Agents"], image: "/courses/ai-automation.png" },
+  { title: "Digital Marketing", description: "Grow brands, run campaigns and build digital presence across multiple channels.", tags: ["SEO", "Social Media", "Ads", "Analytics"], image: "/courses/digital-marketing.png" },
+  { title: "Entrepreneurship", description: "Validate ideas, build MVPs and scale your business with modern execution strategies.", tags: ["Validation", "MVP", "Growth", "Business"], image: "/courses/entrepreneurship.png" },
+  { title: "DSA (Industry Ready)", description: "Master data structures and algorithms with problem solving for interviews and real world applications.", tags: ["DSA", "Algorithms", "Problem Solving", "Interviews"], image: "/courses/dsa.png" }
 ];
 
 const learningProcessSteps = [
@@ -313,41 +313,11 @@ const footerLinks = {
 
 export default function HeroSection() {
   return (
-    <div className="min-h-screen bg-[#FFF9F5] text-slate-900 font-sans overflow-hidden selection:bg-orange-200">
-      {/* Navigation */}
-      <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto relative z-20">
-        <div className="flex items-center gap-3">
-          {/* Logo Placeholder */}
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-600 to-red-500 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-orange-500/30">
-            D
-          </div>
-          <span className="font-extrabold text-xl tracking-wide">DEVPHOENIX</span>
-        </div>
+    <div className="min-h-screen font-sans overflow-hidden">
 
-        <div className="hidden md:flex items-center gap-8 font-medium text-slate-600">
-          <a href="#" className="text-slate-900 border-b-2 border-orange-500 pb-1">Home</a>
-          <a href="#" className="hover:text-orange-500 transition-colors">Courses</a>
-          <a href="#" className="hover:text-orange-500 transition-colors">Explore</a>
-          <a href="#" className="hover:text-orange-500 transition-colors">About Us</a>
-          <a href="#" className="hover:text-orange-500 transition-colors">Reviews</a>
-          <a href="#" className="hover:text-orange-500 transition-colors">Blog</a>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <button className="p-2 text-slate-600 hover:text-slate-900 transition-colors">
-            <Search className="w-5 h-5" />
-          </button>
-          <button className="hidden md:block px-6 py-2.5 font-medium hover:text-orange-500 transition-colors">
-            Login
-          </button>
-          <button className="px-6 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-medium rounded-full hover:shadow-lg hover:shadow-orange-500/30 transition-all transform hover:-translate-y-0.5">
-            Sign Up
-          </button>
-        </div>
-      </nav>
 
       {/* Main Hero */}
-      <main className="max-w-7xl mx-auto px-8 pt-12 pb-24 relative">
+      <main className="max-w-7xl mx-auto px-8 pt-32 pb-24 relative">
         {/* Background Decorative Elements */}
         <div className="absolute top-1/2 right-1/4 w-[800px] h-[800px] bg-orange-200/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4 pointer-events-none z-0" />
 
@@ -617,11 +587,14 @@ export default function HeroSection() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-orange-500/10 transition-colors duration-500" />
 
               <div className="mb-6 relative z-10">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/50 text-orange-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 relative border border-orange-100/50">
-                  <div className="absolute inset-0 bg-orange-400/20 rounded-2xl blur-md scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative z-10">
-                    {feature.icon}
-                  </div>
+                <div className="w-full h-40 rounded-2xl bg-orange-50/50 mb-6 group-hover:bg-orange-50 transition-colors duration-300 relative border border-orange-100/50 overflow-hidden z-10">
+                  <Image
+                    src={feature.image}
+                    alt={feature.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 33vw"
+                    className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
                 <p className="text-slate-600 leading-relaxed text-sm">
@@ -889,8 +862,14 @@ export default function HeroSection() {
                 <span className="text-sm font-bold text-orange-500 bg-orange-50 px-2.5 py-1 rounded-lg">{path.id}</span>
               </div>
 
-              <div className="relative z-10">
-                {path.illustration}
+              <div className="relative w-full h-40 rounded-2xl mb-6 border border-orange-100 overflow-hidden bg-orange-50/50 group-hover:bg-orange-50 transition-colors z-10">
+                <Image 
+                  src={path.image} 
+                  alt={path.title} 
+                  fill 
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
+                />
               </div>
 
               <h3 className="text-xl font-bold text-slate-900 mb-2 relative z-10">{path.title}</h3>
@@ -1010,8 +989,14 @@ export default function HeroSection() {
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-orange-500/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-orange-500/10 transition-colors duration-500" />
 
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100/50 text-orange-600 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 border border-orange-100/50 relative z-10">
-                {prog.icon}
+              <div className="w-full h-32 rounded-xl bg-slate-50 mb-5 relative overflow-hidden border border-slate-100 group-hover:border-orange-100 transition-colors z-10">
+                <Image 
+                  src={prog.image} 
+                  alt={prog.title} 
+                  fill 
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 25vw, 20vw"
+                  className="object-contain p-2 group-hover:scale-105 transition-transform duration-500" 
+                />
               </div>
 
               <h3 className="text-lg font-bold text-slate-900 mb-2 relative z-10">{prog.title}</h3>
