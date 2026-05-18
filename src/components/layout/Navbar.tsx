@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { navItems } from '@/data/navigation';
+import { navItems as staticNavItems } from '@/data/navigation';
 import { usePathname } from 'next/navigation';
 
 const AnimatedNavLink = ({ href, children, isActive }: { href: string; children: React.ReactNode; isActive: boolean }) => {
@@ -26,6 +26,18 @@ export default function Navbar() {
   const [headerShapeClass, setHeaderShapeClass] = useState('rounded-full');
   const shapeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pathname = usePathname();
+  const [items, setItems] = useState(staticNavItems);
+
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then(r => r.json())
+      .then(data => {
+        if (data && Array.isArray(data.navItems)) {
+          setItems(data.navItems);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -52,23 +64,25 @@ export default function Navbar() {
   }, [isOpen]);
 
   const loginButtonElement = (
-    <button className="px-5 py-2 sm:px-4 text-xs sm:text-sm font-semibold border border-slate-200 bg-white/50 text-slate-700 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors duration-200 w-full sm:w-auto">
-      Login
-    </button>
+    <Link href="/login" className="w-full sm:w-auto">
+      <button className="px-5 py-2 sm:px-4 text-xs sm:text-sm font-semibold border border-slate-200 bg-white/50 text-slate-700 rounded-full hover:bg-slate-50 hover:text-slate-900 transition-colors duration-200 w-full sm:w-auto">
+        Login
+      </button>
+    </Link>
   );
 
   const signupButtonElement = (
-    <div className="relative group w-full sm:w-auto">
+    <Link href="/login" className="relative group w-full sm:w-auto block">
        <div className="absolute inset-0 -m-1 rounded-full
                      hidden sm:block
                      bg-orange-400
                      opacity-20 filter blur-md pointer-events-none
                      transition-all duration-300 ease-out
                      group-hover:opacity-40 group-hover:blur-lg group-hover:-m-2"></div>
-       <button className="relative z-10 px-5 py-2 sm:px-4 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-md hover:shadow-lg transition-all duration-200 w-full sm:w-auto transform hover:-translate-y-0.5">
+       <button className="relative z-10 px-5 py-2 sm:px-4 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-md hover:shadow-lg transition-all duration-200 w-full sm:w-auto transform hover:-translate-y-0.5 block">
          Join Now
        </button>
-    </div>
+    </Link>
   );
 
   return (
@@ -88,13 +102,13 @@ export default function Navbar() {
           {/* LEFT → Logo */}
           <Link href="/" className="relative flex items-center shrink-0 z-50 group">
             <div className="absolute inset-0 bg-orange-400/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full pointer-events-none" />
-            <div className="relative w-[140px] h-[40px] sm:w-[180px] sm:h-[50px] lg:w-[220px] lg:h-[60px] hover:scale-[1.02] transition-all duration-300">
+            <div className="relative w-[140px] h-[42px] sm:w-[170px] sm:h-[50px] lg:w-[220px] lg:h-[60px] flex-shrink-0 hover:scale-[1.02] transition-all duration-300">
               <Image
                 src="/logo/devphoenix-logo.png"
                 alt="DevPhoeniX Logo"
                 fill
                 priority
-                sizes="(max-width: 640px) 140px, (max-width: 1024px) 180px, 220px"
+                sizes="(max-width: 640px) 140px, (max-width: 1024px) 170px, 220px"
                 className="object-contain object-left"
               />
             </div>
@@ -102,7 +116,7 @@ export default function Navbar() {
 
           {/* CENTER → Navigation */}
           <nav className="hidden lg:flex items-center gap-8 mx-auto">
-            {navItems.map((link) => (
+            {items.map((link) => (
               <AnimatedNavLink key={link.href} href={link.href} isActive={pathname === link.href}>
                 {link.label}
               </AnimatedNavLink>
@@ -129,7 +143,7 @@ export default function Navbar() {
         <div className={`lg:hidden flex flex-col items-center w-full transition-all ease-in-out duration-300 overflow-hidden
                          ${isOpen ? 'max-h-[500px] opacity-100 mt-6 mb-2' : 'max-h-0 opacity-0 mt-0 pointer-events-none'}`}>
           <nav className="flex flex-col items-center space-y-4 text-base w-full mb-6">
-            {navItems.map((link) => (
+            {items.map((link) => (
               <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className={`w-full text-center transition-colors font-medium ${pathname === link.href ? 'text-orange-600' : 'text-slate-600 hover:text-orange-600'}`}>
                 {link.label}
               </Link>

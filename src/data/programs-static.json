@@ -1,0 +1,342 @@
+[
+  {
+    "id": "full-stack-development",
+    "slug": "full-stack-development",
+    "title": "Full Stack Development",
+    "description": "Build dynamic web applications using modern front-end and back-end technologies. Go from zero to deploying production-grade apps.",
+    "category": "Development",
+    "level": "Beginner to Advanced",
+    "duration": "4-6 Months",
+    "type": "Premium",
+    "price": "₹4,999",
+    "practicalHours": "100+ Hours",
+    "tags": ["Next.js", "React", "Node.js", "PostgreSQL", "AWS"],
+    "image": "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop",
+    "overview": "This program takes you from the fundamentals of web development to building and deploying full-stack production applications. You'll work on real projects, learn modern frameworks, and graduate with a portfolio that gets you hired.",
+    "outcomes": [
+      "Build full-stack web applications from scratch",
+      "Deploy scalable servers on cloud platforms",
+      "Master React, Next.js, Node.js, and PostgreSQL",
+      "Implement authentication, payments, and real-time features",
+      "Build and ship 5+ portfolio projects"
+    ],
+    "projects": 15,
+    "curriculum": [
+      {
+        "week": "Week 1-2",
+        "title": "HTML, CSS & JavaScript Fundamentals",
+        "topics": ["Semantic HTML5", "Responsive CSS & Flexbox/Grid", "JavaScript ES6+ deep dive", "DOM manipulation"]
+      },
+      {
+        "week": "Week 3-4",
+        "title": "React & Modern Frontend",
+        "topics": ["React components & hooks", "State management", "React Router", "API integration"]
+      },
+      {
+        "week": "Week 5-6",
+        "title": "Next.js & Full Stack Patterns",
+        "topics": ["App Router & SSR/SSG", "Server Actions", "API routes", "Authentication with NextAuth"]
+      },
+      {
+        "week": "Week 7-8",
+        "title": "Backend & Databases",
+        "topics": ["Node.js & Express", "PostgreSQL & Prisma ORM", "REST API design", "JWT & sessions"]
+      },
+      {
+        "week": "Week 9-10",
+        "title": "Cloud & Deployment",
+        "topics": ["AWS EC2, S3, RDS", "CI/CD pipelines", "Docker basics", "Production deployment"]
+      }
+    ],
+    "faqs": [
+      { "question": "Do I need prior coding experience?", "answer": "No. This program starts from the fundamentals and progressively builds up to advanced concepts." },
+      { "question": "Will I get placement support?", "answer": "Yes. DevPhoeniX provides mock interviews, resume reviews, and LinkedIn optimization as part of the program." },
+      { "question": "Is this program online or offline?", "answer": "Currently online-first with live mentor sessions and recorded lectures accessible anytime." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹9,999",
+      "discountedPrice": "₹4,999",
+      "emi": "₹999/month",
+      "includes": ["Lifetime access to recordings", "Live mentor sessions", "Certificate of completion", "Project reviews", "Community access"]
+    },
+    "tools": ["VS Code", "Git & GitHub", "Postman", "Vercel", "AWS Console", "Figma basics"]
+  },
+  {
+    "id": "cloud-computing",
+    "slug": "cloud-computing",
+    "title": "Cloud Computing (AWS)",
+    "description": "Master Amazon Web Services from core infrastructure to serverless architectures and cloud-native application deployment.",
+    "category": "Cloud & DevOps",
+    "level": "Intermediate",
+    "duration": "3-4 Months",
+    "type": "Premium",
+    "price": "₹4,999",
+    "practicalHours": "80+ Hours",
+    "tags": ["AWS", "EC2", "S3", "Lambda", "Terraform"],
+    "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop",
+    "overview": "This program trains you in Amazon Web Services — the world's leading cloud platform. You'll go from understanding cloud fundamentals to deploying scalable, production-grade infrastructure on AWS.",
+    "outcomes": [
+      "Architect scalable cloud infrastructure on AWS",
+      "Deploy containerized applications with ECS & ECR",
+      "Build serverless functions with AWS Lambda",
+      "Implement CI/CD pipelines on AWS",
+      "Pass AWS Cloud Practitioner exam preparation"
+    ],
+    "projects": 8,
+    "curriculum": [
+      { "week": "Week 1-2", "title": "AWS Fundamentals & Core Services", "topics": ["IAM & security", "EC2 & VPC", "S3 & CloudFront", "Route 53 & DNS"] },
+      { "week": "Week 3-4", "title": "Serverless & Managed Services", "topics": ["AWS Lambda", "API Gateway", "DynamoDB", "RDS & Aurora"] },
+      { "week": "Week 5-6", "title": "Containers & DevOps", "topics": ["Docker & ECS", "ECR", "CodePipeline & CodeBuild", "CloudFormation basics"] },
+      { "week": "Week 7-8", "title": "Advanced Architecture", "topics": ["Auto Scaling", "Load Balancers", "CloudWatch monitoring", "Cost optimization"] }
+    ],
+    "faqs": [
+      { "question": "Do I need a DevOps background?", "answer": "Basic Linux and networking knowledge helps, but the program covers everything from the ground up." },
+      { "question": "Will I get hands-on labs?", "answer": "Yes. Every module has dedicated lab assignments on real AWS accounts." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹7,999",
+      "discountedPrice": "₹4,999",
+      "emi": "₹999/month",
+      "includes": ["AWS account sandbox labs", "Mentor-led sessions", "Exam prep material", "Certificate of completion"]
+    },
+    "tools": ["AWS Console", "AWS CLI", "Terraform", "Docker", "GitHub Actions"]
+  },
+  {
+    "id": "data-analytics",
+    "slug": "data-analytics",
+    "title": "Data Analytics",
+    "description": "Transform raw data into actionable business insights using Python, SQL, Power BI, and machine learning fundamentals.",
+    "category": "Data & AI",
+    "level": "Beginner to Intermediate",
+    "duration": "3-4 Months",
+    "type": "Premium",
+    "price": "₹3,999",
+    "practicalHours": "80+ Hours",
+    "tags": ["Python", "SQL", "Power BI", "Pandas", "Excel"],
+    "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
+    "overview": "Data is the new oil. This program teaches you how to extract, clean, analyze, and visualize data to drive real business decisions using industry-standard tools.",
+    "outcomes": [
+      "Write complex SQL queries for business analysis",
+      "Manipulate and analyze data with Python & Pandas",
+      "Build interactive dashboards in Power BI",
+      "Implement basic machine learning models",
+      "Present data stories to stakeholders"
+    ],
+    "projects": 10,
+    "curriculum": [
+      { "week": "Week 1-2", "title": "SQL & Database Foundations", "topics": ["SQL from basics to advanced", "Joins, aggregations, CTEs", "PostgreSQL & MySQL"] },
+      { "week": "Week 3-4", "title": "Python for Data", "topics": ["Python fundamentals", "Pandas & NumPy", "Data cleaning & transformation", "Matplotlib & Seaborn"] },
+      { "week": "Week 5-6", "title": "Power BI & Visualization", "topics": ["Power BI Desktop", "DAX basics", "Dashboard design", "Business reporting"] },
+      { "week": "Week 7-8", "title": "ML Fundamentals", "topics": ["Scikit-learn basics", "Regression & classification", "Model evaluation", "Capstone project"] }
+    ],
+    "faqs": [
+      { "question": "Do I need a math background?", "answer": "Basic math is helpful but not required. The program builds intuition step by step." },
+      { "question": "What tools will I use?", "answer": "Python, SQL, Power BI, Excel, and Jupyter Notebooks." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹6,999",
+      "discountedPrice": "₹3,999",
+      "emi": "₹799/month",
+      "includes": ["Live sessions", "Dataset library", "Certificate", "Portfolio project reviews"]
+    },
+    "tools": ["Python", "Jupyter", "Power BI", "PostgreSQL", "Excel"]
+  },
+  {
+    "id": "dsa-industry-ready",
+    "slug": "dsa-industry-ready",
+    "title": "DSA (Industry Ready)",
+    "description": "Crack FAANG and top product company interviews with a structured, problem-first approach to Data Structures & Algorithms.",
+    "category": "Computer Science",
+    "level": "Beginner to Advanced",
+    "duration": "3-5 Months",
+    "type": "Premium",
+    "price": "₹3,499",
+    "practicalHours": "120+ Hours",
+    "tags": ["C++", "Java", "Python", "LeetCode", "System Design"],
+    "image": "https://images.unsplash.com/photo-1516116216624-53e697fedbea?q=80&w=2128&auto=format&fit=crop",
+    "overview": "Stop grinding LeetCode blindly. This program gives you a structured, pattern-based approach to master DSA and crack top tech company interviews with confidence.",
+    "outcomes": [
+      "Master all core data structures (Arrays, Trees, Graphs, DP)",
+      "Solve 200+ curated interview problems",
+      "Learn time & space complexity analysis",
+      "Crack FAANG-level system design basics",
+      "Build interview confidence through mock sessions"
+    ],
+    "projects": 5,
+    "curriculum": [
+      { "week": "Week 1-2", "title": "Arrays, Strings & Complexity", "topics": ["Big O analysis", "Array patterns", "Two pointer, sliding window", "String manipulation"] },
+      { "week": "Week 3-4", "title": "Linked Lists, Stacks & Queues", "topics": ["Singly/doubly linked lists", "Stack & queue operations", "Monotonic stack", "LRU cache"] },
+      { "week": "Week 5-6", "title": "Trees & Graphs", "topics": ["Binary trees", "BST", "BFS & DFS", "Graph algorithms"] },
+      { "week": "Week 7-8", "title": "Dynamic Programming", "topics": ["Memoization vs tabulation", "1D & 2D DP", "Knapsack patterns", "Practice problems"] }
+    ],
+    "faqs": [
+      { "question": "Which language should I use?", "answer": "The program supports C++, Java, and Python. Use whichever you're most comfortable with." },
+      { "question": "How many problems will I solve?", "answer": "200+ curated problems covering all major patterns with video explanations for each." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹6,499",
+      "discountedPrice": "₹3,499",
+      "emi": "₹699/month",
+      "includes": ["200+ problem set", "Mock interviews", "Video solutions", "Certificate", "Discord community"]
+    },
+    "tools": ["LeetCode", "VS Code", "C++ / Java / Python"]
+  },
+  {
+    "id": "ai-automation",
+    "slug": "ai-automation",
+    "title": "AI Automation",
+    "description": "Build autonomous AI agents, automate business workflows, and ship AI-powered products using n8n, OpenAI, and LangChain.",
+    "category": "AI & Automation",
+    "level": "Intermediate",
+    "duration": "2-3 Months",
+    "type": "Premium",
+    "price": "₹4,499",
+    "practicalHours": "60+ Hours",
+    "tags": ["n8n", "OpenAI", "LangChain", "Python", "Zapier"],
+    "image": "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?q=80&w=2032&auto=format&fit=crop",
+    "overview": "The future belongs to builders who can make AI work for them. Learn to build real AI agents, automate complex workflows, and ship AI-powered products that actually solve problems.",
+    "outcomes": [
+      "Build autonomous AI agents with n8n and OpenAI",
+      "Automate multi-step business workflows",
+      "Create custom GPT-powered applications",
+      "Integrate AI into existing products via APIs",
+      "Deploy AI systems to production"
+    ],
+    "projects": 8,
+    "curriculum": [
+      { "week": "Week 1", "title": "AI & LLM Foundations", "topics": ["How LLMs work", "Prompt engineering", "OpenAI API", "Tokens & cost optimization"] },
+      { "week": "Week 2-3", "title": "n8n Workflow Automation", "topics": ["n8n setup & nodes", "Triggers & webhooks", "AI nodes with OpenAI", "Error handling"] },
+      { "week": "Week 4-5", "title": "LangChain & Agents", "topics": ["LangChain basics", "RAG (Retrieval Augmented Generation)", "Memory & tools", "Building agents"] },
+      { "week": "Week 6-8", "title": "Production AI Systems", "topics": ["Vector databases", "API integration", "Deployment on VPS", "Monitoring AI pipelines"] }
+    ],
+    "faqs": [
+      { "question": "Do I need ML knowledge?", "answer": "No. This is focused on building with existing AI APIs and tools, not training models." },
+      { "question": "What will I build?", "answer": "You'll build an AI support bot, an automated content pipeline, a custom document QA system, and more." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹7,999",
+      "discountedPrice": "₹4,499",
+      "emi": "₹899/month",
+      "includes": ["API credits for labs", "n8n cloud access", "Live sessions", "Certificate", "Private Discord"]
+    },
+    "tools": ["n8n", "OpenAI API", "LangChain", "Python", "Pinecone", "Vercel"]
+  },
+  {
+    "id": "digital-marketing",
+    "slug": "digital-marketing",
+    "title": "Digital Marketing",
+    "description": "Master performance marketing, content strategy, SEO, paid ads, and growth frameworks used by top D2C and SaaS brands.",
+    "category": "Marketing & Growth",
+    "level": "Beginner to Intermediate",
+    "duration": "2-3 Months",
+    "type": "Premium",
+    "price": "₹2,999",
+    "practicalHours": "60+ Hours",
+    "tags": ["SEO", "Google Ads", "Meta Ads", "Content", "Analytics"],
+    "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop",
+    "overview": "Learn modern digital marketing from a builder's perspective — not theory, but real strategies used by fast-growing startups and D2C brands to acquire users at scale.",
+    "outcomes": [
+      "Run profitable Google & Meta ad campaigns",
+      "Build SEO strategies that generate organic traffic",
+      "Create high-converting content frameworks",
+      "Analyze marketing data in Google Analytics 4",
+      "Build marketing funnels and growth loops"
+    ],
+    "projects": 6,
+    "curriculum": [
+      { "week": "Week 1-2", "title": "SEO & Content Marketing", "topics": ["Keyword research", "On-page & technical SEO", "Content strategy", "Link building basics"] },
+      { "week": "Week 3-4", "title": "Paid Advertising", "topics": ["Google Ads setup & strategy", "Meta Ads (Facebook/Instagram)", "Retargeting", "Ad creative fundamentals"] },
+      { "week": "Week 5-6", "title": "Analytics & Growth", "topics": ["Google Analytics 4", "Conversion tracking", "A/B testing", "Growth loops"] }
+    ],
+    "faqs": [
+      { "question": "Is this for business owners or marketers?", "answer": "Both! This program is designed for founders, marketers, and freelancers who want to grow businesses digitally." },
+      { "question": "Will I manage real ad budgets?", "answer": "Yes. You'll practice on real or simulated ad accounts with guided supervision." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹5,999",
+      "discountedPrice": "₹2,999",
+      "emi": "₹599/month",
+      "includes": ["Google Ads simulation account", "Meta Ads practice", "GA4 lab access", "Certificate"]
+    },
+    "tools": ["Google Ads", "Meta Business Manager", "GA4", "SEMrush", "Canva", "Hotjar"]
+  },
+  {
+    "id": "advanced-excel",
+    "slug": "advanced-excel",
+    "title": "Advanced Excel",
+    "description": "Master Excel from basics to advanced automation — VLOOKUP to Power Query, dashboards, macros, and financial modeling.",
+    "category": "Productivity & Tools",
+    "level": "Beginner to Advanced",
+    "duration": "6-8 Weeks",
+    "type": "Standard",
+    "price": "₹1,499",
+    "practicalHours": "40+ Hours",
+    "tags": ["Excel", "Power Query", "VBA", "Dashboards", "Formulas"],
+    "image": "https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=2070&auto=format&fit=crop",
+    "overview": "Excel is still the most used business tool globally. This program takes you from basic formulas to building automated financial models and interactive dashboards used in corporate India.",
+    "outcomes": [
+      "Master all Excel formulas including XLOOKUP, IFS, SUMIFS",
+      "Build automated dashboards with charts & slicers",
+      "Use Power Query for data transformation",
+      "Write VBA macros for task automation",
+      "Build financial models and analysis reports"
+    ],
+    "projects": 5,
+    "curriculum": [
+      { "week": "Week 1-2", "title": "Formulas & Functions Deep Dive", "topics": ["Lookup functions (VLOOKUP, XLOOKUP)", "Logical functions", "Text & date functions", "Array formulas"] },
+      { "week": "Week 3-4", "title": "Dashboards & Visualization", "topics": ["Pivot tables & charts", "Dynamic dashboards", "Conditional formatting", "Slicers & timelines"] },
+      { "week": "Week 5-6", "title": "Automation & Power Query", "topics": ["Power Query basics", "Data transformation", "VBA Macro introduction", "Automated reports"] }
+    ],
+    "faqs": [
+      { "question": "Which version of Excel do I need?", "answer": "Excel 2016 or later. Microsoft 365 is preferred for access to XLOOKUP and other modern functions." },
+      { "question": "Is VBA covered?", "answer": "Yes, VBA is introduced in the automation module with practical macro examples." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹2,999",
+      "discountedPrice": "₹1,499",
+      "emi": null,
+      "includes": ["Lifetime access", "Practice workbooks", "Certificate", "Email support"]
+    },
+    "tools": ["Microsoft Excel", "Power Query", "VBA Editor"]
+  },
+  {
+    "id": "entrepreneurship",
+    "slug": "entrepreneurship",
+    "title": "Entrepreneurship",
+    "description": "Go from idea to MVP to first paying customer. Learn the full startup execution framework used by India's top founders.",
+    "category": "Business & Strategy",
+    "level": "All Levels",
+    "duration": "2-3 Months",
+    "type": "Premium",
+    "price": "₹3,499",
+    "practicalHours": "50+ Hours",
+    "tags": ["Startup", "MVP", "Fundraising", "Product", "GTM"],
+    "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80&w=2070&auto=format&fit=crop",
+    "overview": "This isn't a theory course. It's a battle-tested execution system for building real startups. From ideation to product-market fit to first customers — learn what India's top founders actually do.",
+    "outcomes": [
+      "Validate ideas before building anything",
+      "Build and ship an MVP in 30 days",
+      "Acquire your first 100 customers",
+      "Understand unit economics and fundraising basics",
+      "Create pitch decks and investor narratives"
+    ],
+    "projects": 4,
+    "curriculum": [
+      { "week": "Week 1-2", "title": "Ideation & Validation", "topics": ["Problem-solution fit", "Customer discovery interviews", "Market sizing (TAM/SAM/SOM)", "Validation without code"] },
+      { "week": "Week 3-4", "title": "MVP & Product", "topics": ["MVP frameworks", "No-code tools (Bubble, Webflow)", "User testing", "Feedback loops"] },
+      { "week": "Week 5-6", "title": "Go-to-Market", "topics": ["GTM strategy", "Sales & outreach", "Content marketing for startups", "First 100 users playbook"] },
+      { "week": "Week 7-8", "title": "Fundraising & Scaling", "topics": ["Pitch deck structure", "Angel & VC landscape in India", "Unit economics", "Scaling operations"] }
+    ],
+    "faqs": [
+      { "question": "Do I need a technical background?", "answer": "No. This program is for anyone with a business idea — technical or non-technical." },
+      { "question": "Will I get mentorship from actual founders?", "answer": "Yes. DevPhoeniX connects students with experienced founders for 1:1 mentorship sessions." }
+    ],
+    "pricingDetails": {
+      "originalPrice": "₹6,999",
+      "discountedPrice": "₹3,499",
+      "emi": "₹699/month",
+      "includes": ["Founder mentorship sessions", "Investor pitch review", "Startup toolkit", "Certificate", "Alumni network"]
+    },
+    "tools": ["Notion", "Figma", "Bubble", "Google Workspace", "Stripe/Razorpay"]
+  }
+]
