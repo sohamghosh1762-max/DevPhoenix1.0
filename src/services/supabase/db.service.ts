@@ -1,4 +1,4 @@
-import { supabase } from './client';
+import { supabase, supabaseAdmin, hasAdminConfig } from './client';
 import { Program, Blog, Testimonial, Mentor, Lead, HomepageSettings, ProjectShowcase } from '@/types';
 
 // Generic error handler
@@ -7,37 +7,52 @@ const handleError = (error: any) => {
   throw new Error(error.message || 'Database error occurred');
 };
 
+// Use supabaseAdmin (if service role key is set) to bypass Row Level Security (RLS) on server-side database actions
+const dbClient = hasAdminConfig ? supabaseAdmin : supabase;
+
+if (hasAdminConfig) {
+  console.log('🛡️ DATABASE SERVICE: Using RLS bypass admin client.');
+} else {
+  console.log('⚠️ DATABASE SERVICE: Using standard client (subject to RLS restrictions).');
+}
+
 // ==========================================
 // PROGRAMS
 // ==========================================
 export const programsService = {
   async getAll(): Promise<Program[]> {
-    const { data, error } = await supabase.from('programs').select('*').order('created_at', { ascending: false });
+    console.log('FETCHING: All programs');
+    const { data, error } = await dbClient.from('programs').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
     return data || [];
   },
   async getById(id: string): Promise<Program | null> {
-    const { data, error } = await supabase.from('programs').select('*').eq('id', id).single();
+    console.log(`FETCHING: Program by id = ${id}`);
+    const { data, error } = await dbClient.from('programs').select('*').eq('id', id).single();
     if (error && error.code !== 'PGRST116') handleError(error);
     return data;
   },
   async getBySlug(slug: string): Promise<Program | null> {
-    const { data, error } = await supabase.from('programs').select('*').eq('slug', slug).single();
+    console.log(`FETCHING: Program by slug = ${slug}`);
+    const { data, error } = await dbClient.from('programs').select('*').eq('slug', slug).single();
     if (error && error.code !== 'PGRST116') handleError(error);
     return data;
   },
   async create(program: Partial<Program>): Promise<Program> {
-    const { data, error } = await supabase.from('programs').insert(program).select().single();
+    console.log('CREATING: Program', program.id);
+    const { data, error } = await dbClient.from('programs').insert(program).select().single();
     if (error) handleError(error);
     return data;
   },
   async update(id: string, program: Partial<Program>): Promise<Program> {
-    const { data, error } = await supabase.from('programs').update(program).eq('id', id).select().single();
+    console.log(`UPDATING: Program id = ${id}`);
+    const { data, error } = await dbClient.from('programs').update(program).eq('id', id).select().single();
     if (error) handleError(error);
     return data;
   },
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('programs').delete().eq('id', id);
+    console.log(`DELETING: Program id = ${id}`);
+    const { error } = await dbClient.from('programs').delete().eq('id', id);
     if (error) handleError(error);
   }
 };
@@ -48,29 +63,34 @@ export const programsService = {
 // ==========================================
 export const blogsService = {
   async getAll(publishedOnly = false): Promise<Blog[]> {
-    let query = supabase.from('blogs').select('*').order('publishedAt', { ascending: false });
+    console.log(`FETCHING: All blogs (publishedOnly = ${publishedOnly})`);
+    let query = dbClient.from('blogs').select('*').order('publishedAt', { ascending: false });
     if (publishedOnly) query = query.eq('isPublished', true);
     const { data, error } = await query;
     if (error) handleError(error);
     return data || [];
   },
   async getBySlug(slug: string): Promise<Blog | null> {
-    const { data, error } = await supabase.from('blogs').select('*').eq('slug', slug).single();
+    console.log(`FETCHING: Blog by slug = ${slug}`);
+    const { data, error } = await dbClient.from('blogs').select('*').eq('slug', slug).single();
     if (error && error.code !== 'PGRST116') handleError(error);
     return data;
   },
   async create(blog: Partial<Blog>): Promise<Blog> {
-    const { data, error } = await supabase.from('blogs').insert(blog).select().single();
+    console.log('CREATING: Blog', blog.id);
+    const { data, error } = await dbClient.from('blogs').insert(blog).select().single();
     if (error) handleError(error);
     return data;
   },
   async update(id: string, blog: Partial<Blog>): Promise<Blog> {
-    const { data, error } = await supabase.from('blogs').update(blog).eq('id', id).select().single();
+    console.log(`UPDATING: Blog id = ${id}`);
+    const { data, error } = await dbClient.from('blogs').update(blog).eq('id', id).select().single();
     if (error) handleError(error);
     return data;
   },
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    console.log(`DELETING: Blog id = ${id}`);
+    const { error } = await dbClient.from('blogs').delete().eq('id', id);
     if (error) handleError(error);
   }
 };
@@ -80,22 +100,26 @@ export const blogsService = {
 // ==========================================
 export const testimonialsService = {
   async getAll(): Promise<Testimonial[]> {
-    const { data, error } = await supabase.from('testimonials').select('*').order('created_at', { ascending: false });
+    console.log('FETCHING: All testimonials');
+    const { data, error } = await dbClient.from('testimonials').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
     return data || [];
   },
   async create(testimonial: Partial<Testimonial>): Promise<Testimonial> {
-    const { data, error } = await supabase.from('testimonials').insert(testimonial).select().single();
+    console.log('CREATING: Testimonial');
+    const { data, error } = await dbClient.from('testimonials').insert(testimonial).select().single();
     if (error) handleError(error);
     return data;
   },
   async update(id: string, testimonial: Partial<Testimonial>): Promise<Testimonial> {
-    const { data, error } = await supabase.from('testimonials').update(testimonial).eq('id', id).select().single();
+    console.log(`UPDATING: Testimonial id = ${id}`);
+    const { data, error } = await dbClient.from('testimonials').update(testimonial).eq('id', id).select().single();
     if (error) handleError(error);
     return data;
   },
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+    console.log(`DELETING: Testimonial id = ${id}`);
+    const { error } = await dbClient.from('testimonials').delete().eq('id', id);
     if (error) handleError(error);
   }
 };
@@ -105,22 +129,26 @@ export const testimonialsService = {
 // ==========================================
 export const mentorsService = {
   async getAll(): Promise<Mentor[]> {
-    const { data, error } = await supabase.from('mentors').select('*').order('created_at', { ascending: false });
+    console.log('FETCHING: All mentors');
+    const { data, error } = await dbClient.from('mentors').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
     return data || [];
   },
   async create(mentor: Partial<Mentor>): Promise<Mentor> {
-    const { data, error } = await supabase.from('mentors').insert(mentor).select().single();
+    console.log('CREATING: Mentor');
+    const { data, error } = await dbClient.from('mentors').insert(mentor).select().single();
     if (error) handleError(error);
     return data;
   },
   async update(id: string, mentor: Partial<Mentor>): Promise<Mentor> {
-    const { data, error } = await supabase.from('mentors').update(mentor).eq('id', id).select().single();
+    console.log(`UPDATING: Mentor id = ${id}`);
+    const { data, error } = await dbClient.from('mentors').update(mentor).eq('id', id).select().single();
     if (error) handleError(error);
     return data;
   },
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('mentors').delete().eq('id', id);
+    console.log(`DELETING: Mentor id = ${id}`);
+    const { error } = await dbClient.from('mentors').delete().eq('id', id);
     if (error) handleError(error);
   }
 };
@@ -130,22 +158,26 @@ export const mentorsService = {
 // ==========================================
 export const leadsService = {
   async getAll(): Promise<Lead[]> {
-    const { data, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
+    console.log('FETCHING: All leads');
+    const { data, error } = await dbClient.from('leads').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
     return data || [];
   },
   async create(lead: Partial<Lead>): Promise<Lead> {
-    const { data, error } = await supabase.from('leads').insert(lead).select().single();
+    console.log('CREATING: Lead');
+    const { data, error } = await dbClient.from('leads').insert(lead).select().single();
     if (error) handleError(error);
     return data;
   },
   async update(id: string, lead: Partial<Lead>): Promise<Lead> {
-    const { data, error } = await supabase.from('leads').update(lead).eq('id', id).select().single();
+    console.log(`UPDATING: Lead id = ${id}`);
+    const { data, error } = await dbClient.from('leads').update(lead).eq('id', id).select().single();
     if (error) handleError(error);
     return data;
   },
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('leads').delete().eq('id', id);
+    console.log(`DELETING: Lead id = ${id}`);
+    const { error } = await dbClient.from('leads').delete().eq('id', id);
     if (error) handleError(error);
   }
 };
@@ -155,12 +187,14 @@ export const leadsService = {
 // ==========================================
 export const siteConfigService = {
   async get(): Promise<HomepageSettings | null> {
-    const { data, error } = await supabase.from('site_config').select('*').eq('id', 'global').single();
+    console.log('FETCHING: Site configuration');
+    const { data, error } = await dbClient.from('site_config').select('*').eq('id', 'global').single();
     if (error && error.code !== 'PGRST116') handleError(error);
     return data;
   },
   async update(config: Partial<HomepageSettings>): Promise<HomepageSettings> {
-    const { data, error } = await supabase.from('site_config').update(config).eq('id', 'global').select().single();
+    console.log('UPDATING: Site configuration');
+    const { data, error } = await dbClient.from('site_config').update(config).eq('id', 'global').select().single();
     if (error) handleError(error);
     return data;
   }
@@ -171,22 +205,26 @@ export const siteConfigService = {
 // ==========================================
 export const showcaseService = {
   async getAll(): Promise<ProjectShowcase[]> {
-    const { data, error } = await supabase.from('showcase').select('*').order('created_at', { ascending: false });
+    console.log('FETCHING: All showcase projects');
+    const { data, error } = await dbClient.from('showcase').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
     return data || [];
   },
   async create(project: Partial<ProjectShowcase>): Promise<ProjectShowcase> {
-    const { data, error } = await supabase.from('showcase').insert(project).select().single();
+    console.log('CREATING: Showcase project');
+    const { data, error } = await dbClient.from('showcase').insert(project).select().single();
     if (error) handleError(error);
     return data;
   },
   async update(id: string, project: Partial<ProjectShowcase>): Promise<ProjectShowcase> {
-    const { data, error } = await supabase.from('showcase').update(project).eq('id', id).select().single();
+    console.log(`UPDATING: Showcase project id = ${id}`);
+    const { data, error } = await dbClient.from('showcase').update(project).eq('id', id).select().single();
     if (error) handleError(error);
     return data;
   },
   async delete(id: string): Promise<void> {
-    const { error } = await supabase.from('showcase').delete().eq('id', id);
+    console.log(`DELETING: Showcase project id = ${id}`);
+    const { error } = await dbClient.from('showcase').delete().eq('id', id);
     if (error) handleError(error);
   }
 };
@@ -196,19 +234,18 @@ export const showcaseService = {
 // ==========================================
 export const visualBlocksService = {
   async getAll(): Promise<any[]> {
-    const { data, error } = await supabase.from('visual_blocks').select('*').order('position', { ascending: true });
+    console.log('FETCHING: All visual blocks');
+    const { data, error } = await dbClient.from('visual_blocks').select('*').order('position', { ascending: true });
     if (error) handleError(error);
     return data || [];
   },
   async saveAll(blocks: any[]): Promise<void> {
-    // Standard visual block sync: delete existing, insert new
-    // Bypassing RLS requires service role, else table has insert/delete rules.
-    const { error: deleteError } = await supabase.from('visual_blocks').delete().neq('id', 'placeholder-non-existent');
+    console.log('SYNCHRONIZING: Visual blocks', blocks.length);
+    const { error: deleteError } = await dbClient.from('visual_blocks').delete().neq('id', 'placeholder-non-existent');
     if (deleteError) handleError(deleteError);
     if (blocks.length > 0) {
-      const { error: insertError } = await supabase.from('visual_blocks').insert(blocks);
+      const { error: insertError } = await dbClient.from('visual_blocks').insert(blocks);
       if (insertError) handleError(insertError);
     }
   }
 };
-

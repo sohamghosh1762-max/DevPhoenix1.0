@@ -1,4 +1,6 @@
-import { supabase } from './client';
+import { supabase, supabaseAdmin, hasAdminConfig } from './client';
+
+const dbClient = hasAdminConfig ? supabaseAdmin : supabase;
 
 export const storageService = {
   /**
@@ -13,16 +15,19 @@ export const storageService = {
     const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
     const filePath = `${folder}/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
+    console.log(`STORAGE UPLOAD: Uploading ${file.name} to bucket = ${bucket}, path = ${filePath}`);
+
+    const { error: uploadError } = await dbClient.storage
       .from(bucket)
       .upload(filePath, file, { upsert: true });
 
     if (uploadError) {
       console.error('Upload Error:', uploadError);
-      throw new Error('Failed to upload image');
+      throw new Error(`Failed to upload image: ${uploadError.message}`);
     }
 
-    const { data } = supabase.storage.from(bucket).getPublicUrl(filePath);
+    const { data } = dbClient.storage.from(bucket).getPublicUrl(filePath);
+    console.log(`STORAGE UPLOAD SUCCESS: Public URL = ${data.publicUrl}`);
     return data.publicUrl;
   },
 
@@ -33,16 +38,18 @@ export const storageService = {
    */
   async deleteFile(publicUrl: string, bucket: string = 'media'): Promise<void> {
     try {
+      console.log(`STORAGE DELETE: Attempting to remove publicUrl = ${publicUrl} from bucket = ${bucket}`);
       // Extract file path from public URL
       const urlParts = publicUrl.split(`/${bucket}/`);
       if (urlParts.length < 2) throw new Error('Invalid public URL');
       const filePath = urlParts[1];
 
-      const { error } = await supabase.storage.from(bucket).remove([filePath]);
+      const { error } = await dbClient.storage.from(bucket).remove([filePath]);
       if (error) throw error;
-    } catch (err) {
+      console.log(`STORAGE DELETE SUCCESS: Path = ${filePath} removed successfully.`);
+    } catch (err: any) {
       console.error('Delete Error:', err);
-      throw new Error('Failed to delete image');
+      throw new Error(`Failed to delete image: ${err.message}`);
     }
   }
 };

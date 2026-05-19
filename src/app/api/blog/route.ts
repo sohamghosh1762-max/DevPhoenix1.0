@@ -34,9 +34,14 @@ function write(d: any[]) {
   writeFileSync(FILE_PATH, JSON.stringify(d, null, 2));
 }
 
+if (!hasSupabaseConfig) {
+  console.warn('⚠️ WARNING [Blog API]: Supabase keys missing. Falling back to local JSON persistence.');
+}
+
 export async function GET() {
   if (hasSupabaseConfig) {
     try {
+
       const items = await blogsService.getAll();
       return NextResponse.json(items);
     } catch (err: any) {

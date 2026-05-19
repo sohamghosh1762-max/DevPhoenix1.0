@@ -16,8 +16,13 @@ function readLocalPrograms() {
 function writeLocalPrograms(data: any[]) { writeFileSync(PROGRAMS_PATH, JSON.stringify(data, null, 2)); }
 
 
+if (!hasSupabaseConfig) {
+  console.warn('⚠️ WARNING [Programs API]: Supabase keys missing. Falling back to local JSON persistence.');
+}
+
 export async function GET() {
   if (!hasSupabaseConfig) {
+
     return NextResponse.json(readLocalPrograms());
   }
 

@@ -19,8 +19,13 @@ function writeLeads(data: Lead[]) {
   writeFileSync(FILE_PATH, JSON.stringify(data, null, 2));
 }
 
+if (!hasSupabaseConfig) {
+  console.warn('⚠️ WARNING [Leads API]: Supabase keys missing. Falling back to local JSON persistence.');
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+
   const status = searchParams.get('status');
   const search = searchParams.get('search');
   
