@@ -238,3 +238,36 @@ ON storage.objects
 FOR DELETE
 TO authenticated
 USING (bucket_id = 'media');
+
+
+-- LEARNING PATHS TABLE
+CREATE TABLE IF NOT EXISTS public.learning_paths (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    level TEXT DEFAULT 'All Levels',
+    duration TEXT,
+    image TEXT,
+    included TEXT[] DEFAULT '{}',
+    build JSONB DEFAULT '[]'::jsonb,
+    tags TEXT[] DEFAULT '{}',
+    modules JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS
+ALTER TABLE public.learning_paths ENABLE ROW LEVEL SECURITY;
+
+-- Idempotent RLS Policies
+DROP POLICY IF EXISTS "Allow public read-only access to learning_paths" ON public.learning_paths;
+CREATE POLICY "Allow public read-only access to learning_paths"
+    ON public.learning_paths FOR SELECT
+    USING (true);
+
+DROP POLICY IF EXISTS "Allow authenticated admin write access to learning_paths" ON public.learning_paths;
+CREATE POLICY "Allow authenticated admin write access to learning_paths"
+    ON public.learning_paths FOR ALL
+    USING (true)
+    WITH CHECK (true);
+

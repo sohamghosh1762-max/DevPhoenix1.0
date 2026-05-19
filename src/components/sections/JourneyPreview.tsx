@@ -60,7 +60,8 @@ export function JourneyPreview() {
   const [visualBlocks, setVisualBlocks] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch('/api/visual-blocks')
+    fetch('/api/visual-blocks', { cache: 'no-store' })
+
       .then(r => r.json())
       .then(d => {
         if (Array.isArray(d)) {

@@ -4,6 +4,9 @@ import { join } from 'path';
 import { storageService } from '@/services/supabase/storage.service';
 import { hasSupabaseConfig } from '@/services/supabase/client';
 
+export const dynamic = 'force-dynamic';
+
+
 // ── Collect all image URLs referenced in data files ────────────────────────────
 function harvestDataImages(): { name: string; url: string; folder: string; source: string }[] {
   const results: { name: string; url: string; folder: string; source: string }[] = [];

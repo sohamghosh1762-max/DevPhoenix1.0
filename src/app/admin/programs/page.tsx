@@ -2,10 +2,19 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit2, Trash2, Search, GraduationCap, ChevronDown, ChevronUp, BookOpen, HelpCircle, DollarSign, ExternalLink } from 'lucide-react';
-import FormModal, { Field, Input, Textarea, Select } from '@/components/admin/FormModal';
+import FormModal, { Field } from '@/components/admin/FormModal';
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Input, Textarea, Select } from "@/components/ui/FormElements";
+import { PremiumEmptyState } from "@/components/ui/PremiumEmptyState";
+import { designSystem } from "@/lib/design-system";
 import ImagePicker from '@/components/admin/ImagePicker';
 import VisualBlockManager from '@/components/admin/VisualBlockManager';
 import Link from 'next/link';
+import { showToast } from '@/components/ui/PremiumToast';
+import { ConfirmDeleteModal } from '@/components/admin/ConfirmDeleteModal';
+
 
 const EMPTY_MODULE = { week: '', title: '', topics: '' };
 const EMPTY_FAQ = { question: '', answer: '' };
@@ -30,12 +39,14 @@ export default function AdminPrograms() {
   const [form, setForm] = useState<any>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>('basic');
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   // ── curriculum editing state ──
   const [newModule, setNewModule] = useState(EMPTY_MODULE);
   const [newFaq, setNewFaq] = useState(EMPTY_FAQ);
 
-  const load = () => fetch('/api/programs').then(r => r.json()).then(d => setPrograms(Array.isArray(d) ? d : [])).catch(() => {});
+  const load = () => fetch('/api/programs', { cache: 'no-store' }).then(r => r.json()).then(d => setPrograms(Array.isArray(d) ? d : [])).catch(() => {});
+
   useEffect(() => { load(); }, []);
 
   const openNew = () => {
@@ -62,8 +73,21 @@ export default function AdminPrograms() {
   };
 
   const handleSave = async () => {
+    if (!form.title?.trim()) {
+      showToast('Program title is required!', 'error');
+      return;
+    }
     setLoading(true);
-    const slug = form.slug || form.id || form.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    
+    // Auto-clean & format slug safely
+    const rawSlug = form.slug || form.title;
+    const slug = String(rawSlug)
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-');
+
     const payload = {
       ...form,
       slug,
@@ -80,18 +104,42 @@ export default function AdminPrograms() {
       },
     };
     const method = editing ? 'PUT' : 'POST';
-    await fetch('/api/programs', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    setModalOpen(false);
-    setLoading(false);
-    setNewModule(EMPTY_MODULE);
-    setNewFaq(EMPTY_FAQ);
-    load();
+    try {
+      const res = await fetch('/api/programs', { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error();
+      showToast(`Program "${form.title}" saved successfully!`, 'success');
+      setModalOpen(false);
+      setNewModule(EMPTY_MODULE);
+      setNewFaq(EMPTY_FAQ);
+      load();
+    } catch {
+      showToast('Failed to save program details.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this program?')) return;
-    await fetch('/api/programs', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-    load();
+  const handleDelete = (id: string) => {
+    setConfirmDeleteId(id);
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
+
+    const original = [...programs];
+    setPrograms(prev => prev.filter(p => p.id !== id));
+    showToast('Program deleted successfully', 'success');
+
+    try {
+      const res = await fetch('/api/programs', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      if (!res.ok) throw new Error();
+      load();
+    } catch {
+      setPrograms(original);
+      showToast('Error deleting program, restored.', 'error');
+    }
   };
 
   // ── Curriculum helpers ──
@@ -131,79 +179,125 @@ export default function AdminPrograms() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className={`${designSystem.spacing.containerMaxWidth} py-8`}>
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Programs</h1>
-          <p className="text-slate-500 mt-1">{programs.length} programs • {programs.filter(p => p.type === 'Premium').length} Premium</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Programs</h1>
+          <p className="text-sm text-slate-500 mt-1">{programs.length} programs &bull; {programs.filter(p => p.type === 'Premium').length} Premium</p>
         </div>
-        <button onClick={openNew} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all">
-          <Plus className="w-4 h-4" /> Add Program
-        </button>
+        <Button onClick={openNew} icon={<Plus className="w-4 h-4" />}>
+          Add Program
+        </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-8">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search programs..." className="w-full h-10 pl-9 pr-4 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search programs..."
+            className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all"
+          />
         </div>
-        {['All', 'Premium', 'Industrial'].map(fl => (
-          <button key={fl} onClick={() => setFilter(fl)} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filter === fl ? 'bg-orange-500 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}>{fl}</button>
-        ))}
+        <div className="flex gap-2">
+          {['All', 'Premium', 'Industrial'].map(fl => (
+            <Button
+              key={fl}
+              onClick={() => setFilter(fl)}
+              variant={filter === fl ? 'primary' : 'secondary'}
+              size="sm"
+            >
+              {fl}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <AnimatePresence>
           {filtered.map(p => (
-            <motion.div key={p.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden group"
+            <motion.div
+              key={p.id}
+              layout
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <div className="relative h-36 bg-slate-100">
-                {p.image && <img src={p.image} alt={p.title} className="w-full h-full object-cover" />}
-                <div className="absolute top-2 right-2">
-                  <span className={`text-xs font-bold px-2 py-1 rounded-full ${p.type === 'Premium' ? 'bg-orange-500 text-white' : 'bg-slate-700 text-white'}`}>{p.type}</span>
+              <Card variant="glow" padding="none" className="h-full flex flex-col group border border-slate-100/80 animate-[fadeIn_0.4s_ease-out]">
+                <div className="relative h-44 bg-slate-50 overflow-hidden">
+                  {p.image ? (
+                    <img src={p.image} alt={p.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  ) : (
+                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400">
+                      <GraduationCap className="w-8 h-8 opacity-40 animate-pulse" />
+                    </div>
+                  )}
+                  <div className="absolute top-3 right-3 z-10">
+                    <Badge variant={p.type === 'Premium' ? 'orange' : 'default'}>{p.type}</Badge>
+                  </div>
+                  {/* Curriculum badge */}
+                  {p.curriculum?.length > 0 && (
+                    <div className="absolute bottom-3 left-3 z-10">
+                      <Badge variant="success">{p.curriculum.length} Modules</Badge>
+                    </div>
+                  )}
                 </div>
-                {/* Curriculum badge */}
-                {p.curriculum?.length > 0 && (
-                  <div className="absolute bottom-2 left-2">
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-green-500 text-white">{p.curriculum.length} modules</span>
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <h3 className="font-extrabold text-slate-900 mb-1">{p.title}</h3>
-                <p className="text-xs text-slate-500 line-clamp-2 mb-3">{p.description}</p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-sm font-bold text-orange-600">{p.pricingDetails?.discountedPrice || p.price}</span>
-                    {p.pricingDetails?.originalPrice && <span className="text-xs text-slate-400 line-through ml-2">{p.pricingDetails.originalPrice}</span>}
-                  </div>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Link href={`/programs/${p.slug || p.id}`} target="_blank" className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-blue-50 flex items-center justify-center transition-colors">
-                      <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
-                    </Link>
-                    <button onClick={() => openEdit(p)} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-50 flex items-center justify-center transition-colors">
-                      <Edit2 className="w-3.5 h-3.5 text-slate-600" />
-                    </button>
-                    <button onClick={() => handleDelete(p.id)} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 flex items-center justify-center transition-colors">
-                      <Trash2 className="w-3.5 h-3.5 text-red-400" />
-                    </button>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="font-extrabold text-slate-900 mb-2 leading-snug">{p.title}</h3>
+                  <p className="text-xs text-slate-500 line-clamp-2 mb-4 leading-relaxed">{p.description}</p>
+                  
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                    <div>
+                      <span className="text-base font-extrabold text-orange-600">{p.pricingDetails?.discountedPrice || p.price}</span>
+                      {p.pricingDetails?.originalPrice && (
+                        <span className="text-xs text-slate-400 line-through ml-2">{p.pricingDetails.originalPrice}</span>
+                      )}
+                    </div>
+                    
+                    <div className="flex gap-1.5">
+                      <Link
+                        href={`/programs/${p.slug || p.id}`}
+                        target="_blank"
+                        className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-blue-50 flex items-center justify-center transition-colors"
+                        title="View Live Detail Page"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-blue-500" />
+                      </Link>
+                      <button
+                        onClick={() => openEdit(p)}
+                        className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-orange-50 flex items-center justify-center transition-colors"
+                        title="Edit Program"
+                      >
+                        <Edit2 className="w-3.5 h-3.5 text-slate-600" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-red-50 flex items-center justify-center transition-colors"
+                        title="Delete Program"
+                      >
+                        <Trash2 className="w-3.5 h-3.5 text-red-400" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             </motion.div>
           ))}
         </AnimatePresence>
-        {filtered.length === 0 && (
-          <div className="col-span-3 py-16 text-center text-slate-400">
-            <GraduationCap className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="font-medium">No programs found.</p>
-          </div>
-        )}
       </div>
+
+      {filtered.length === 0 && (
+        <PremiumEmptyState
+          title="No Programs Found"
+          description="Try broadening your search term or filtering options."
+          icon={GraduationCap}
+        />
+      )}
 
       {/* Modal with tabs */}
       <FormModal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? `Edit: ${editing.title}` : 'Add New Program'} onSubmit={handleSave} loading={loading}>
@@ -353,6 +447,14 @@ export default function AdminPrograms() {
           subtitle="Manage learning badges, sidebar visual blocks, and detail-page graphic panels."
         />
       </div>
+
+      <ConfirmDeleteModal
+        isOpen={confirmDeleteId !== null}
+        title="Delete Program"
+        message="Are you sure you want to permanently delete this program? All curriculum and FAQ details will be lost forever."
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }

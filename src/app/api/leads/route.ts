@@ -1,179 +1,169 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
-import { Lead, LeadNote } from '@/types';
-import { leadsService } from '@/services/supabase/db.service';
-import { hasSupabaseConfig } from '@/services/supabase/client';
+import { NextRequest } from "next/server";
+import { leadsService } from "@/services/supabase/db.service";
+import { hasSupabaseConfig } from "@/services/supabase/client";
+import { apiResponse, getLocalCacheHelper } from "@/lib/api-utils";
+import { LeadCMS } from "@/types/cms-schema";
 
-const FILE_PATH = join(process.cwd(), 'src/data/leads.json');
+export const dynamic = "force-dynamic";
 
-function readLeads(): Lead[] {
-  try {
-    return JSON.parse(readFileSync(FILE_PATH, 'utf-8'));
-  } catch {
-    return [];
-  }
-}
-
-function writeLeads(data: Lead[]) {
-  writeFileSync(FILE_PATH, JSON.stringify(data, null, 2));
-}
-
-if (!hasSupabaseConfig) {
-  console.warn('⚠️ WARNING [Leads API]: Supabase keys missing. Falling back to local JSON persistence.');
-}
+const cache = getLocalCacheHelper<LeadCMS>("leads.json");
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+  try {
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get("status");
+    const search = searchParams.get("search");
 
-  const status = searchParams.get('status');
-  const search = searchParams.get('search');
-  
-  let leads: Lead[] = [];
-  if (hasSupabaseConfig) {
-    try {
-      leads = await leadsService.getAll();
-    } catch (err: any) {
-      console.error('Supabase leads GET error, falling back to local:', err);
-      leads = readLeads();
+    let leads: LeadCMS[] = [];
+    if (hasSupabaseConfig) {
+      try {
+        leads = await leadsService.getAll();
+      } catch (err) {
+        console.error("Supabase leads GET error, falling back to local cache:", err);
+        leads = cache.read();
+      }
+    } else {
+      leads = cache.read();
     }
-  } else {
-    leads = readLeads();
-  }
 
-  if (status && status !== 'All') leads = leads.filter(l => l.status === status);
-  if (search) {
-    const q = search.toLowerCase();
-    leads = leads.filter(l => 
-      l.name?.toLowerCase().includes(q) ||
-      l.email?.toLowerCase().includes(q) ||
-      l.phone?.includes(q) ||
-      l.program?.toLowerCase().includes(q)
-    );
+    if (status && status !== "All") {
+      leads = leads.filter((l) => l.status === status);
+    }
+    if (search) {
+      const q = search.toLowerCase();
+      leads = leads.filter(
+        (l) =>
+          l.name?.toLowerCase().includes(q) ||
+          l.email?.toLowerCase().includes(q) ||
+          l.phone?.includes(q) ||
+          l.program?.toLowerCase().includes(q)
+      );
+    }
+
+    return apiResponse.success(leads);
+  } catch (error: any) {
+    return apiResponse.error(error.message);
   }
-  return NextResponse.json(leads);
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const now = new Date().toISOString();
-  const newLead: Lead = {
-    id: `lead-${Date.now()}`,
-    name: body.name,
-    email: body.email,
-    phone: body.phone,
-    program: body.program || '',
-    currentStatus: body.currentStatus || '',
-    message: body.message || '',
-    source_page: body.source_page || '',
-    source_campaign: body.source_campaign || '',
-    status: 'New',
-    notes: [],
-    created_at: now,
-    updated_at: now,
-  };
-
-  if (hasSupabaseConfig) {
-    try {
-      const created = await leadsService.create(newLead);
-      return NextResponse.json(created, { status: 201 });
-    } catch (err: any) {
-      console.error('Supabase leads POST error, falling back to local:', err);
+  try {
+    const body = await req.json();
+    if (!body.name?.trim() || !body.email?.trim() || !body.phone?.trim()) {
+      return apiResponse.badRequest("Name, Email, and Phone are required parameters.");
     }
-  }
 
-  const leads = readLeads();
-  leads.unshift(newLead);
-  writeLeads(leads);
-  return NextResponse.json(newLead, { status: 201 });
+    const now = new Date().toISOString();
+    const newLead: LeadCMS = {
+      id: body.id || `lead-${Date.now()}`,
+      name: body.name,
+      email: body.email,
+      phone: body.phone,
+      program: body.program || "",
+      currentStatus: body.currentStatus || "",
+      message: body.message || "",
+      source_page: body.source_page || "",
+      status: "New",
+      notes: [],
+      created_at: now,
+    };
+
+    if (!hasSupabaseConfig) {
+      const list = cache.read();
+      list.unshift(newLead);
+      cache.write(list);
+      return apiResponse.success(newLead, 201);
+    }
+
+    const result = await leadsService.create(newLead);
+    return apiResponse.success(result, 201);
+  } catch (error: any) {
+    return apiResponse.error(error.message);
+  }
 }
 
 export async function PUT(req: NextRequest) {
-  const body = await req.json();
-  
-  if (hasSupabaseConfig) {
-    try {
-      let leadToUpdate: Partial<Lead> = {};
-      
-      if (body.action === 'add_note') {
-        const { data, error } = await (leadsService as any).getAll(); // Fetch all to find the specific lead
-        const existingLeads = await leadsService.getAll();
-        const found = existingLeads.find(l => l.id === body.id);
-        if (!found) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-        
-        const note: LeadNote = {
+  try {
+    const body = await req.json();
+    if (!body.id) {
+      return apiResponse.badRequest("Lead ID is required");
+    }
+
+    if (hasSupabaseConfig) {
+      const existingLeads = await leadsService.getAll();
+      const found = existingLeads.find((l) => l.id === body.id);
+      if (!found) return apiResponse.notFound("Lead not found");
+
+      let updatedPayload: any = {};
+      if (body.action === "add_note") {
+        const note = {
           id: `note-${Date.now()}`,
           content: body.note,
           created_at: new Date().toISOString(),
-          author: body.author || 'Admin',
+          author: body.author || "Admin",
         };
-        leadToUpdate = {
+        updatedPayload = {
           notes: [...(found.notes || []), note],
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         };
       } else {
-        leadToUpdate = { 
+        updatedPayload = {
           ...body,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         };
-        // Remove id and notes if present to prevent updating primary key or overwriting notes
-        delete leadToUpdate.id;
-        if (body.status) {
-          leadToUpdate.last_contacted_at = new Date().toISOString();
-        }
+        delete updatedPayload.id;
       }
-      
-      const updated = await leadsService.update(body.id, leadToUpdate);
-      return NextResponse.json(updated);
-    } catch (err: any) {
-      console.error('Supabase leads PUT error, falling back to local:', err);
-    }
-  }
 
-  // Local fallback
-  const leads = readLeads();
-  const idx = leads.findIndex(l => l.id === body.id);
-  if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  if (body.action === 'add_note') {
-    const note: LeadNote = {
-      id: `note-${Date.now()}`,
-      content: body.note,
-      created_at: new Date().toISOString(),
-      author: body.author || 'Admin',
-    };
-    leads[idx].notes = [...(leads[idx].notes || []), note];
-    leads[idx].updated_at = new Date().toISOString();
-  } else {
-    leads[idx] = { 
-      ...leads[idx], 
-      ...body,
-      notes: leads[idx].notes,
-      updated_at: new Date().toISOString(),
-    };
-    if (body.status !== leads[idx].status) {
-      leads[idx].last_contacted_at = new Date().toISOString();
+      const result = await leadsService.update(body.id, updatedPayload);
+      return apiResponse.success(result);
     }
+
+    // Local Cache Fallback
+    const list = cache.read();
+    const idx = list.findIndex((l) => l.id === body.id);
+    if (idx === -1) return apiResponse.notFound("Lead not found");
+
+    if (body.action === "add_note") {
+      const note = {
+        id: `note-${Date.now()}`,
+        content: body.note,
+        created_at: new Date().toISOString(),
+        author: body.author || "Admin",
+      };
+      list[idx].notes = [...(list[idx].notes || []), note];
+      list[idx].updated_at = new Date().toISOString();
+    } else {
+      list[idx] = {
+        ...list[idx],
+        ...body,
+        notes: list[idx].notes,
+        updated_at: new Date().toISOString(),
+      };
+    }
+
+    cache.write(list);
+    return apiResponse.success(list[idx]);
+  } catch (error: any) {
+    return apiResponse.error(error.message);
   }
-  
-  writeLeads(leads);
-  return NextResponse.json(leads[idx]);
 }
 
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
-
-  if (hasSupabaseConfig) {
-    try {
-      await leadsService.delete(id);
-      return NextResponse.json({ success: true });
-    } catch (err: any) {
-      console.error('Supabase leads DELETE error, falling back to local:', err);
+  try {
+    const { id } = await req.json();
+    if (!id) {
+      return apiResponse.badRequest("Lead ID is required");
     }
+
+    if (!hasSupabaseConfig) {
+      const list = cache.read();
+      cache.write(list.filter((l) => l.id !== id));
+      return apiResponse.success({ success: true });
+    }
+
+    await leadsService.delete(id);
+    return apiResponse.success({ success: true });
+  } catch (error: any) {
+    return apiResponse.error(error.message);
   }
-
-  const leads = readLeads();
-  writeLeads(leads.filter(l => l.id !== id));
-  return NextResponse.json({ success: true });
 }
-

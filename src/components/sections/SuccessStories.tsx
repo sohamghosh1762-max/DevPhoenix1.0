@@ -75,7 +75,7 @@ export function SuccessStories() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: idx * 0.15, duration: 0.5 }}
-            whileHover={designSystem.motion.hoverLift.whileHover}
+            whileHover={designSystem.motion.hoverLift.whileHover as any}
             className="h-full"
           >
             <TestimonialCard 

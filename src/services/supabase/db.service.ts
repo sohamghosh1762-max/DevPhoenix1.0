@@ -57,6 +57,42 @@ export const programsService = {
   }
 };
 
+// ==========================================
+// LEARNING PATHS
+// ==========================================
+export const learningPathsService = {
+  async getAll(): Promise<any[]> {
+    console.log('FETCHING: All learning paths');
+    const { data, error } = await dbClient.from('learning_paths').select('*').order('created_at', { ascending: false });
+    if (error) handleError(error);
+    return data || [];
+  },
+  async getById(id: string): Promise<any | null> {
+    console.log(`FETCHING: Learning path by id = ${id}`);
+    const { data, error } = await dbClient.from('learning_paths').select('*').eq('id', id).single();
+    if (error && error.code !== 'PGRST116') handleError(error);
+    return data;
+  },
+  async create(path: Partial<any>): Promise<any> {
+    console.log('CREATING: Learning path', path.id);
+    const { data, error } = await dbClient.from('learning_paths').insert(path).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async update(id: string, path: Partial<any>): Promise<any> {
+    console.log(`UPDATING: Learning path id = ${id}`);
+    const { data, error } = await dbClient.from('learning_paths').update(path).eq('id', id).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async delete(id: string): Promise<void> {
+    console.log(`DELETING: Learning path id = ${id}`);
+    const { error } = await dbClient.from('learning_paths').delete().eq('id', id);
+    if (error) handleError(error);
+  }
+};
+
+
 
 // ==========================================
 // BLOGS

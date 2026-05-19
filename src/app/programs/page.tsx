@@ -4,17 +4,37 @@ import { motion } from "framer-motion";
 import { Clock, Briefcase, CheckCircle2, ChevronRight, Award, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { programsData, valueFeatures } from "@/data/programs";
+import { useEffect, useState } from "react";
+import { programsData } from "@/data/programs";
 import Navbar from "@/components/layout/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { SectionWrapper } from "@/components/sections/SectionWrapper";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { GlowCard } from "@/components/ui/GlowCard";
 import { designSystem } from "@/lib/design-system";
+import { PremiumEmptyState } from "@/components/ui/PremiumEmptyState";
+
 
 export default function ProgramsPage() {
-  const premiumPrograms = programsData.filter(p => p.type === 'Premium');
-  const industrialPrograms = programsData.filter(p => p.type === 'Industrial');
+  const [programs, setPrograms] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/programs', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPrograms(data);
+        } else {
+          setPrograms(programsData);
+        }
+      })
+      .catch(() => {
+        setPrograms(programsData);
+      });
+  }, []);
+
+  const premiumPrograms = programs.filter(p => p.type === 'Premium');
+  const industrialPrograms = programs.filter(p => p.type === 'Industrial');
 
   return (
     <>
@@ -98,94 +118,107 @@ export default function ProgramsPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
-              {premiumPrograms.map((prog, idx) => (
-                <GlowCard key={prog.id} glowColor="orange" customSize className="w-full">
-                  <div className="flex flex-col h-full z-10 p-2">
-                    
-                    {/* Image Area */}
-                    <div className="w-full h-56 rounded-2xl bg-slate-100 mb-6 overflow-hidden relative border border-slate-200">
-                      <Image 
-                        src={prog.image} 
-                        alt={prog.title} 
-                        fill 
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover hover:scale-105 transition-transform duration-700"
-                      />
-                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm border border-white/20">
-                         <Award className="w-4 h-4 text-green-600" />
-                         <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">Certificate</span>
+            {premiumPrograms.length === 0 ? (
+              <PremiumEmptyState
+                title="No Premium Programs Available"
+                description="Our educational engineers are currently compiling new premium career pathways. Check back soon!"
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
+                {premiumPrograms.map((prog, idx) => (
+                  <GlowCard key={prog.id} glowColor="orange" customSize className="w-full">
+                    <div className="flex flex-col h-full z-10 p-2">
+                      
+                      {/* Image Area */}
+                      {prog.image && (
+                        <div className="w-full h-56 rounded-2xl bg-slate-100 mb-6 overflow-hidden relative border border-slate-200">
+                          <Image 
+                            src={prog.image} 
+                            alt={prog.title} 
+                            fill 
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="object-cover hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm border border-white/20">
+                             <Award className="w-4 h-4 text-green-600" />
+                             <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">Certificate</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Meta Header */}
+                      <div className="flex items-center justify-between mb-4">
+                         <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-orange-100 text-orange-700">
+                           Premium Program
+                         </span>
+                         <span className="text-lg font-extrabold text-slate-900">{prog.price}</span>
                       </div>
-                    </div>
 
-                    {/* Meta Header */}
-                    <div className="flex items-center justify-between mb-4">
-                       <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-orange-100 text-orange-700">
-                         Premium Program
-                       </span>
-                       <span className="text-lg font-extrabold text-slate-900">{prog.price}</span>
-                    </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">{prog.title}</h3>
+                      <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-grow">{prog.description}</p>
+                      
+                      {/* Tags */}
+                      {Array.isArray(prog.tags) && (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {prog.tags.map((tag: string, i: number) => (
+                            <span key={i} className="text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3">{prog.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-grow">{prog.description}</p>
-                    
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {prog.tags.map((tag, i) => (
-                        <span key={i} className="text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                            <Clock className="w-4 h-4" />
-                         </div>
-                         <div className="flex flex-col">
-                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Duration</span>
-                           <span className="text-sm font-bold text-slate-700">{prog.duration}</span>
-                         </div>
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                              <Clock className="w-4 h-4" />
+                           </div>
+                           <div className="flex flex-col">
+                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Duration</span>
+                             <span className="text-sm font-bold text-slate-700">{prog.duration}</span>
+                           </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                              <Briefcase className="w-4 h-4" />
+                           </div>
+                           <div className="flex flex-col">
+                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Practical</span>
+                             <span className="text-sm font-bold text-slate-700">{prog.practicalHours}</span>
+                           </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                            <Briefcase className="w-4 h-4" />
-                         </div>
-                         <div className="flex flex-col">
-                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Practical</span>
-                           <span className="text-sm font-bold text-slate-700">{prog.practicalHours}</span>
-                         </div>
+
+                      {Array.isArray(prog.outcomes) && (
+                        <div className="mb-8">
+                          <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">Key Outcomes</p>
+                          <ul className="space-y-2">
+                            {prog.outcomes.slice(0, 3).map((outcome: string, i: number) => (
+                              <li key={i} className="flex items-start gap-2 text-sm font-medium text-slate-600">
+                                <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                                {outcome}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* CTA Footer */}
+                      <div className="mt-auto pt-6 border-t border-slate-100 flex items-center gap-4">
+                        <button className="flex-1 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-orange-500 transition-colors shadow-sm text-center">
+                          Enroll Now
+                        </button>
+                        <Link href={`/programs/${prog.slug || prog.id}`} className="flex-1 py-3 border-2 border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1">
+                          Syllabus <ChevronRight className="w-4 h-4" />
+                        </Link>
                       </div>
-                    </div>
 
-                    <div className="mb-8">
-                      <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">Key Outcomes</p>
-                      <ul className="space-y-2">
-                        {prog.outcomes.slice(0, 3).map((outcome, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm font-medium text-slate-600">
-                            <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                            {outcome}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
-
-                    {/* CTA Footer */}
-                    <div className="mt-auto pt-6 border-t border-slate-100 flex items-center gap-4">
-                      <button className="flex-1 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-orange-500 transition-colors shadow-sm text-center">
-                        Enroll Now
-                      </button>
-                      <Link href={`/programs/${(prog as any).slug || prog.id}`} className="flex-1 py-3 border-2 border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1">
-                        Syllabus <ChevronRight className="w-4 h-4" />
-                      </Link>
-                    </div>
-
-                  </div>
-                </GlowCard>
-              ))}
-            </div>
+                  </GlowCard>
+                ))}
+              </div>
+            )}
           </div>
         </SectionWrapper>
 
@@ -201,94 +234,107 @@ export default function ProgramsPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
-              {industrialPrograms.map((prog, idx) => (
-                <GlowCard key={prog.id} glowColor="orange" customSize className="w-full">
-                  <div className="flex flex-col h-full z-10 p-2">
-                    
-                    {/* Image Area */}
-                    <div className="w-full h-56 rounded-2xl bg-slate-100 mb-6 overflow-hidden relative border border-slate-200">
-                      <Image 
-                        src={prog.image} 
-                        alt={prog.title} 
-                        fill 
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover hover:scale-105 transition-transform duration-700"
-                      />
-                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm border border-white/20">
-                         <Award className="w-4 h-4 text-green-600" />
-                         <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">Certificate</span>
+            {industrialPrograms.length === 0 ? (
+              <PremiumEmptyState
+                title="No Industrial Programs Available"
+                description="Accelerated training batches are currently being scheduled with our corporate partners. Check back soon!"
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
+                {industrialPrograms.map((prog, idx) => (
+                  <GlowCard key={prog.id} glowColor="orange" customSize className="w-full">
+                    <div className="flex flex-col h-full z-10 p-2">
+                      
+                      {/* Image Area */}
+                      {prog.image && (
+                        <div className="w-full h-56 rounded-2xl bg-slate-100 mb-6 overflow-hidden relative border border-slate-200">
+                          <Image 
+                            src={prog.image} 
+                            alt={prog.title} 
+                            fill 
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            className="object-cover hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm border border-white/20">
+                             <Award className="w-4 h-4 text-green-600" />
+                             <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">Certificate</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Meta Header */}
+                      <div className="flex items-center justify-between mb-4">
+                         <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-slate-100 text-slate-700">
+                           Industrial Training
+                         </span>
+                         <span className="text-lg font-extrabold text-slate-900">{prog.price}</span>
                       </div>
-                    </div>
 
-                    {/* Meta Header */}
-                    <div className="flex items-center justify-between mb-4">
-                       <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-slate-100 text-slate-700">
-                         Industrial Training
-                       </span>
-                       <span className="text-lg font-extrabold text-slate-900">{prog.price}</span>
-                    </div>
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3">{prog.title}</h3>
+                      <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-grow">{prog.description}</p>
+                      
+                      {/* Tags */}
+                      {Array.isArray(prog.tags) && (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {prog.tags.map((tag: string, i: number) => (
+                            <span key={i} className="text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
-                    <h3 className="text-2xl font-bold text-slate-900 mb-3">{prog.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed mb-6 flex-grow">{prog.description}</p>
-                    
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {prog.tags.map((tag, i) => (
-                        <span key={i} className="text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Stats Grid */}
-                    <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                      <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                            <Clock className="w-4 h-4" />
-                         </div>
-                         <div className="flex flex-col">
-                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Duration</span>
-                           <span className="text-sm font-bold text-slate-700">{prog.duration}</span>
-                         </div>
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                              <Clock className="w-4 h-4" />
+                           </div>
+                           <div className="flex flex-col">
+                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Duration</span>
+                             <span className="text-sm font-bold text-slate-700">{prog.duration}</span>
+                           </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                              <Briefcase className="w-4 h-4" />
+                           </div>
+                           <div className="flex flex-col">
+                             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Practical</span>
+                             <span className="text-sm font-bold text-slate-700">{prog.practicalHours}</span>
+                           </div>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                         <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-                            <Briefcase className="w-4 h-4" />
-                         </div>
-                         <div className="flex flex-col">
-                           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Practical</span>
-                           <span className="text-sm font-bold text-slate-700">{prog.practicalHours}</span>
-                         </div>
+
+                      {Array.isArray(prog.outcomes) && (
+                        <div className="mb-8">
+                          <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">Key Outcomes</p>
+                          <ul className="space-y-2">
+                            {prog.outcomes.slice(0, 3).map((outcome: string, i: number) => (
+                              <li key={i} className="flex items-start gap-2 text-sm font-medium text-slate-600">
+                                <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                                {outcome}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* CTA Footer */}
+                      <div className="mt-auto pt-6 border-t border-slate-100 flex items-center gap-4">
+                        <button className="flex-1 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-orange-500 transition-colors shadow-sm text-center">
+                          Enroll Now
+                        </button>
+                        <Link href={`/programs/${prog.slug || prog.id}`} className="flex-1 py-3 border-2 border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1">
+                          Syllabus <ChevronRight className="w-4 h-4" />
+                        </Link>
                       </div>
-                    </div>
 
-                    <div className="mb-8">
-                      <p className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-3">Key Outcomes</p>
-                      <ul className="space-y-2">
-                        {prog.outcomes.slice(0, 3).map((outcome, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm font-medium text-slate-600">
-                            <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
-                            {outcome}
-                          </li>
-                        ))}
-                      </ul>
                     </div>
-
-                    {/* CTA Footer */}
-                    <div className="mt-auto pt-6 border-t border-slate-100 flex items-center gap-4">
-                      <button className="flex-1 py-3 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-orange-500 transition-colors shadow-sm text-center">
-                        Enroll Now
-                      </button>
-                      <Link href={`/programs/${(prog as any).slug || prog.id}`} className="flex-1 py-3 border-2 border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:border-slate-300 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1">
-                        Syllabus <ChevronRight className="w-4 h-4" />
-                      </Link>
-                    </div>
-
-                  </div>
-                </GlowCard>
-              ))}
-            </div>
+                  </GlowCard>
+                ))}
+              </div>
+            )}
           </div>
         </SectionWrapper>
         

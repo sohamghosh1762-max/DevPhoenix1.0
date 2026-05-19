@@ -14,7 +14,8 @@ export default function AdminTestimonials() {
   const [loading, setLoading] = useState(false);
 
   const load = async () => {
-    const dynamic = await fetch('/api/testimonials').then(r => r.json()).catch(() => []);
+    const dynamic = await fetch('/api/testimonials', { cache: 'no-store' }).then(r => r.json()).catch(() => []);
+
     // Merge static + dynamic
     const all = [...staticTestimonials.map(t => ({ ...t, source: 'static' })), ...(Array.isArray(dynamic) ? dynamic.map((t: any) => ({ ...t, source: 'dynamic' })) : [])];
     setItems(all);

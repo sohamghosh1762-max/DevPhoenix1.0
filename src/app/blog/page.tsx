@@ -12,12 +12,13 @@ import { blogPosts as staticBlogPosts } from "@/data/blog";
 import { designSystem } from "@/lib/design-system";
 import { SchemaCard } from "@/components/ui/SchemaCard";
 import { BlogCard } from "@/components/cards/BlogCard";
+import { PremiumEmptyState } from "@/components/ui/PremiumEmptyState";
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<any[]>(staticBlogPosts);
 
   useEffect(() => {
-    fetch('/api/blog')
+    fetch('/api/blog', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
         if (Array.isArray(d) && d.length > 0) {
@@ -68,20 +69,29 @@ export default function BlogPage() {
 
         {/* Blog Grid */}
         <SectionWrapper background="white">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {posts.map((post, idx) => (
-              <motion.div 
-                key={post.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1, duration: 0.5 }}
-                whileHover={{ y: -6, transition: { duration: 0.3 } }}
-                className="h-full"
-              >
-                <BlogCard post={post as any} className="h-full" />
-              </motion.div>
-            ))}
+          <div className="max-w-7xl mx-auto">
+            {posts.length === 0 ? (
+              <PremiumEmptyState
+                title="No Articles Published Yet"
+                description="Our tech writers are in the lab building case studies and guides. Join our newsletter to get notified on launch!"
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {posts.map((post, idx) => (
+                  <motion.div 
+                    key={post.slug || post.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1, duration: 0.5 }}
+                    whileHover={{ y: -6, transition: { duration: 0.3 } }}
+                    className="h-full"
+                  >
+                    <BlogCard post={post as any} className="h-full" />
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </SectionWrapper>
 
@@ -90,3 +100,4 @@ export default function BlogPage() {
     </>
   );
 }
+

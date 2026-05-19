@@ -1,108 +1,116 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { blogPosts } from '@/data/blog';
-import { blogsService } from '@/services/supabase/db.service';
-import { hasSupabaseConfig } from '@/services/supabase/client';
+import { NextRequest } from "next/server";
+import { blogPosts } from "@/data/blog";
+import { blogsService } from "@/services/supabase/db.service";
+import { hasSupabaseConfig } from "@/services/supabase/client";
+import { apiResponse, getLocalCacheHelper, slugify } from "@/lib/api-utils";
+import { BlogCMS } from "@/types/cms-schema";
 
-const FILE_PATH = join(process.cwd(), 'src/data/blog-dynamic.json');
+export const dynamic = "force-dynamic";
 
-const INITIAL_SEED = blogPosts.map((post, idx) => ({
+const INITIAL_SEED: BlogCMS[] = blogPosts.map((post, idx) => ({
   id: `blog-static-${idx}`,
-  createdAt: new Date(Date.now() - idx * 24 * 60 * 60 * 1000).toISOString(),
-  ...post
+  created_at: new Date(Date.now() - idx * 24 * 60 * 60 * 1000).toISOString(),
+  title: post.title,
+  slug: post.slug,
+  excerpt: post.excerpt,
+  content: post.content,
+  category: post.category,
+  readTime: post.readTime,
+  date: post.date,
+  image: post.image,
+  published: true,
+  author: post.author,
 }));
 
-function read() {
-  if (!existsSync(FILE_PATH)) {
-    writeFileSync(FILE_PATH, JSON.stringify(INITIAL_SEED, null, 2));
-    return INITIAL_SEED;
-  }
-  try {
-    const data = JSON.parse(readFileSync(FILE_PATH, 'utf-8'));
-    if (!Array.isArray(data) || data.length === 0) {
-      writeFileSync(FILE_PATH, JSON.stringify(INITIAL_SEED, null, 2));
-      return INITIAL_SEED;
-    }
-    return data;
-  } catch {
-    return INITIAL_SEED;
-  }
-}
-
-function write(d: any[]) {
-  writeFileSync(FILE_PATH, JSON.stringify(d, null, 2));
-}
-
-if (!hasSupabaseConfig) {
-  console.warn('⚠️ WARNING [Blog API]: Supabase keys missing. Falling back to local JSON persistence.');
-}
+const cache = getLocalCacheHelper<BlogCMS>("blog-dynamic.json", undefined, INITIAL_SEED);
 
 export async function GET() {
-  if (hasSupabaseConfig) {
-    try {
-
-      const items = await blogsService.getAll();
-      return NextResponse.json(items);
-    } catch (err: any) {
-      console.error('Supabase blogs GET error, falling back to local:', err);
-    }
+  if (!hasSupabaseConfig) {
+    return apiResponse.success(cache.read());
   }
-  return NextResponse.json(read());
+  try {
+    const data = await blogsService.getAll();
+    return apiResponse.success(data);
+  } catch (error: any) {
+    return apiResponse.error(error.message);
+  }
 }
 
 export async function POST(req: NextRequest) {
-  const b = await req.json();
-  const n = { id: `blog-${Date.now()}`, createdAt: new Date().toISOString(), ...b };
-
-  if (hasSupabaseConfig) {
-    try {
-      const created = await blogsService.create(n);
-      return NextResponse.json(created, { status: 201 });
-    } catch (err: any) {
-      console.error('Supabase blogs POST error, falling back to local:', err);
+  try {
+    const body = await req.json();
+    if (!body.title?.trim()) {
+      return apiResponse.badRequest("Article title is required");
     }
-  }
 
-  const items = read();
-  items.unshift(n);
-  write(items);
-  return NextResponse.json(n, { status: 201 });
+    const cleanSlug = slugify(body.slug || body.title);
+    const newPost: BlogCMS = {
+      ...body,
+      id: body.id || `blog-${Date.now()}`,
+      slug: cleanSlug,
+      created_at: new Date().toISOString(),
+    };
+
+    if (!hasSupabaseConfig) {
+      const list = cache.read();
+      list.unshift(newPost);
+      cache.write(list);
+      return apiResponse.success(newPost, 201);
+    }
+
+    const result = await blogsService.create(newPost);
+    return apiResponse.success(result, 201);
+  } catch (error: any) {
+    return apiResponse.error(error.message);
+  }
 }
 
 export async function PUT(req: NextRequest) {
-  const b = await req.json();
-
-  if (hasSupabaseConfig) {
-    try {
-      const updated = await blogsService.update(b.id, b);
-      return NextResponse.json(updated);
-    } catch (err: any) {
-      console.error('Supabase blogs PUT error, falling back to local:', err);
+  try {
+    const body = await req.json();
+    if (!body.id) {
+      return apiResponse.badRequest("Article ID is required");
     }
-  }
 
-  const items = read();
-  const i = items.findIndex((x: any) => x.id === b.id);
-  if (i === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  items[i] = { ...items[i], ...b };
-  write(items);
-  return NextResponse.json(items[i]);
+    const cleanSlug = slugify(body.slug || body.title || body.id);
+    const updatedPayload = {
+      ...body,
+      slug: cleanSlug,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (!hasSupabaseConfig) {
+      const list = cache.read();
+      const idx = list.findIndex((p) => p.id === body.id);
+      if (idx === -1) return apiResponse.notFound("Article not found");
+      list[idx] = { ...list[idx], ...updatedPayload };
+      cache.write(list);
+      return apiResponse.success(list[idx]);
+    }
+
+    const result = await blogsService.update(body.id, updatedPayload);
+    return apiResponse.success(result);
+  } catch (error: any) {
+    return apiResponse.error(error.message);
+  }
 }
 
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
-
-  if (hasSupabaseConfig) {
-    try {
-      await blogsService.delete(id);
-      return NextResponse.json({ success: true });
-    } catch (err: any) {
-      console.error('Supabase blogs DELETE error, falling back to local:', err);
+  try {
+    const { id } = await req.json();
+    if (!id) {
+      return apiResponse.badRequest("Article ID is required");
     }
+
+    if (!hasSupabaseConfig) {
+      const list = cache.read();
+      cache.write(list.filter((p) => p.id !== id));
+      return apiResponse.success({ success: true });
+    }
+
+    await blogsService.delete(id);
+    return apiResponse.success({ success: true });
+  } catch (error: any) {
+    return apiResponse.error(error.message);
   }
-
-  write(read().filter((x: any) => x.id !== id));
-  return NextResponse.json({ success: true });
 }
-

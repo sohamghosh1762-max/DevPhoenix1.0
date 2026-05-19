@@ -1,17 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import PublicChrome from "@/components/layout/PublicChrome";
+import { PremiumToastContainer } from "@/components/ui/PremiumToast";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = { variable: "font-sans" };
+const geistMono = { variable: "font-mono" };
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://devphoenix.tech'),
@@ -62,7 +55,9 @@ export default function RootLayout({
         {/* PublicChrome renders Navbar + LeadPopup only on non-admin pages */}
         <PublicChrome />
         {children}
+        <PremiumToastContainer />
       </body>
     </html>
   );
 }
+

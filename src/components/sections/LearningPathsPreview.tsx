@@ -1,14 +1,32 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { learningPathsData } from "@/data/learningPaths";
 import { SectionWrapper } from "./SectionWrapper";
 
 export function LearningPathsPreview() {
-  const previewPaths = learningPathsData.slice(0, 4);
+  const [paths, setPaths] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/learning-paths', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPaths(data);
+        } else {
+          setPaths(learningPathsData);
+        }
+      })
+      .catch(() => {
+        setPaths(learningPathsData);
+      });
+  }, []);
+
+  const previewPaths = paths.slice(0, 4);
 
   return (
     <SectionWrapper background="white">
@@ -47,7 +65,7 @@ export function LearningPathsPreview() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {previewPaths.map((path, idx) => (
           <motion.div
-            key={idx}
+            key={path.id || idx}
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -61,26 +79,30 @@ export function LearningPathsPreview() {
               <span className="text-sm font-bold text-orange-500 bg-orange-50 px-2.5 py-1 rounded-lg">{path.id}</span>
             </div>
 
-            <div className="relative w-full h-40 rounded-2xl mb-6 border border-orange-100 overflow-hidden bg-orange-50/50 group-hover:bg-orange-50 transition-colors z-10">
-              <Image 
-                src={path.image} 
-                alt={path.title} 
-                fill 
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                className="object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
-              />
-            </div>
+            {path.image && (
+              <div className="relative w-full h-40 rounded-2xl mb-6 border border-orange-100 overflow-hidden bg-orange-50/50 group-hover:bg-orange-50 transition-colors z-10">
+                <Image 
+                  src={path.image} 
+                  alt={path.title} 
+                  fill 
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
+                />
+              </div>
+            )}
 
             <h3 className="text-xl font-bold text-slate-900 mb-2 relative z-10">{path.title}</h3>
             <p className="text-slate-600 text-sm mb-6 leading-relaxed relative z-10 line-clamp-3">{path.description}</p>
             
-            <div className="mb-6 flex flex-wrap gap-2 relative z-10">
-              {path.tags.slice(0, 3).map((tag, i) => (
-                <span key={i} className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
-                  {tag}
-                </span>
-              ))}
-            </div>
+            {Array.isArray(path.tags) && path.tags.length > 0 && (
+              <div className="mb-6 flex flex-wrap gap-2 relative z-10">
+                {path.tags.slice(0, 3).map((tag: string, i: number) => (
+                  <span key={i} className="text-xs font-medium text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
 
             <Link href="/learning-paths" className="mt-auto relative z-10">
               <div className="pt-4 border-t border-slate-100 flex items-center justify-between">

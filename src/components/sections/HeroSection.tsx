@@ -44,7 +44,8 @@ export function HeroSection() {
       })
       .catch(() => {});
 
-    fetch('/api/visual-blocks')
+    fetch('/api/visual-blocks', { cache: 'no-store' })
+
       .then(r => r.json())
       .then(d => {
         if (Array.isArray(d)) {
@@ -91,7 +92,7 @@ export function HeroSection() {
           <motion.div
             initial={designSystem.motion.fadeInUp.initial}
             animate={designSystem.motion.fadeInUp.whileInView}
-            transition={designSystem.motion.fadeInUp.transition}
+            transition={designSystem.motion.fadeInUp.transition as any}
             className="flex flex-col items-start"
           >
             <motion.div

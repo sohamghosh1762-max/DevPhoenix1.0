@@ -1,9 +1,19 @@
 "use client";
+
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit2, Trash2, PenSquare } from 'lucide-react';
-import FormModal, { Field, Input, Textarea, Select } from '@/components/admin/FormModal';
+import FormModal, { Field } from '@/components/admin/FormModal';
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Input, Textarea, Select } from "@/components/ui/FormElements";
+import { PremiumEmptyState } from "@/components/ui/PremiumEmptyState";
+import { designSystem } from "@/lib/design-system";
 import ImagePicker from '@/components/admin/ImagePicker';
+import { showToast } from '@/components/ui/PremiumToast';
+import { ConfirmDeleteModal } from '@/components/admin/ConfirmDeleteModal';
+
 
 const EMPTY = { id: '', slug: '', title: '', excerpt: '', category: 'AI & Automation', readTime: '5 min read', date: '', image: '', content: '', published: true, author: { name: 'DevPhoeniX Team', role: 'Engineering', avatar: '/logo/devphoenix-logo.png' } };
 
@@ -13,8 +23,10 @@ export default function AdminBlog() {
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState<any>(EMPTY);
   const [loading, setLoading] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  const load = () => fetch('/api/blog').then(r => r.json()).then(d => setPosts(Array.isArray(d) ? d : [])).catch(() => {});
+  const load = () => fetch('/api/blog', { cache: 'no-store' }).then(r => r.json()).then(d => setPosts(Array.isArray(d) ? d : [])).catch(() => {});
+
   useEffect(() => { load(); }, []);
 
   const openNew = () => { setForm({ ...EMPTY, date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }) }); setEditing(null); setModalOpen(true); };
@@ -22,63 +34,127 @@ export default function AdminBlog() {
   const f = (field: string) => (e: any) => setForm((prev: any) => ({ ...prev, [field]: e.target.value }));
 
   const handleSave = async () => {
+    if (!form.title?.trim()) {
+      showToast('Article title is required!', 'error');
+      return;
+    }
+    if (!form.content?.trim()) {
+      showToast('Article content is required!', 'error');
+      return;
+    }
     setLoading(true);
-    const payload = { ...form, slug: form.slug || form.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') };
-    await fetch('/api/blog', { method: editing ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    setModalOpen(false); setLoading(false); load();
+
+    const rawSlug = form.slug || form.title;
+    const slug = String(rawSlug)
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')
+      .replace(/-+/g, '-');
+
+    const payload = { ...form, slug };
+    try {
+      const res = await fetch('/api/blog', { method: editing ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!res.ok) throw new Error();
+      showToast(`Article "${form.title}" published/saved successfully!`, 'success');
+      setModalOpen(false);
+      load();
+    } catch {
+      showToast('Failed to save article.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this post?')) return;
-    await fetch('/api/blog', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
-    load();
+  const handleDelete = (id: string) => {
+    setConfirmDeleteId(id);
+  };
+
+  const executeDelete = async () => {
+    if (!confirmDeleteId) return;
+    const id = confirmDeleteId;
+    setConfirmDeleteId(null);
+
+    const original = [...posts];
+    setPosts(prev => prev.filter(p => p.id !== id));
+    showToast('Article deleted successfully', 'success');
+
+    try {
+      const res = await fetch('/api/blog', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+      if (!res.ok) throw new Error();
+      load();
+    } catch {
+      setPosts(original);
+      showToast('Error deleting article, restored.', 'error');
+    }
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto">
+    <div className={`${designSystem.spacing.containerMaxWidth} py-8`}>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Blog</h1>
-          <p className="text-slate-500 mt-1">{posts.length} articles</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Blog</h1>
+          <p className="text-sm text-slate-500 mt-1">{posts.length} articles published</p>
         </div>
-        <button onClick={openNew} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all">
-          <Plus className="w-4 h-4" /> New Article
-        </button>
+        <Button onClick={openNew} icon={<Plus className="w-4 h-4" />}>
+          New Article
+        </Button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <AnimatePresence>
           {posts.map(post => (
-            <motion.div key={post.id} layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 flex items-center gap-4 group"
+            <motion.div
+              key={post.id}
+              layout
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
             >
-              {post.image && <div className="relative w-20 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-100"><img src={post.image} alt={post.title} className="w-full h-full object-cover" /></div>}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">{post.category}</span>
-                  <span className="text-xs text-slate-400">{post.readTime}</span>
+              <Card variant="glass" padding="sm" className="flex items-center gap-4 group border border-slate-100/50">
+                {post.image && (
+                  <div className="relative w-20 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-50 border border-slate-100">
+                    <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Badge variant="orange">{post.category}</Badge>
+                    <span className="text-xs text-slate-400 font-medium">{post.readTime}</span>
+                  </div>
+                  <h3 className="font-extrabold text-slate-900 truncate leading-snug">{post.title}</h3>
+                  <p className="text-xs text-slate-500 line-clamp-1 mt-0.5 leading-relaxed">{post.excerpt}</p>
                 </div>
-                <h3 className="font-extrabold text-slate-900 truncate">{post.title}</h3>
-                <p className="text-sm text-slate-500 line-clamp-1 mt-0.5">{post.excerpt}</p>
-              </div>
-              <div className="flex gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => openEdit(post)} className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-orange-50 flex items-center justify-center transition-colors">
-                  <Edit2 className="w-4 h-4 text-slate-600" />
-                </button>
-                <button onClick={() => handleDelete(post.id)} className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-50 flex items-center justify-center transition-colors">
-                  <Trash2 className="w-4 h-4 text-red-400" />
-                </button>
-              </div>
+                <div className="flex gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => openEdit(post)}
+                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-orange-50 flex items-center justify-center transition-colors"
+                    title="Edit Article"
+                  >
+                    <Edit2 className="w-4 h-4 text-slate-600" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(post.id)}
+                    className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-50 flex items-center justify-center transition-colors"
+                    title="Delete Article"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-400" />
+                  </button>
+                </div>
+              </Card>
             </motion.div>
           ))}
         </AnimatePresence>
-        {posts.length === 0 && (
-          <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-16 text-center">
-            <PenSquare className="w-10 h-10 text-slate-200 mx-auto mb-3" />
-            <p className="text-slate-500 font-medium">No articles yet. Write your first one!</p>
-          </div>
-        )}
       </div>
+
+      {posts.length === 0 && (
+        <PremiumEmptyState
+          title="No Articles Written"
+          description="Click 'New Article' to compose and publish your first industry post."
+          icon={PenSquare}
+        />
+      )}
 
       <FormModal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Edit Article' : 'New Article'} onSubmit={handleSave} loading={loading} submitLabel="Publish">
         <Field label="Title" required><Input value={form.title} onChange={f('title')} placeholder="Building AI Agents with n8n..." /></Field>
@@ -93,6 +169,14 @@ export default function AdminBlog() {
           <Textarea value={form.content} onChange={f('content')} rows={10} placeholder="<h2>Introduction</h2><p>Your article content here...</p>" className="font-mono text-xs" />
         </Field>
       </FormModal>
+
+      <ConfirmDeleteModal
+        isOpen={confirmDeleteId !== null}
+        title="Delete Article"
+        message="Are you sure you want to permanently delete this article? This action cannot be undone."
+        onConfirm={executeDelete}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
     </div>
   );
 }

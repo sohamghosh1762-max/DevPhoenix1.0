@@ -102,10 +102,15 @@ export function ProgramPricing({ program }: ProgramPricingProps) {
                   <div className="flex items-center gap-3 mt-2">
                     <span className="text-slate-400 line-through text-lg font-medium">{originalPrice}</span>
                     <span className="text-green-600 text-sm font-bold bg-green-50 px-2 py-0.5 rounded-full border border-green-100">
-                      You save {/* compute discount label inline */}
-                      {originalPrice && displayPrice
-                        ? `₹${(parseInt(originalPrice.replace(/\D/g,'')) - parseInt(displayPrice.replace(/\D/g,''))).toLocaleString('en-IN')}`
-                        : ''}
+                      You save {/* compute discount label safely */}
+                      {(() => {
+                        try {
+                          const orig = parseInt(String(originalPrice).replace(/\D/g, '')) || 0;
+                          const disp = parseInt(String(displayPrice).replace(/\D/g, '')) || 0;
+                          if (orig > disp) return `₹${(orig - disp).toLocaleString('en-IN')}`;
+                        } catch {}
+                        return '';
+                      })()}
                     </span>
                   </div>
                 )}

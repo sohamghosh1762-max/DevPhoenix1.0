@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
+export const dynamic = 'force-dynamic';
+
+
 const FILE_PATH = join(process.cwd(), 'src/data/visual-blocks-dynamic.json');
 
 const INITIAL_SEED = [

@@ -90,7 +90,7 @@ export default function VisualBlockManager({ sectionKey, title, subtitle }: Visu
   const loadBlocks = async () => {
     setLoading(true);
     try {
-      const data = await fetch('/api/visual-blocks').then(r => r.json());
+      const data = await fetch('/api/visual-blocks', { cache: 'no-store' }).then(r => r.json());
       if (Array.isArray(data)) {
         setAllBlocks(data);
       }
@@ -100,7 +100,7 @@ export default function VisualBlockManager({ sectionKey, title, subtitle }: Visu
 
   const loadMedia = async () => {
     try {
-      const data = await fetch('/api/media').then(r => r.json());
+      const data = await fetch('/api/media', { cache: 'no-store' }).then(r => r.json());
       if (Array.isArray(data)) {
         setMediaList(data);
       }

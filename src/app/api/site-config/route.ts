@@ -4,6 +4,9 @@ import { join } from 'path';
 import { siteConfigService } from '@/services/supabase/db.service';
 import { hasSupabaseConfig } from '@/services/supabase/client';
 
+export const dynamic = 'force-dynamic';
+
+
 const FILE_PATH = join(process.cwd(), 'src/data/site-config.json');
 
 function read() {

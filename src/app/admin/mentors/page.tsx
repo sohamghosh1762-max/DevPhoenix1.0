@@ -14,7 +14,8 @@ export default function AdminMentors() {
   const [form, setForm] = useState<any>(EMPTY);
   const [loading, setLoading] = useState(false);
 
-  const load = () => fetch('/api/mentors').then(r => r.json()).then(d => setMentors(Array.isArray(d) ? d : [])).catch(() => {});
+  const load = () => fetch('/api/mentors', { cache: 'no-store' }).then(r => r.json()).then(d => setMentors(Array.isArray(d) ? d : [])).catch(() => {});
+
   useEffect(() => { load(); }, []);
 
   const openNew = () => { setForm(EMPTY); setEditing(null); setModalOpen(true); };

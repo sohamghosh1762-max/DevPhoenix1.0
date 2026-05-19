@@ -4,6 +4,9 @@ import { join } from 'path';
 import { mentorsService } from '@/services/supabase/db.service';
 import { hasSupabaseConfig } from '@/services/supabase/client';
 
+export const dynamic = 'force-dynamic';
+
+
 const FILE_PATH = join(process.cwd(), 'src/data/mentors.json');
 
 function read() {

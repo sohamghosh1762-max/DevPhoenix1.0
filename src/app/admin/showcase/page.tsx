@@ -17,7 +17,8 @@ export default function AdminShowcasePage() {
 
   const load = async () => {
     setLoading(true);
-    const data = await fetch('/api/showcase').then(r => r.json()).catch(() => []);
+    const data = await fetch('/api/showcase', { cache: 'no-store' }).then(r => r.json()).catch(() => []);
+
     setItems(Array.isArray(data) ? data : []);
     setLoading(false);
   };

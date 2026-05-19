@@ -1,15 +1,49 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, Target, BookOpen, Code2, Users, Briefcase } from "lucide-react";
+import { ArrowRight, CheckCircle2, Target, BookOpen, Code2, Users, Briefcase, Bot, Settings, Zap, Layers, PieChart, Cloud, PlayCircle, Rocket } from "lucide-react";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
 import { learningPathsData } from "@/data/learningPaths";
 import Navbar from "@/components/layout/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { SectionWrapper } from "@/components/sections/SectionWrapper";
 import { designSystem } from "@/lib/design-system";
+import { PremiumEmptyState } from "@/components/ui/PremiumEmptyState";
+
+
+// Map static lucide icons for custom build indicators
+const ICON_MAP: Record<string, React.ReactNode> = {
+  'Bot': <Bot className="w-4 h-4" />,
+  'Settings': <Settings className="w-4 h-4" />,
+  'Zap': <Zap className="w-4 h-4" />,
+  'Layers': <Layers className="w-4 h-4" />,
+  'Code': <Code2 className="w-4 h-4" />,
+  'PieChart': <PieChart className="w-4 h-4" />,
+  'Cloud': <Cloud className="w-4 h-4" />,
+  'PlayCircle': <PlayCircle className="w-4 h-4" />,
+  'Rocket': <Rocket className="w-4 h-4" />,
+  'Users': <Users className="w-4 h-4" />
+};
 
 export default function LearningPathsPage() {
+  const [paths, setPaths] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/learning-paths', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setPaths(data);
+        } else {
+          setPaths(learningPathsData);
+        }
+      })
+      .catch(() => {
+        setPaths(learningPathsData);
+      });
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -41,72 +75,87 @@ export default function LearningPathsPage() {
         {/* Detailed Learning Paths */}
         <SectionWrapper background="white" className="py-24">
           <div className="flex flex-col gap-16">
-            {learningPathsData.map((path, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="bg-white rounded-[3rem] p-8 lg:p-12 border border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(249,115,22,0.08)] transition-all duration-500 relative overflow-hidden group flex flex-col lg:flex-row gap-12"
-              >
-                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            {paths.length === 0 ? (
+              <PremiumEmptyState
+                title="No Learning Paths Available"
+                description="We are currently laying out custom skill maps and paths. Join the builder community to suggest a curriculum!"
+              />
+            ) : (
+              paths.map((path, idx) => (
+                <motion.div
+                  key={path.id || idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-white rounded-[3rem] p-8 lg:p-12 border border-slate-100 shadow-[0_10px_40px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_50px_rgba(249,115,22,0.08)] transition-all duration-500 relative overflow-hidden group flex flex-col lg:flex-row gap-12"
+                >
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
 
-                <div className="lg:w-1/3 flex flex-col z-10">
-                   <span className="text-sm font-bold text-orange-500 bg-orange-50 px-3 py-1.5 rounded-lg w-max mb-4">Path {path.id}</span>
-                   <h3 className="text-3xl font-extrabold text-slate-900 mb-4">{path.title}</h3>
-                   <p className="text-slate-600 text-base leading-relaxed mb-8">{path.description}</p>
-                   
-                   <div className="relative w-full aspect-[4/3] rounded-2xl border border-orange-100 overflow-hidden bg-orange-50/50 group-hover:bg-orange-50 transition-colors">
-                     <Image 
-                       src={path.image} 
-                       alt={path.title} 
-                       fill 
-                       sizes="(max-width: 768px) 100vw, 33vw"
-                       className="object-contain p-6 group-hover:scale-105 transition-transform duration-500" 
-                     />
-                   </div>
-                </div>
+                  <div className="lg:w-1/3 flex flex-col z-10">
+                     <span className="text-sm font-bold text-orange-500 bg-orange-50 px-3 py-1.5 rounded-lg w-max mb-4">Path {path.id}</span>
+                     <h3 className="text-3xl font-extrabold text-slate-900 mb-4">{path.title}</h3>
+                     <p className="text-slate-600 text-base leading-relaxed mb-8">{path.description}</p>
+                     
+                     {path.image && (
+                       <div className="relative w-full aspect-[4/3] rounded-2xl border border-orange-100 overflow-hidden bg-orange-50/50 group-hover:bg-orange-50 transition-colors">
+                         <Image 
+                           src={path.image} 
+                           alt={path.title} 
+                           fill 
+                           sizes="(max-width: 768px) 100vw, 33vw"
+                           className="object-contain p-6 group-hover:scale-105 transition-transform duration-500" 
+                         />
+                       </div>
+                     )}
+                  </div>
 
-                <div className="lg:w-2/3 flex flex-col z-10 gap-8 lg:border-l border-slate-100 lg:pl-12">
-                   
-                   <div>
-                     <p className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Included Core Programs</p>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                       {path.included.map((item, i) => (
-                         <div key={i} className="flex items-center gap-2 bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
-                           <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
-                           <span className="text-sm font-semibold text-slate-700">{item}</span>
+                  <div className="lg:w-2/3 flex flex-col z-10 gap-8 lg:border-l border-slate-100 lg:pl-12">
+                     
+                     {Array.isArray(path.included) && path.included.length > 0 && (
+                       <div>
+                         <p className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Included Core Programs</p>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                           {path.included.map((item: string, i: number) => (
+                             <div key={i} className="flex items-center gap-2 bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
+                               <CheckCircle2 className="w-4 h-4 text-orange-500 shrink-0" />
+                               <span className="text-sm font-semibold text-slate-700">{item}</span>
+                             </div>
+                           ))}
                          </div>
-                       ))}
-                     </div>
-                   </div>
+                       </div>
+                     )}
 
-                   <div>
-                     <p className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">What You&apos;ll Build & Ship</p>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                       {path.build.map((item, i) => (
-                         <div key={i} className="flex items-center gap-4 bg-white border border-orange-100 shadow-sm rounded-xl p-4 group-hover:border-orange-200 transition-colors">
-                           <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 shadow-inner shrink-0">
-                             {item.icon}
-                           </div>
-                           <span className="text-sm font-bold text-slate-800">{item.text}</span>
+                     {Array.isArray(path.build) && path.build.length > 0 && (
+                       <div>
+                         <p className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">What You&apos;ll Build & Ship</p>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                           {path.build.map((item: any, i: number) => (
+                             <div key={i} className="flex items-center gap-4 bg-white border border-orange-100 shadow-sm rounded-xl p-4 group-hover:border-orange-200 transition-colors">
+                               <div className="w-10 h-10 rounded-lg bg-orange-50 flex items-center justify-center text-orange-600 shadow-inner shrink-0">
+                                 {ICON_MAP[item.icon] || <Code2 className="w-4 h-4" />}
+                               </div>
+                               <span className="text-sm font-bold text-slate-800">{item.text}</span>
+                             </div>
+                           ))}
                          </div>
-                       ))}
-                     </div>
-                   </div>
+                       </div>
+                     )}
 
-                   <div className="mt-auto pt-6 border-t border-slate-100 flex flex-wrap gap-3">
-                     {path.tags.map((tag, i) => (
-                       <span key={i} className="text-xs font-bold text-slate-500 uppercase bg-slate-100 px-3 py-1.5 rounded-md tracking-wider">
-                         {tag}
-                       </span>
-                     ))}
-                   </div>
+                     {Array.isArray(path.tags) && path.tags.length > 0 && (
+                       <div className="mt-auto pt-6 border-t border-slate-100 flex flex-wrap gap-3">
+                         {path.tags.map((tag: string, i: number) => (
+                           <span key={i} className="text-xs font-bold text-slate-500 uppercase bg-slate-100 px-3 py-1.5 rounded-md tracking-wider">
+                             {tag}
+                           </span>
+                         ))}
+                       </div>
+                     )}
 
-                </div>
-              </motion.div>
-            ))}
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
         </SectionWrapper>
 
