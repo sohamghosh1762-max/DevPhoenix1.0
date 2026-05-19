@@ -1,5 +1,6 @@
 import { supabase, supabaseAdmin, hasAdminConfig } from './client';
 import { Program, Blog, Testimonial, Mentor, Lead, HomepageSettings, ProjectShowcase } from '@/types';
+import { dbMappers } from '@/lib/api/sanitize-payload';
 
 // Generic error handler
 const handleError = (error: any) => {
@@ -24,31 +25,33 @@ export const programsService = {
     console.log('FETCHING: All programs');
     const { data, error } = await dbClient.from('programs').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
-    return data || [];
+    return (data || []).map(row => dbMappers.programToFrontend(row));
   },
   async getById(id: string): Promise<Program | null> {
     console.log(`FETCHING: Program by id = ${id}`);
     const { data, error } = await dbClient.from('programs').select('*').eq('id', id).single();
     if (error && error.code !== 'PGRST116') handleError(error);
-    return data;
+    return data ? dbMappers.programToFrontend(data) : null;
   },
   async getBySlug(slug: string): Promise<Program | null> {
     console.log(`FETCHING: Program by slug = ${slug}`);
     const { data, error } = await dbClient.from('programs').select('*').eq('slug', slug).single();
     if (error && error.code !== 'PGRST116') handleError(error);
-    return data;
+    return data ? dbMappers.programToFrontend(data) : null;
   },
   async create(program: Partial<Program>): Promise<Program> {
     console.log('CREATING: Program', program.id);
-    const { data, error } = await dbClient.from('programs').insert(program).select().single();
+    const dbPayload = dbMappers.programToDb(program);
+    const { data, error } = await dbClient.from('programs').insert(dbPayload).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.programToFrontend(data);
   },
   async update(id: string, program: Partial<Program>): Promise<Program> {
     console.log(`UPDATING: Program id = ${id}`);
-    const { data, error } = await dbClient.from('programs').update(program).eq('id', id).select().single();
+    const dbPayload = dbMappers.programToDb(program);
+    const { data, error } = await dbClient.from('programs').update(dbPayload).eq('id', id).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.programToFrontend(data);
   },
   async delete(id: string): Promise<void> {
     console.log(`DELETING: Program id = ${id}`);
@@ -100,29 +103,31 @@ export const learningPathsService = {
 export const blogsService = {
   async getAll(publishedOnly = false): Promise<Blog[]> {
     console.log(`FETCHING: All blogs (publishedOnly = ${publishedOnly})`);
-    let query = dbClient.from('blogs').select('*').order('publishedAt', { ascending: false });
-    if (publishedOnly) query = query.eq('isPublished', true);
+    let query = dbClient.from('blogs').select('*').order('publishedat', { ascending: false });
+    if (publishedOnly) query = query.eq('ispublished', true);
     const { data, error } = await query;
     if (error) handleError(error);
-    return data || [];
+    return (data || []).map(row => dbMappers.blogToFrontend(row));
   },
   async getBySlug(slug: string): Promise<Blog | null> {
     console.log(`FETCHING: Blog by slug = ${slug}`);
     const { data, error } = await dbClient.from('blogs').select('*').eq('slug', slug).single();
     if (error && error.code !== 'PGRST116') handleError(error);
-    return data;
+    return data ? dbMappers.blogToFrontend(data) : null;
   },
   async create(blog: Partial<Blog>): Promise<Blog> {
     console.log('CREATING: Blog', blog.id);
-    const { data, error } = await dbClient.from('blogs').insert(blog).select().single();
+    const dbPayload = dbMappers.blogToDb(blog);
+    const { data, error } = await dbClient.from('blogs').insert(dbPayload).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.blogToFrontend(data);
   },
   async update(id: string, blog: Partial<Blog>): Promise<Blog> {
     console.log(`UPDATING: Blog id = ${id}`);
-    const { data, error } = await dbClient.from('blogs').update(blog).eq('id', id).select().single();
+    const dbPayload = dbMappers.blogToDb(blog);
+    const { data, error } = await dbClient.from('blogs').update(dbPayload).eq('id', id).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.blogToFrontend(data);
   },
   async delete(id: string): Promise<void> {
     console.log(`DELETING: Blog id = ${id}`);
@@ -168,19 +173,21 @@ export const mentorsService = {
     console.log('FETCHING: All mentors');
     const { data, error } = await dbClient.from('mentors').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
-    return data || [];
+    return (data || []).map(row => dbMappers.mentorToFrontend(row));
   },
   async create(mentor: Partial<Mentor>): Promise<Mentor> {
     console.log('CREATING: Mentor');
-    const { data, error } = await dbClient.from('mentors').insert(mentor).select().single();
+    const dbPayload = dbMappers.mentorToDb(mentor);
+    const { data, error } = await dbClient.from('mentors').insert(dbPayload).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.mentorToFrontend(data);
   },
   async update(id: string, mentor: Partial<Mentor>): Promise<Mentor> {
     console.log(`UPDATING: Mentor id = ${id}`);
-    const { data, error } = await dbClient.from('mentors').update(mentor).eq('id', id).select().single();
+    const dbPayload = dbMappers.mentorToDb(mentor);
+    const { data, error } = await dbClient.from('mentors').update(dbPayload).eq('id', id).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.mentorToFrontend(data);
   },
   async delete(id: string): Promise<void> {
     console.log(`DELETING: Mentor id = ${id}`);
@@ -197,19 +204,21 @@ export const leadsService = {
     console.log('FETCHING: All leads');
     const { data, error } = await dbClient.from('leads').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
-    return data || [];
+    return (data || []).map(row => dbMappers.leadToFrontend(row));
   },
   async create(lead: Partial<Lead>): Promise<Lead> {
     console.log('CREATING: Lead');
-    const { data, error } = await dbClient.from('leads').insert(lead).select().single();
+    const dbPayload = dbMappers.leadToDb(lead);
+    const { data, error } = await dbClient.from('leads').insert(dbPayload).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.leadToFrontend(data);
   },
   async update(id: string, lead: Partial<Lead>): Promise<Lead> {
     console.log(`UPDATING: Lead id = ${id}`);
-    const { data, error } = await dbClient.from('leads').update(lead).eq('id', id).select().single();
+    const dbPayload = dbMappers.leadToDb(lead);
+    const { data, error } = await dbClient.from('leads').update(dbPayload).eq('id', id).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.leadToFrontend(data);
   },
   async delete(id: string): Promise<void> {
     console.log(`DELETING: Lead id = ${id}`);
@@ -244,19 +253,21 @@ export const showcaseService = {
     console.log('FETCHING: All showcase projects');
     const { data, error } = await dbClient.from('showcase').select('*').order('created_at', { ascending: false });
     if (error) handleError(error);
-    return data || [];
+    return (data || []).map(row => dbMappers.showcaseToFrontend(row));
   },
   async create(project: Partial<ProjectShowcase>): Promise<ProjectShowcase> {
     console.log('CREATING: Showcase project');
-    const { data, error } = await dbClient.from('showcase').insert(project).select().single();
+    const dbPayload = dbMappers.showcaseToDb(project);
+    const { data, error } = await dbClient.from('showcase').insert(dbPayload).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.showcaseToFrontend(data);
   },
   async update(id: string, project: Partial<ProjectShowcase>): Promise<ProjectShowcase> {
     console.log(`UPDATING: Showcase project id = ${id}`);
-    const { data, error } = await dbClient.from('showcase').update(project).eq('id', id).select().single();
+    const dbPayload = dbMappers.showcaseToDb(project);
+    const { data, error } = await dbClient.from('showcase').update(dbPayload).eq('id', id).select().single();
     if (error) handleError(error);
-    return data;
+    return dbMappers.showcaseToFrontend(data);
   },
   async delete(id: string): Promise<void> {
     console.log(`DELETING: Showcase project id = ${id}`);

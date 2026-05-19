@@ -224,3 +224,185 @@ export const sanitizePayload = {
     };
   },
 };
+
+/**
+ * Bidirectional database mapping layer to align frontend camelCase interfaces
+ * with unquoted Postgres snake_case and lowercase columns transparently.
+ */
+export const dbMappers = {
+  /**
+   * Programs:
+   * Frontend: practicalHours, pricingDetails
+   * Database: practical_hours, pricing_details
+   */
+  programToDb(camel: any): any {
+    if (!camel) return camel;
+    const db = { ...camel };
+    if ('practicalHours' in db) {
+      db.practical_hours = db.practicalHours;
+      delete db.practicalHours;
+    }
+    if ('pricingDetails' in db) {
+      db.pricing_details = db.pricingDetails;
+      delete db.pricingDetails;
+    }
+    return db;
+  },
+  programToFrontend(db: any): any {
+    if (!db) return db;
+    const camel = { ...db };
+    if ('practical_hours' in camel) {
+      camel.practicalHours = camel.practical_hours;
+      delete camel.practical_hours;
+    }
+    if ('pricing_details' in camel) {
+      camel.pricingDetails = camel.pricing_details;
+      delete camel.pricing_details;
+    }
+    return camel;
+  },
+
+  /**
+   * Blogs:
+   * Frontend: coverImage, publishedAt, readTime, isPublished
+   * Database: coverimage, publishedat, readtime, ispublished (Postgres unquoted lowercase)
+   */
+  blogToDb(camel: any): any {
+    if (!camel) return camel;
+    const db = { ...camel };
+    if ('coverImage' in db) {
+      db.coverimage = db.coverImage;
+      delete db.coverImage;
+    }
+    if ('publishedAt' in db) {
+      db.publishedat = db.publishedAt;
+      delete db.publishedAt;
+    }
+    if ('readTime' in db) {
+      db.readtime = db.readTime;
+      delete db.readTime;
+    }
+    if ('isPublished' in db) {
+      db.ispublished = db.isPublished;
+      delete db.isPublished;
+    }
+    return db;
+  },
+  blogToFrontend(db: any): any {
+    if (!db) return db;
+    const camel = { ...db };
+    if ('coverimage' in camel) {
+      camel.coverImage = camel.coverimage;
+      delete camel.coverimage;
+    }
+    if ('publishedat' in camel) {
+      camel.publishedAt = camel.publishedat;
+      delete camel.publishedat;
+    }
+    if ('readtime' in camel) {
+      camel.readTime = camel.readtime;
+      delete camel.readtime;
+    }
+    if ('ispublished' in camel) {
+      camel.isPublished = camel.ispublished;
+      delete camel.ispublished;
+    }
+    return camel;
+  },
+
+  /**
+   * Showcase:
+   * Frontend: githubUrl, liveUrl, authorName, programName
+   * Database: githuburl, liveurl, authorname, programname
+   */
+  showcaseToDb(camel: any): any {
+    if (!camel) return camel;
+    const db = { ...camel };
+    if ('githubUrl' in db) {
+      db.githuburl = db.githubUrl;
+      delete db.githubUrl;
+    }
+    if ('liveUrl' in db) {
+      db.liveurl = db.liveUrl;
+      delete db.liveUrl;
+    }
+    if ('authorName' in db) {
+      db.authorname = db.authorName;
+      delete db.authorName;
+    }
+    if ('programName' in db) {
+      db.programname = db.programName;
+      delete db.programName;
+    }
+    return db;
+  },
+  showcaseToFrontend(db: any): any {
+    if (!db) return db;
+    const camel = { ...db };
+    if ('githuburl' in camel) {
+      camel.githubUrl = camel.githuburl;
+      delete camel.githuburl;
+    }
+    if ('liveurl' in camel) {
+      camel.liveUrl = camel.liveurl;
+      delete camel.liveurl;
+    }
+    if ('authorname' in camel) {
+      camel.authorName = camel.authorname;
+      delete camel.authorname;
+    }
+    if ('programname' in camel) {
+      camel.programName = camel.programname;
+      delete camel.programname;
+    }
+    return camel;
+  },
+
+  /**
+   * Leads:
+   * Frontend: currentStatus
+   * Database: currentstatus
+   */
+  leadToDb(camel: any): any {
+    if (!camel) return camel;
+    const db = { ...camel };
+    if ('currentStatus' in db) {
+      db.currentstatus = db.currentStatus;
+      delete db.currentStatus;
+    }
+    return db;
+  },
+  leadToFrontend(db: any): any {
+    if (!db) return db;
+    const camel = { ...db };
+    if ('currentstatus' in camel) {
+      camel.currentStatus = camel.currentstatus;
+      delete camel.currentstatus;
+    }
+    return camel;
+  },
+
+  /**
+   * Mentors:
+   * Frontend: isVerified
+   * Database: isverified
+   */
+  mentorToDb(camel: any): any {
+    if (!camel) return camel;
+    const db = { ...camel };
+    if ('isVerified' in db) {
+      db.isverified = db.isVerified;
+      delete db.isVerified;
+    }
+    return db;
+  },
+  mentorToFrontend(db: any): any {
+    if (!db) return db;
+    const camel = { ...db };
+    if ('isverified' in camel) {
+      camel.isVerified = camel.isverified;
+      delete camel.isverified;
+    }
+    return camel;
+  },
+};
