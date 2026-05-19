@@ -254,6 +254,9 @@ const INITIAL_SEED = [
   }
 ];
 
+import { visualBlocksService } from '@/services/supabase/db.service';
+import { hasSupabaseConfig } from '@/services/supabase/client';
+
 function read() {
   if (!existsSync(FILE_PATH)) {
     writeFileSync(FILE_PATH, JSON.stringify(INITIAL_SEED, null, 2), 'utf-8');
@@ -272,6 +275,19 @@ function write(data: any) {
 }
 
 export async function GET() {
+  if (hasSupabaseConfig) {
+    try {
+      const items = await visualBlocksService.getAll();
+      if (items && items.length > 0) {
+        return NextResponse.json(items);
+      }
+      // If table exists but has 0 blocks, seed it with the INITIAL_SEED
+      await visualBlocksService.saveAll(INITIAL_SEED);
+      return NextResponse.json(INITIAL_SEED);
+    } catch (err: any) {
+      console.error('Supabase visual-blocks GET error, falling back to local:', err);
+    }
+  }
   const data = read();
   return NextResponse.json(data);
 }
@@ -279,12 +295,23 @@ export async function GET() {
 export async function PUT(req: Request) {
   try {
     const payload = await req.json();
-    if (Array.isArray(payload)) {
-      write(payload);
-      return NextResponse.json({ success: true });
+    if (!Array.isArray(payload)) {
+      return NextResponse.json({ error: 'Payload must be an array of visual blocks' }, { status: 400 });
     }
-    return NextResponse.json({ error: 'Payload must be an array of visual blocks' }, { status: 400 });
+
+    if (hasSupabaseConfig) {
+      try {
+        await visualBlocksService.saveAll(payload);
+        return NextResponse.json({ success: true });
+      } catch (err: any) {
+        console.error('Supabase visual-blocks PUT error, falling back to local:', err);
+      }
+    }
+
+    write(payload);
+    return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || 'Server error' }, { status: 500 });
   }
 }
+

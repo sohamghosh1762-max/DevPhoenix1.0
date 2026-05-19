@@ -1,7 +1,7 @@
--- DevPhoeniX Ecosystem - Supabase Schema
--- Run this in the Supabase SQL Editor
+-- DevPhoeniX Ecosystem - Production-Ready Supabase Schema
+-- Run this in the Supabase SQL Editor (https://supabase.com/dashboard/project/_/sql)
 
--- 1. Programs Table
+-- ── 1. PROGRAMS TABLE ─────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS programs (
   id TEXT PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
@@ -19,10 +19,9 @@ CREATE TABLE IF NOT EXISTS programs (
   outcomes TEXT[] NOT NULL DEFAULT '{}',
   projects INTEGER NOT NULL DEFAULT 0,
   
-  -- Deep Dynamic Schema
   curriculum JSONB DEFAULT '[]'::jsonb,
   faqs JSONB DEFAULT '[]'::jsonb,
-  pricingDetails JSONB,
+  pricingDetails JSONB DEFAULT '{}'::jsonb,
   tools TEXT[] DEFAULT '{}',
   certifications TEXT[] DEFAULT '{}',
   
@@ -30,9 +29,9 @@ CREATE TABLE IF NOT EXISTS programs (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Blogs Table
+-- ── 2. BLOGS TABLE ────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS blogs (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
   title TEXT NOT NULL,
   excerpt TEXT NOT NULL,
@@ -42,15 +41,15 @@ CREATE TABLE IF NOT EXISTS blogs (
   readTime TEXT NOT NULL,
   category TEXT NOT NULL,
   tags TEXT[] NOT NULL DEFAULT '{}',
-  author JSONB NOT NULL, -- { name, avatar, role }
+  author JSONB NOT NULL DEFAULT '{"name": "Admin", "role": "Instructor", "avatar": ""}'::jsonb,
   isPublished BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 3. Testimonials Table
+-- ── 3. TESTIMONIALS TABLE ──────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS testimonials (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   role TEXT NOT NULL,
   company TEXT,
@@ -61,9 +60,9 @@ CREATE TABLE IF NOT EXISTS testimonials (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 4. Mentors Table
+-- ── 4. MENTORS TABLE ───────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS mentors (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   role TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'online',
@@ -74,7 +73,7 @@ CREATE TABLE IF NOT EXISTS mentors (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 5. Leads Table (CRM)
+-- ── 5. LEADS TABLE (CRM) ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS leads (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -93,18 +92,18 @@ CREATE TABLE IF NOT EXISTS leads (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 6. Site Config Table (Singleton)
+-- ── 6. SITE CONFIG TABLE (SINGLETON) ───────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS site_config (
   id TEXT PRIMARY KEY DEFAULT 'global',
-  hero JSONB NOT NULL, -- { badge, headline1, headline2, subheadline, primaryCta, secondaryCta, stats }
-  contact JSONB NOT NULL, -- { email, phone }
-  socials JSONB NOT NULL, -- { instagram, linkedin, facebook, twitter, github }
+  hero JSONB NOT NULL,
+  contact JSONB NOT NULL,
+  socials JSONB NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 7. Showcase Table
+-- ── 7. SHOWCASE TABLE ──────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS showcase (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   image TEXT NOT NULL,
@@ -116,16 +115,34 @@ CREATE TABLE IF NOT EXISTS showcase (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 8. Admin Users (For future RBAC)
+-- ── 8. VISUAL BLOCKS TABLE ─────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS visual_blocks (
+  id TEXT PRIMARY KEY,
+  section_key TEXT NOT NULL,
+  title TEXT NOT NULL,
+  subtitle TEXT,
+  description TEXT,
+  image_url TEXT,
+  image_alt TEXT,
+  badge TEXT,
+  cta_text TEXT,
+  cta_link TEXT,
+  position INTEGER NOT NULL DEFAULT 0,
+  visibility BOOLEAN NOT NULL DEFAULT true,
+  theme_variant TEXT NOT NULL DEFAULT 'glass',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ── 9. ADMIN USERS TABLE ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS admin_users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id),
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT UNIQUE NOT NULL,
-  role TEXT NOT NULL DEFAULT 'editor', -- super_admin, editor, content_manager
+  role TEXT NOT NULL DEFAULT 'editor',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   last_login TIMESTAMP WITH TIME ZONE
 );
 
--- Insert initial dummy Site Config if empty
+-- ── 10. INSERT INITIAL GLOBAL CONFIGURATION ───────────────────────────────────
 INSERT INTO site_config (id, hero, contact, socials)
 VALUES (
   'global',
@@ -134,32 +151,90 @@ VALUES (
   '{"instagram":"#","linkedin":"#","facebook":"#","twitter":"#","github":"#"}'
 ) ON CONFLICT (id) DO NOTHING;
 
--- Set up Row Level Security (RLS) policies
--- Note: Since we are using Next.js Server Components / API Routes with a Service Role Key (eventually), 
--- we can allow anonymous reads and restrict writes, OR completely bypass RLS if using the service role.
--- For now, enabling public read access to content tables.
-
+-- ── 11. ROW LEVEL SECURITY (RLS) POLICIES ─────────────────────────────────────
 ALTER TABLE programs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read-only access to programs" ON programs;
 CREATE POLICY "Allow public read-only access to programs" ON programs FOR SELECT USING (true);
 
 ALTER TABLE blogs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Allow public read-only access to published blogs" ON blogs FOR SELECT USING (isPublished = true);
+DROP POLICY IF EXISTS "Allow public read-only access to blogs" ON blogs;
+CREATE POLICY "Allow public read-only access to blogs" ON blogs FOR SELECT USING (true);
 
 ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read-only access to testimonials" ON testimonials;
 CREATE POLICY "Allow public read-only access to testimonials" ON testimonials FOR SELECT USING (true);
 
 ALTER TABLE mentors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read-only access to mentors" ON mentors;
 CREATE POLICY "Allow public read-only access to mentors" ON mentors FOR SELECT USING (true);
 
 ALTER TABLE site_config ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read-only access to site config" ON site_config;
 CREATE POLICY "Allow public read-only access to site config" ON site_config FOR SELECT USING (true);
 
 ALTER TABLE showcase ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read-only access to showcase" ON showcase;
 CREATE POLICY "Allow public read-only access to showcase" ON showcase FOR SELECT USING (true);
 
--- Leads and Admin Users should NOT have public read access.
+ALTER TABLE visual_blocks ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow public read-only access to visual blocks" ON visual_blocks;
+CREATE POLICY "Allow public read-only access to visual blocks" ON visual_blocks FOR SELECT USING (true);
+
+-- Leads and admin users tables are protected from public read access.
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 
--- Note: To allow Next.js API routes (or Server Actions) to write to these tables,
--- you MUST use the SUPABASE_SERVICE_ROLE_KEY on the server side, which bypasses RLS.
+-- Note: Since Next.js server-side API routes bypass RLS using the SUPABASE_SERVICE_ROLE_KEY 
+-- (or perform authenticated admin actions), you can create write policies or rely on Service Role.
+
+-- ── 12. STORAGE BUCKET CREATION & POLICIES ─────────────────────────────────────
+
+-- Ensure extension exists
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create public media bucket
+INSERT INTO storage.buckets (
+  id,
+  name,
+  public,
+  file_size_limit,
+  allowed_mime_types
+)
+VALUES (
+  'media',
+  'media',
+  true,
+  10485760,
+  ARRAY[
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/webp',
+    'image/gif',
+    'image/svg+xml'
+  ]
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- PUBLIC READ ACCESS
+DROP POLICY IF EXISTS "Public Read Access" ON storage.objects;
+CREATE POLICY "Public Read Access"
+ON storage.objects
+FOR SELECT
+USING (bucket_id = 'media');
+
+-- AUTHENTICATED UPLOAD ACCESS
+DROP POLICY IF EXISTS "Allow Authenticated Uploads" ON storage.objects;
+CREATE POLICY "Allow Authenticated Uploads"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'media');
+
+-- AUTHENTICATED DELETE ACCESS
+DROP POLICY IF EXISTS "Allow Authenticated Deletes" ON storage.objects;
+CREATE POLICY "Allow Authenticated Deletes"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (bucket_id = 'media');

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, writeFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
+import { storageService } from '@/services/supabase/storage.service';
+import { hasSupabaseConfig } from '@/services/supabase/client';
 
 // ── Collect all image URLs referenced in data files ────────────────────────────
 function harvestDataImages(): { name: string; url: string; folder: string; source: string }[] {
@@ -106,3 +108,71 @@ function formatSize(bytes: number) {
   if (bytes > 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${bytes} B`;
 }
+
+export async function POST(req: Request) {
+  try {
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+    const folder = (formData.get('folder') as string) || 'uploads';
+    if (!file) {
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    }
+
+    if (hasSupabaseConfig) {
+      const publicUrl = await storageService.uploadFile(file, 'media', folder);
+      return NextResponse.json({ url: publicUrl, name: file.name });
+    }
+
+    // Local disk fallback
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    const uploadsDir = join(process.cwd(), 'public', 'uploads');
+    if (!existsSync(uploadsDir)) {
+      mkdirSync(uploadsDir, { recursive: true });
+    }
+    
+    // Deconflict name
+    const ext = file.name.split('.').pop();
+    const cleanName = `${Math.random().toString(36).substring(2, 10)}_${Date.now()}.${ext}`;
+    const filePath = join(uploadsDir, cleanName);
+    
+    writeFileSync(filePath, buffer);
+    const localUrl = `/uploads/${cleanName}`;
+    
+    return NextResponse.json({ url: localUrl, name: cleanName });
+  } catch (err: any) {
+    console.error('API Media Upload Error:', err);
+    return NextResponse.json({ error: err.message || 'Failed to upload media' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { url } = await req.json();
+    if (!url) {
+      return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+    }
+
+    if (hasSupabaseConfig && url.includes('/media/')) {
+      await storageService.deleteFile(url, 'media');
+      return NextResponse.json({ success: true });
+    }
+
+    // Local disk delete
+    if (url.startsWith('/uploads/')) {
+      const filename = url.replace('/uploads/', '');
+      const filePath = join(process.cwd(), 'public', 'uploads', filename);
+      if (existsSync(filePath)) {
+        unlinkSync(filePath);
+        return NextResponse.json({ success: true });
+      }
+    }
+
+    return NextResponse.json({ success: true, message: 'No file deleted' });
+  } catch (err: any) {
+    console.error('API Media Delete Error:', err);
+    return NextResponse.json({ error: err.message || 'Failed to delete media' }, { status: 500 });
+  }
+}
+

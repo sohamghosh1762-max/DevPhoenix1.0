@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Upload, Search, Folder, FileImage, Copy, CheckCircle, RefreshCw } from "lucide-react";
+import { Upload, Search, Folder, FileImage, Copy, CheckCircle, RefreshCw, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { GlowCard } from "@/components/ui/GlowCard";
 
@@ -38,11 +38,51 @@ export default function MediaLibraryPage() {
     setTimeout(() => setCopiedUrl(null), 2000);
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     setIsUploading(true);
-    // TODO: Connect to Supabase Storage for real upload
-    setTimeout(() => { setIsUploading(false); loadMedia(); }, 1500);
+    try {
+      for (let i = 0; i < e.target.files.length; i++) {
+        const file = e.target.files[i];
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', activeFolder === 'all' ? 'uploads' : activeFolder);
+
+        const res = await fetch('/api/media', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Upload failed');
+        }
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to upload media file(s)');
+    } finally {
+      setIsUploading(false);
+      loadMedia();
+    }
+  };
+
+  const handleDelete = async (url: string) => {
+    if (!confirm('Are you sure you want to delete this asset permanently?')) return;
+    try {
+      const res = await fetch('/api/media', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Delete failed');
+      }
+      loadMedia();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete asset');
+    }
   };
 
   return (
@@ -149,6 +189,13 @@ export default function MediaLibraryPage() {
                       >
                         {copiedUrl === asset.url ? <CheckCircle className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                       </button>
+                      <button
+                        onClick={() => handleDelete(asset.url)}
+                        className="p-2 rounded-lg bg-white/10 hover:bg-red-600 text-white transition-colors"
+                        title="Delete Asset"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
 
@@ -182,3 +229,4 @@ export default function MediaLibraryPage() {
     </div>
   );
 }
+

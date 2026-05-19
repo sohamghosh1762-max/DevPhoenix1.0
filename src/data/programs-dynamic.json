@@ -786,5 +786,34 @@
       "Google Workspace",
       "Stripe/Razorpay"
     ]
+  },
+  {
+    "id": "qhs",
+    "title": "qhs",
+    "description": "hqw",
+    "overview": "qsj",
+    "category": "Development",
+    "level": "Beginner",
+    "duration": "4-6 Months",
+    "type": "Premium",
+    "price": "",
+    "practicalHours": "100+ Hours",
+    "tags": [],
+    "image": "",
+    "outcomes": [],
+    "projects": 10,
+    "curriculum": [],
+    "faqs": [],
+    "originalPrice": "",
+    "discountedPrice": "",
+    "emi": "",
+    "includes": "",
+    "slug": "qhs",
+    "pricingDetails": {
+      "originalPrice": "",
+      "discountedPrice": "",
+      "emi": null,
+      "includes": []
+    }
   }
 ]

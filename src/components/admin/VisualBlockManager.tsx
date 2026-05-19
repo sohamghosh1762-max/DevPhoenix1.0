@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
 import { Plus, Edit2, Trash2, ArrowUp, ArrowDown, Eye, EyeOff, Image as ImageIcon, Search, Check, FolderOpen } from 'lucide-react';
 import FormModal, { Field, Input, Textarea, Select } from '@/components/admin/FormModal';
 
@@ -47,6 +48,38 @@ export default function VisualBlockManager({ sectionKey, title, subtitle }: Visu
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<any>(EMPTY_BLOCK);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+
+  const handleDirectUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folder', sectionKey);
+      
+      const res = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.error || 'Upload failed');
+      }
+      
+      const data = await res.json();
+      setForm((p: any) => ({ ...p, image_url: data.url }));
+      loadMedia(); // Refresh indexed asset library
+    } catch (err: any) {
+      alert(err.message || 'Failed to upload image');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
 
   // Media Library state
   const [mediaList, setMediaList] = useState<any[]>([]);
@@ -341,17 +374,33 @@ export default function VisualBlockManager({ sectionKey, title, subtitle }: Visu
             </div>
 
             <Field label="Image URL">
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <Input value={form.image_url} onChange={f('image_url')} placeholder="/learning.png" />
                 <button
                   type="button"
                   onClick={() => setShowMediaChooser(true)}
-                  className="px-3 bg-slate-800 text-slate-200 hover:bg-slate-700 text-xs font-bold rounded-xl transition-all whitespace-nowrap"
+                  className="px-3 py-2 bg-slate-800 text-slate-200 hover:bg-slate-700 text-xs font-bold rounded-xl transition-all whitespace-nowrap"
                 >
-                  Choose Asset
+                  Choose
+                </button>
+                <input
+                  type="file"
+                  ref={uploadInputRef}
+                  onChange={handleDirectUpload}
+                  className="hidden"
+                  accept="image/*"
+                />
+                <button
+                  type="button"
+                  disabled={uploadingImage}
+                  onClick={() => uploadInputRef.current?.click()}
+                  className="px-3 py-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all whitespace-nowrap animate-in fade-in"
+                >
+                  {uploadingImage ? 'Uploading...' : 'Upload'}
                 </button>
               </div>
             </Field>
+
 
             {form.image_url && (
               <div className="w-full h-32 rounded-xl bg-slate-100 border overflow-hidden relative">

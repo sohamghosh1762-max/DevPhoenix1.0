@@ -42,6 +42,7 @@ export const programsService = {
   }
 };
 
+
 // ==========================================
 // BLOGS
 // ==========================================
@@ -58,7 +59,20 @@ export const blogsService = {
     if (error && error.code !== 'PGRST116') handleError(error);
     return data;
   },
-  // Add create, update, delete similarly...
+  async create(blog: Partial<Blog>): Promise<Blog> {
+    const { data, error } = await supabase.from('blogs').insert(blog).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async update(id: string, blog: Partial<Blog>): Promise<Blog> {
+    const { data, error } = await supabase.from('blogs').update(blog).eq('id', id).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('blogs').delete().eq('id', id);
+    if (error) handleError(error);
+  }
 };
 
 // ==========================================
@@ -70,7 +84,20 @@ export const testimonialsService = {
     if (error) handleError(error);
     return data || [];
   },
-  // Add CRUD...
+  async create(testimonial: Partial<Testimonial>): Promise<Testimonial> {
+    const { data, error } = await supabase.from('testimonials').insert(testimonial).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async update(id: string, testimonial: Partial<Testimonial>): Promise<Testimonial> {
+    const { data, error } = await supabase.from('testimonials').update(testimonial).eq('id', id).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+    if (error) handleError(error);
+  }
 };
 
 // ==========================================
@@ -82,7 +109,20 @@ export const mentorsService = {
     if (error) handleError(error);
     return data || [];
   },
-  // Add CRUD...
+  async create(mentor: Partial<Mentor>): Promise<Mentor> {
+    const { data, error } = await supabase.from('mentors').insert(mentor).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async update(id: string, mentor: Partial<Mentor>): Promise<Mentor> {
+    const { data, error } = await supabase.from('mentors').update(mentor).eq('id', id).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('mentors').delete().eq('id', id);
+    if (error) handleError(error);
+  }
 };
 
 // ==========================================
@@ -99,7 +139,15 @@ export const leadsService = {
     if (error) handleError(error);
     return data;
   },
-  // Add update status...
+  async update(id: string, lead: Partial<Lead>): Promise<Lead> {
+    const { data, error } = await supabase.from('leads').update(lead).eq('id', id).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('leads').delete().eq('id', id);
+    if (error) handleError(error);
+  }
 };
 
 // ==========================================
@@ -117,3 +165,50 @@ export const siteConfigService = {
     return data;
   }
 };
+
+// ==========================================
+// PROJECT SHOWCASE
+// ==========================================
+export const showcaseService = {
+  async getAll(): Promise<ProjectShowcase[]> {
+    const { data, error } = await supabase.from('showcase').select('*').order('created_at', { ascending: false });
+    if (error) handleError(error);
+    return data || [];
+  },
+  async create(project: Partial<ProjectShowcase>): Promise<ProjectShowcase> {
+    const { data, error } = await supabase.from('showcase').insert(project).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async update(id: string, project: Partial<ProjectShowcase>): Promise<ProjectShowcase> {
+    const { data, error } = await supabase.from('showcase').update(project).eq('id', id).select().single();
+    if (error) handleError(error);
+    return data;
+  },
+  async delete(id: string): Promise<void> {
+    const { error } = await supabase.from('showcase').delete().eq('id', id);
+    if (error) handleError(error);
+  }
+};
+
+// ==========================================
+// VISUAL BLOCKS
+// ==========================================
+export const visualBlocksService = {
+  async getAll(): Promise<any[]> {
+    const { data, error } = await supabase.from('visual_blocks').select('*').order('position', { ascending: true });
+    if (error) handleError(error);
+    return data || [];
+  },
+  async saveAll(blocks: any[]): Promise<void> {
+    // Standard visual block sync: delete existing, insert new
+    // Bypassing RLS requires service role, else table has insert/delete rules.
+    const { error: deleteError } = await supabase.from('visual_blocks').delete().neq('id', 'placeholder-non-existent');
+    if (deleteError) handleError(deleteError);
+    if (blocks.length > 0) {
+      const { error: insertError } = await supabase.from('visual_blocks').insert(blocks);
+      if (insertError) handleError(insertError);
+    }
+  }
+};
+
