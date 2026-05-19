@@ -5,7 +5,7 @@
     "title": "DevPhoeniX Student Builder",
     "subtitle": "",
     "description": "Mascot illustration for landing header",
-    "image_url": "/learning.png",
+    "image_url": "/mascot.png",
     "image_alt": "DevPhoeniX Student Builder",
     "badge": "",
     "cta_text": "",
@@ -42,7 +42,7 @@
     "badge": "",
     "cta_text": "",
     "cta_link": "",
-    "position": 4,
+    "position": 3,
     "visibility": true,
     "theme_variant": "glass",
     "created_at": "2026-05-18T21:41:02.178Z"
@@ -238,21 +238,5 @@
     "visibility": true,
     "theme_variant": "glass",
     "created_at": "2026-05-18T21:41:02.178Z"
-  },
-  {
-    "title": "Premium Growth Indicator",
-    "subtitle": "",
-    "description": "",
-    "image_url": "/community/community-scene.png",
-    "image_alt": "",
-    "badge": "",
-    "cta_text": "",
-    "cta_link": "",
-    "position": 3,
-    "visibility": true,
-    "theme_variant": "glass",
-    "id": "block-1779140711673",
-    "section_key": "hero",
-    "created_at": "2026-05-18T21:45:11.673Z"
   }
 ]
