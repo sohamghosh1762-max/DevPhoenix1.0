@@ -13,7 +13,7 @@ import { DynamicImage } from "@/components/ui/DynamicImage";
 
 // ─── Dynamic Helper ──────────────────────────────────────────────────────────
 async function getBlogPosts() {
-  let rawList = [];
+  let rawList: any[] = [];
   if (hasMongoConfig) {
     try {
       rawList = await blogsService.getAll();

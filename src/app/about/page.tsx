@@ -7,7 +7,6 @@ import Navbar from "@/components/layout/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { SectionWrapper } from "@/components/sections/SectionWrapper";
 import { designSystem } from "@/lib/design-system";
-import { designSystem } from "@/lib/design-system";
 import { useEffect, useState } from "react";
 
 export default function AboutPage() {

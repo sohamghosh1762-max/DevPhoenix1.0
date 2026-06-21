@@ -5,8 +5,8 @@ import { hasMongoConfig } from "@/services/mongodb/client";
 const BASE_URL = 'https://devphoenix.tech';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  let programs = [];
-  let blogs = [];
+ let programs: any[] = [];
+let blogs: any[] = [];
   if (hasMongoConfig) {
     try {
       programs = await programsService.getAll();
