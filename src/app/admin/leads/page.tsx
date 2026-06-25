@@ -139,14 +139,51 @@ function LeadDetailPanel({ lead, onClose, onUpdate }: {
               <p className="font-semibold text-slate-900 text-sm">{lead.program || '—'}</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-4">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Current Status</p>
-              <p className="font-semibold text-slate-900 text-sm">{lead.currentStatus || '—'}</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Goal / Status</p>
+              <p className="font-semibold text-slate-900 text-sm">{lead.current_status || lead.currentStatus || '—'}</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-4">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Source</p>
               <p className="font-semibold text-slate-900 text-sm">{lead.source_page || 'Direct'}</p>
             </div>
+            {lead.college && (
+              <div className="bg-slate-50 rounded-xl p-4 col-span-2">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">College / Organization</p>
+                <p className="font-semibold text-slate-900 text-sm">{lead.college}</p>
+              </div>
+            )}
+            <div className="bg-slate-50 rounded-xl p-4 col-span-2">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Assigned Counsellor</p>
+              <p className="font-semibold text-slate-900 text-sm">{lead.assigned_admin || 'Rajesh Kumar'}</p>
+            </div>
           </div>
+
+          {/* Enrollment Info Box (if converted) */}
+          {status === 'Converted' && (
+            <div className="bg-green-50 border border-green-100 rounded-2xl p-5 space-y-3">
+              <p className="text-xs font-bold text-green-700 uppercase tracking-wider">🎓 Enrollment Information</p>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <p className="text-slate-400 uppercase tracking-wide mb-0.5">Program Name</p>
+                  <p className="font-bold text-slate-800">{lead.program || '—'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 uppercase tracking-wide mb-0.5">Enrollment Date</p>
+                  <p className="font-bold text-slate-800">
+                    {lead.enrollment_date ? new Date(lead.enrollment_date).toLocaleDateString('en-IN') : new Date(lead.created_at).toLocaleDateString('en-IN')}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-slate-400 uppercase tracking-wide mb-0.5">Payment Status</p>
+                  <p className="font-bold text-green-700">{lead.payment_status || 'Paid'}</p>
+                </div>
+                <div>
+                  <p className="text-slate-400 uppercase tracking-wide mb-0.5">Payment Amount</p>
+                  <p className="font-bold text-slate-800">₹{lead.payment_amount?.toLocaleString('en-IN') || '1,249'}</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {lead.message && (
             <div className="bg-orange-50 border border-orange-100 rounded-xl p-4">
@@ -258,15 +295,35 @@ export default function AdminLeads() {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [page, setPage] = useState(1);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
+  const [kpiCounts, setKpiCounts] = useState<Record<string, number>>({});
+  const [conversionRate, setConversionRate] = useState(0);
   const PER_PAGE = 10;
 
   const load = async () => {
     setLoading(true);
-    const data = await fetch('/api/leads').then(r => r.json()).catch(() => []);
-    setLeads(Array.isArray(data) ? data : []);
-    setLoading(false);
+    try {
+      const res = await fetch(`/api/leads?page=${page}&limit=${PER_PAGE}&search=${encodeURIComponent(search)}&status=${statusFilter}&sortBy=${sortBy}`);
+      const json = await res.json();
+      if (json.success && json.data) {
+        setLeads(json.data.leads || []);
+        setTotalCount(json.data.totalCount || 0);
+        setKpiCounts(json.data.counts || {});
+        setConversionRate(json.data.conversionRate || 0);
+      } else {
+        setLeads([]);
+      }
+    } catch (err) {
+      console.error("Error loading leads:", err);
+      setLeads([]);
+    } finally {
+      setLoading(false);
+    }
   };
-  useEffect(() => { load(); }, []);
+
+  useEffect(() => {
+    load();
+  }, [page, search, statusFilter, sortBy]);
 
   const handleDelete = (id: string) => {
     setConfirmDeleteId(id);
@@ -291,37 +348,72 @@ export default function AdminLeads() {
     }
   };
 
-  const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Program', 'Status', 'Source', 'Message', 'Date'];
-    const rows = leads.map(l => [l.name, l.email, l.phone, l.program, l.status, l.source_page || '', l.message || '', l.created_at]);
-    const csv = [headers, ...rows].map(r => r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `devphoenix-leads-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+  const exportCSV = async () => {
+    try {
+      showToast("Preparing export files...", "info");
+      const res = await fetch(`/api/leads?search=${encodeURIComponent(search)}&status=${statusFilter}&sortBy=${sortBy}&downloadAll=true`);
+      const json = await res.json();
+      if (!json.success || !json.data || !json.data.leads) {
+        showToast("Failed to fetch export data.", "error");
+        return;
+      }
+      const exportLeads = json.data.leads;
+      if (exportLeads.length === 0) {
+        showToast("No leads match filters to export.", "info");
+        return;
+      }
+
+      // 1. CSV Export
+      const csvHeaders = ['Name', 'Email', 'Phone', 'College', 'Program', 'Goal', 'Lead Source', 'Status', 'Date', 'Enrollment Status'];
+      const csvRows = exportLeads.map((l: Lead) => [
+        l.name, 
+        l.email, 
+        l.phone, 
+        l.college || '', 
+        l.program || '', 
+        l.current_status || l.currentStatus || '', 
+        l.source_page || '', 
+        l.status, 
+        new Date(l.created_at).toLocaleString(),
+        l.payment_status || 'Unconverted'
+      ]);
+      const csv = [csvHeaders, ...csvRows].map((r: any[]) => r.map((c: any) => `"${String(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const csvBlob = new Blob([csv], { type: 'text/csv' });
+      const csvUrl = URL.createObjectURL(csvBlob);
+      const csvLink = document.createElement('a');
+      csvLink.href = csvUrl;
+      csvLink.download = `devphoenix-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+      csvLink.click();
+
+      // 2. XLSX Export
+      const xlsxData = exportLeads.map((l: Lead) => ({
+        'Name': l.name,
+        'Email': l.email,
+        'Phone': l.phone,
+        'College': l.college || '',
+        'Program': l.program || '',
+        'Goal': l.current_status || l.currentStatus || '',
+        'Lead Source': l.source_page || '',
+        'Status': l.status,
+        'Date': new Date(l.created_at).toLocaleString(),
+        'Enrollment Status': l.payment_status || 'Unconverted'
+      }));
+      const XLSX = await import('xlsx');
+      const worksheet = XLSX.utils.json_to_sheet(xlsxData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+      XLSX.writeFile(workbook, `devphoenix-leads-${new Date().toISOString().slice(0, 10)}.xlsx`);
+
+      showToast("Export completed successfully!", "success");
+    } catch (err) {
+      console.error("Export error:", err);
+      showToast("Export failed.", "error");
+    }
   };
 
-  // Filter & sort
-  let filtered = leads.filter(l => {
-    const q = search.toLowerCase();
-    const matchSearch = !search || l.name?.toLowerCase().includes(q) || l.email?.toLowerCase().includes(q) || l.phone?.includes(q) || l.program?.toLowerCase().includes(q);
-    const matchStatus = statusFilter === 'All' || l.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
-
-  filtered = [...filtered].sort((a, b) => {
-    if (sortBy === 'newest') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    if (sortBy === 'oldest') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-    return a.name.localeCompare(b.name);
-  });
-
-  const totalPages = Math.ceil(filtered.length / PER_PAGE);
-  const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  // Stats
-  const counts: Partial<Record<LeadStatus | 'All', number>> = { All: leads.length };
-  leads.forEach(l => { counts[l.status] = (counts[l.status] || 0) + 1; });
-  const conversionRate = leads.length > 0 ? Math.round(((counts['Converted'] || 0) / leads.length) * 100) : 0;
+  const totalPages = Math.ceil(totalCount / PER_PAGE);
+  const paginated = leads;
+  const counts = kpiCounts;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 max-w-7xl mx-auto py-8">
@@ -458,7 +550,7 @@ export default function AdminLeads() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-6">
-          <p className="text-sm text-slate-500 font-semibold">Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}</p>
+          <p className="text-sm text-slate-500 font-semibold">Showing {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, totalCount)} of {totalCount}</p>
           <div className="flex gap-2">
             <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1} className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold disabled:opacity-40 transition-colors">← Prev</button>
             <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold disabled:opacity-40 transition-colors">Next →</button>

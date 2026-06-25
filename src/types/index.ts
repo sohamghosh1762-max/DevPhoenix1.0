@@ -134,6 +134,9 @@ export interface Lead {
   last_contacted_at?: string;
   created_at: string;
   updated_at?: string;
+  enrollment_date?: string;
+  payment_status?: string;
+  payment_amount?: number;
 }
 
 export type OpportunityStage = 'Discovery' | 'Proposal' | 'Negotiation' | 'Won' | 'Lost';

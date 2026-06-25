@@ -131,12 +131,12 @@ export default function Navbar() {
               <span className="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse" />
               <strong className="text-slate-200">100+</strong> active learners
             </span>
-            <span className="w-px h-3 bg-slate-800" />
-            <span><strong className="text-slate-200">9+</strong> Programs</span>
+            <span className="hidden sm:inline w-px h-3 bg-slate-800" />
+            <span className="hidden sm:inline"><strong className="text-slate-200">9+</strong> Programs</span>
           </div>
           <div className="flex items-center gap-4">
-            <span><strong className="text-slate-200">98%</strong> satisfaction</span>
-            <span className="w-px h-3 bg-slate-800" />
+            <span className="hidden sm:inline"><strong className="text-slate-200">98%</strong> satisfaction</span>
+            <span className="hidden sm:inline w-px h-3 bg-slate-800" />
             <span className="text-orange-400">★ <strong className="text-slate-200">4.8/5</strong></span>
           </div>
         </div>

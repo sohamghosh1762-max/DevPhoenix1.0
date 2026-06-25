@@ -154,6 +154,9 @@ export const sanitizePayload = {
       notes: Array.isArray(body.notes) ? body.notes : [],
       assigned_admin: trimString(body.assigned_admin, "Assigned Admin") || null,
       last_contacted_at: body.last_contacted_at || null,
+      enrollment_date: trimString(body.enrollment_date || body.enrollmentDate, "Enrollment Date") || null,
+      payment_status: trimString(body.payment_status || body.paymentStatus, "Payment Status") || null,
+      payment_amount: body.payment_amount !== undefined && body.payment_amount !== null ? Number(body.payment_amount) : (body.paymentAmount !== undefined && body.paymentAmount !== null ? Number(body.paymentAmount) : null),
     };
   },
 

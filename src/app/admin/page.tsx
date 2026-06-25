@@ -72,46 +72,76 @@ export default function AdminDashboard() {
   const [programs, setPrograms] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [mentors, setMentors] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [chartRange, setChartRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
 
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/leads', { cache: 'no-store' }).then(r => r.json()).catch(() => ({ success: false })),
-      fetch('/api/programs', { cache: 'no-store' }).then(r => r.json()).catch(() => ({ success: false })),
-      fetch('/api/testimonials', { cache: 'no-store' }).then(r => r.json()).catch(() => ({ success: false })),
-      fetch('/api/mentors', { cache: 'no-store' }).then(r => r.json()).catch(() => ({ success: false })),
-    ]).then(([l, p, t, m]) => {
-      const leadsList = l && l.success && Array.isArray(l.data) ? l.data : (Array.isArray(l) ? l : []);
-      const programsList = p && p.success && Array.isArray(p.data) ? p.data : (Array.isArray(p) ? p : []);
-      const testimonialsList = t && t.success && Array.isArray(t.data) ? t.data : (Array.isArray(t) ? t : []);
-      const mentorsList = m && m.success && Array.isArray(m.data) ? m.data : (Array.isArray(m) ? m : []);
+  const loadDashboard = async () => {
+    try {
+      const [analyticsRes, leadsRes, programsRes, testimonialsRes, mentorsRes] = await Promise.all([
+        fetch('/api/admin/analytics', { cache: 'no-store' }).then(r => r.json()).catch(() => null),
+        fetch(`/api/leads?limit=8&search=${encodeURIComponent(search)}&status=${statusFilter}`, { cache: 'no-store' }).then(r => r.json()).catch(() => null),
+        fetch('/api/programs', { cache: 'no-store' }).then(r => r.json()).catch(() => null),
+        fetch('/api/testimonials', { cache: 'no-store' }).then(r => r.json()).catch(() => null),
+        fetch('/api/mentors', { cache: 'no-store' }).then(r => r.json()).catch(() => null),
+      ]);
 
-      setLeads(leadsList);
-      setPrograms(programsList);
-      setTestimonials(testimonialsList);
-      setMentors(mentorsList);
+      if (analyticsRes && analyticsRes.success) {
+        setAnalytics(analyticsRes.data);
+      }
+      if (leadsRes && leadsRes.success && leadsRes.data) {
+        setLeads(leadsRes.data.leads || []);
+      }
+      if (programsRes && programsRes.success) {
+        setPrograms(programsRes.data || []);
+      }
+      if (testimonialsRes && testimonialsRes.success) {
+        setTestimonials(testimonialsRes.data || []);
+      }
+      if (mentorsRes && mentorsRes.success) {
+        setMentors(mentorsRes.data || []);
+      }
+    } catch (err) {
+      console.error("Failed to load admin dashboard data:", err);
+    } finally {
       setLoading(false);
-    });
-  }, []);
+    }
+  };
+
+  useEffect(() => {
+    loadDashboard();
+  }, [search, statusFilter]);
 
   // Derived CRM metrics
-  const newLeads = leads.filter(l => l.status === 'New' || !l.status).length;
-  const contactedLeads = leads.filter(l => l.status === 'Contacted').length;
-  const qualifiedLeads = leads.filter(l => l.status === 'Qualified').length;
-  const consultationLeads = leads.filter(l => l.status === 'Consultation Scheduled').length;
-  const convertedLeads = leads.filter(l => l.status === 'Converted').length;
-  const conversionRate = leads.length > 0 ? Math.round((convertedLeads / leads.length) * 100) : 0;
+  const kpis = analytics?.kpis || {
+    totalLeads: 0,
+    newLeads: 0,
+    contactedLeads: 0,
+    qualifiedLeads: 0,
+    consultationLeads: 0,
+    convertedLeads: 0,
+    lostLeads: 0,
+    conversionRate: 0,
+    totalRevenue: 0
+  };
+
+  const newLeads = kpis.newLeads;
+  const contactedLeads = kpis.contactedLeads;
+  const qualifiedLeads = kpis.qualifiedLeads;
+  const consultationLeads = kpis.consultationLeads;
+  const convertedLeads = kpis.convertedLeads;
+  const conversionRate = kpis.conversionRate;
+  const totalRevenue = kpis.totalRevenue;
+  const totalLeads = kpis.totalLeads;
 
   // Pipeline Values (Estimation based on Rs. 1,249 average enrollment fee per lead)
   const estLeadValue = 1249;
   const getPipelineVal = (count: number) => `₹${(count * estLeadValue).toLocaleString('en-IN')}`;
-  const totalRevenue = convertedLeads * estLeadValue;
 
   // Interactive Chart Datasets
-  const chartData = {
+  const chartData = analytics?.chartData || {
     '7d': [12, 19, 15, 22, 30, 28, 35],
     '30d': [10, 15, 8, 12, 22, 19, 25, 30, 28, 35, 42, 38, 45, 52, 48, 50, 62, 58, 65, 72, 68, 75, 82, 78, 85, 92, 88, 95, 108, 114],
     '90d': [30, 45, 52, 48, 65, 78, 82, 75, 92, 110, 105, 125, 142, 138, 160, 185, 192, 180, 210, 235, 220, 240, 268, 255, 290, 315, 310, 340, 375, 362, 390],
@@ -126,18 +156,18 @@ export default function AdminDashboard() {
     return data.map((v, i) => `${i * step},${height - 10 - ((v - min) / range) * (height - 20)}`).join(' L ');
   };
 
-  const activeChartDataset = chartData[chartRange];
+  const activeChartDataset = chartData[chartRange] || [];
   const chartWidth = 550;
   const chartHeight = 220;
   const linePath = getSvgPathCoordinates(activeChartDataset, chartWidth, chartHeight);
   const areaPath = linePath ? `${linePath} L ${chartWidth},${chartHeight} L 0,${chartHeight} Z` : '';
 
   // Lead Sources percentages
-  const leadSources = [
-    { label: 'Website', count: Math.round(leads.length * 0.45) || 28, pct: '45%', color: 'bg-[#FF6B00]', stroke: '#FF6B00' },
-    { label: 'Social Media', count: Math.round(leads.length * 0.25) || 16, pct: '25%', color: 'bg-[#2563EB]', stroke: '#2563EB' },
-    { label: 'Referrals', count: Math.round(leads.length * 0.18) || 11, pct: '18%', color: 'bg-[#10B981]', stroke: '#10B981' },
-    { label: 'Direct / Email', count: Math.round(leads.length * 0.12) || 7, pct: '12%', color: 'bg-[#8B5CF6]', stroke: '#8B5CF6' },
+  const leadSources = analytics?.leadSources || [
+    { label: 'Website', count: Math.round(totalLeads * 0.45) || 28, pct: '45%', color: 'bg-[#FF6B00]', stroke: '#FF6B00' },
+    { label: 'Social Media', count: Math.round(totalLeads * 0.25) || 16, pct: '25%', color: 'bg-[#2563EB]', stroke: '#2563EB' },
+    { label: 'Referrals', count: Math.round(totalLeads * 0.18) || 11, pct: '18%', color: 'bg-[#10B981]', stroke: '#10B981' },
+    { label: 'Direct / Email', count: Math.round(totalLeads * 0.12) || 7, pct: '12%', color: 'bg-[#8B5CF6]', stroke: '#8B5CF6' },
   ];
 
   // Quick Action Buttons
@@ -175,13 +205,7 @@ export default function AdminDashboard() {
     return <DashboardSkeleton />;
   }
 
-  // Filter leads list for the main table search
-  const filteredLeads = leads.filter(l => {
-    const q = search.toLowerCase();
-    const matchSearch = !search || l.name?.toLowerCase().includes(q) || l.email?.toLowerCase().includes(q) || l.program?.toLowerCase().includes(q);
-    const matchStatus = statusFilter === 'All' || l.status === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  const filteredLeads = leads;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -324,7 +348,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
-            {leadSources.map(s => (
+            {leadSources.map((s: any) => (
               <div key={s.label} className="flex items-center gap-1.5 p-1 rounded hover:bg-slate-50 transition-colors">
                 <span className={`w-2 h-2 rounded-full shrink-0 ${s.color}`} />
                 <span className="truncate flex-1">{s.label}</span>
@@ -374,14 +398,14 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {(programs.length > 0 ? programs.slice(0, 3) : [
-            { title: 'Full Stack Development', category: 'Development', id: '1', price: '₹4,999' },
-            { title: 'Cloud & DevOps Masterclass', category: 'Cloud', id: '2', price: '₹5,999' },
-            { title: 'AI & Automation Bootcamp', category: 'AI', id: '3', price: '₹6,999' }
-          ]).map((prog, idx) => {
-            const count = leads.filter(l => l.program === prog.title).length || (12 - idx * 3);
-            const conv = Math.round((idx === 0 ? 0.35 : idx === 1 ? 0.28 : 0.22) * 100);
-            const revVal = count * estLeadValue;
+          {(analytics?.programMetrics && analytics.programMetrics.length > 0 ? analytics.programMetrics.slice(0, 3) : [
+            { title: 'Full Stack Development', category: 'Development', id: '1', price: '₹4,999', count: 12, conv: 35, revVal: 12 * 1249 },
+            { title: 'Cloud & DevOps Masterclass', category: 'Cloud', id: '2', price: '₹5,999', count: 9, conv: 28, revVal: 9 * 1249 },
+            { title: 'AI & Automation Bootcamp', category: 'AI', id: '3', price: '₹6,999', count: 6, conv: 22, revVal: 6 * 1249 }
+          ]).map((prog: any, idx: number) => {
+            const count = prog.count !== undefined ? prog.count : (leads.filter(l => l.program === prog.title).length || (12 - idx * 3));
+            const conv = prog.conv !== undefined ? prog.conv : Math.round((idx === 0 ? 0.35 : idx === 1 ? 0.28 : 0.22) * 100);
+            const revVal = prog.revVal !== undefined ? prog.revVal : count * estLeadValue;
 
             return (
               <div key={prog.id || idx} className="border border-slate-100 rounded-xl p-5 hover:shadow-md transition-all duration-300 bg-white">
@@ -430,11 +454,11 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex items-end justify-between gap-1.5 h-36 px-2">
-            {[
+            {(analytics?.revenueAnalysis || [
               { m: 'Jan', val: 32 }, { m: 'Feb', val: 40 }, { m: 'Mar', val: 55 },
               { m: 'Apr', val: 48 }, { m: 'May', val: 75 }, { m: 'Jun', val: 60 }
-            ].map(m => (
-              <div key={m.m} className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer">
+            ]).map((m: any) => (
+              <div key={m.m} className="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer" title={`Revenue: ₹${(m.revenue !== undefined ? m.revenue : (m.val * 1000)).toLocaleString('en-IN')}`}>
                 <div className="relative w-full flex items-end justify-center bg-slate-50 border border-slate-100 rounded-lg h-28 overflow-hidden">
                   <div
                     style={{ height: `${m.val}%` }}
