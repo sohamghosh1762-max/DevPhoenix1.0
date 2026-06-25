@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-import * as XLSX from "xlsx";
 import { Resend } from "resend";
 import { leadsService } from "@/services/mongodb/db.service";
 import { hasMongoConfig } from "@/services/mongodb/client";
@@ -51,83 +48,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Ensure public folder exists
-    const publicDir = path.join(
-      process.cwd(),
-      "public"
-    );
 
-    if (!fs.existsSync(publicDir)) {
-      fs.mkdirSync(publicDir, {
-        recursive: true,
-      });
-    }
-
-    // Excel file path
-    const excelFilename = source === "contact" ? "contact_enquiries.xlsx" : "enquiries.xlsx";
-    const filePath = path.join(
-      publicDir,
-      excelFilename
-    );
-
-    console.log("📂 Excel Path:", filePath);
-
-    let rows: any[] = [];
-
-    // Read existing Excel
-    if (fs.existsSync(filePath)) {
-      console.log("📖 Existing Excel found");
-
-      const fileBuffer = fs.readFileSync(filePath);
-      const existingWorkbook = XLSX.read(fileBuffer, { type: "buffer" });
-
-      const sheet =
-        existingWorkbook.Sheets["Enquiries"];
-
-      if (sheet) {
-        rows =
-          XLSX.utils.sheet_to_json(sheet);
-      }
-    }
-
-    // Add new entry
-    rows.push({
-      Name: name,
-      Email: email,
-      Phone: phone,
-      College: college || "",
-      Program: program,
-      Goal: goal || "",
-      Message: message || "",
-      Source: source || "modal",
-      Date: new Date().toLocaleString(),
-    });
-
-    console.log("📝 Total Rows:", rows.length);
-
-    // Create workbook
-    const workbook = XLSX.utils.book_new();
-
-    const worksheet =
-      XLSX.utils.json_to_sheet(rows);
-
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "Enquiries"
-    );
-
-    // Save Excel
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "buffer",
-    });
-    fs.writeFileSync(filePath, excelBuffer);
-
-    console.log(
-      "✅ Excel saved successfully:",
-      filePath
-    );
 
     // Persist to CRM Database
     const newLead: Lead = {
