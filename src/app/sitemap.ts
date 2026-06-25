@@ -1,17 +1,33 @@
 import { MetadataRoute } from 'next';
 import { blogsService, programsService } from "@/services/mongodb/db.service";
 import { hasMongoConfig } from "@/services/mongodb/client";
+import { programsData } from "@/data/programs";
+import { blogPosts } from "@/data/blog";
 
 const BASE_URL = 'https://devphoenix.tech';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
- let programs: any[] = [];
-let blogs: any[] = [];
+  let programs: any[] = [];
+  let blogs: any[] = [];
+  
   if (hasMongoConfig) {
     try {
       programs = await programsService.getAll();
       blogs = await blogsService.getAll();
     } catch {}
+  }
+
+  // Fallbacks if database is offline or empty
+  if (!programs || programs.length === 0) {
+    programs = programsData;
+  }
+  if (!blogs || blogs.length === 0) {
+    blogs = blogPosts.map((post, idx) => ({
+      id: `blog-static-${idx}`,
+      slug: post.slug,
+      published_at: post.date || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }));
   }
 
   const staticPages: MetadataRoute.Sitemap = [

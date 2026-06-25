@@ -33,7 +33,7 @@ export default function ContactPage() {
     setError('');
 
     try {
-      const res = await fetch('/api/leads', {
+      const res = await fetch("/api/enquiry", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -41,10 +41,9 @@ export default function ContactPage() {
           email: form.email,
           phone: form.phone,
           college: form.college,
-          program: form.program || 'General Contact Inquiry',
+          program: form.program,
           message: form.message,
-          source_page: '/contact',
-          source_campaign: 'contact_page'
+          source: "contact",
         })
       });
 

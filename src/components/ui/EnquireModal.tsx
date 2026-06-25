@@ -48,20 +48,20 @@ export function EnquireModal({ isOpen, onClose }: EnquireModalProps) {
 
     try {
       const combinedMessage = `Goal: ${form.goal || "N/A"}. ${form.message || ""}`;
-      const res = await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          college: form.college,
-          program: form.program || "Not decided yet",
-          message: combinedMessage,
-          source_page: pathname,
-          source_campaign: "join_now_modal"
-        })
-      });
+      const res = await fetch("/api/enquiry", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    name: form.name,
+    email: form.email,
+    phone: form.phone,
+    college: form.college,
+    program: form.program || "Not decided yet",
+    goal: form.goal,
+    message: combinedMessage,
+    source: "modal",
+  }),
+});
 
       const data = await res.json();
       if (data.success) {

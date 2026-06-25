@@ -86,15 +86,17 @@ export default function LeadPopup() {
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setLoading(true);
     try {
-      await fetch('/api/leads', {
+      await fetch('/api/enquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...form,
-          current_status: form.current_status,
-          currentStatus: form.current_status,
-          source_page: pathname || '/',
-          source_campaign: 'popup',
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          program: form.program || "Not decided yet",
+          college: form.current_status || "N/A",
+          message: form.message || "Requesting Free Counselling",
+          source: "counselling",
         }),
       });
       setSubmittedData({ name: form.name, program: form.program });

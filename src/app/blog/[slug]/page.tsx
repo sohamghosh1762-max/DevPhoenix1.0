@@ -10,6 +10,7 @@ import { blogsService } from "@/services/mongodb/db.service";
 import { hasMongoConfig } from "@/services/mongodb/client";
 import { blogPostingJsonLd, breadcrumbJsonLd, organizationJsonLd } from "@/lib/seo";
 import { DynamicImage } from "@/components/ui/DynamicImage";
+import { blogPosts } from "@/data/blog";
 
 // ─── Dynamic Helper ──────────────────────────────────────────────────────────
 async function getBlogPosts() {
@@ -19,6 +20,25 @@ async function getBlogPosts() {
       rawList = await blogsService.getAll();
     } catch {}
   }
+  
+  if (!rawList || rawList.length === 0) {
+    rawList = blogPosts.map((post, idx) => ({
+      id: `blog-static-${idx}`,
+      created_at: new Date(Date.now() - idx * 24 * 60 * 60 * 1000).toISOString(),
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      category: post.category,
+      tags: (post as any).tags || [],
+      read_time: post.readTime || "5 min read",
+      published_at: new Date(Date.now() - idx * 24 * 60 * 60 * 1000).toISOString(),
+      cover_image: post.image,
+      is_published: true,
+      author: post.author,
+    }));
+  }
+
   return rawList.map((post: any) => ({
     ...post,
     cover_image: post.cover_image || post.coverImage || post.image,
