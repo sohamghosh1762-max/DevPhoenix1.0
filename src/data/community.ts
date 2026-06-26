@@ -33,7 +33,7 @@ export const communityStatsData = [
 ];
 
 export const contactInfo = {
-  email: "contact@devphoenix.com",
+  email: "devphoenix@zohomail.in",
   phone: "+91 9734876490"
 };
 

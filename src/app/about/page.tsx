@@ -129,8 +129,8 @@ export default function AboutPage() {
                   <div className="space-y-6">
                     <div>
                       <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Email Us</p>
-                      <a href={`mailto:${config.contact?.email || 'contact@devphoenix.com'}`} className="text-lg font-bold text-slate-900 hover:text-orange-500 transition-colors">
-                        {config.contact?.email || 'contact@devphoenix.com'}
+                      <a href={`mailto:${config.contact?.email || 'devphoenix@zohomail.in'}`} className="text-lg font-bold text-slate-900 hover:text-orange-500 transition-colors">
+                        {config.contact?.email || 'devphoenix@zohomail.in'}
                       </a>
                     </div>
                     <div>

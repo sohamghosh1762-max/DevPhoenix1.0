@@ -108,8 +108,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Email Us</p>
-                    <a href="mailto:contact@devphoenix.com" className="text-lg font-bold text-slate-800 hover:text-orange-500 transition-colors">
-                      contact@devphoenix.com
+                    <a href="mailto:devphoenix@zohomail.in" className="text-lg font-bold text-slate-800 hover:text-orange-500 transition-colors">
+                      devphoenix@zohomail.in
                     </a>
                   </div>
                 </div>

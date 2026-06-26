@@ -103,14 +103,65 @@ export function LearningPathsPreview() {
                 </div>
 
                 {path.image && (
-                  <div className="relative w-full h-40 rounded-2xl mb-6 border border-orange-100 overflow-hidden bg-orange-50/50 transition-colors z-10">
-                    <Image 
-                      src={path.image} 
-                      alt={path.title} 
-                      fill 
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500" 
-                    />
+                  <div className="w-full flex justify-center mb-6 z-10">
+                    <div className="relative w-[160px] h-[280px] select-none pointer-events-none drop-shadow-[0_12px_24px_rgba(249,115,22,0.12)] group-hover:drop-shadow-[0_16px_32px_rgba(249,115,22,0.22)] group-hover:scale-[1.03] group-hover:rotate-1 transition-all duration-500">
+                      {/* Device Chassis / Bezel */}
+                      <div className="absolute inset-0 bg-[#0F172A] rounded-[2.2rem] p-[7px] shadow-2xl ring-1 ring-white/15">
+                        {/* Screen Glass */}
+                        <div className="relative w-full h-full rounded-[1.7rem] overflow-hidden bg-slate-950 border border-slate-800">
+                          {/* Speaker / Dynamic Island */}
+                          <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-4 bg-[#020617] rounded-full z-30 flex items-center justify-between px-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-900 border border-slate-800" />
+                            <span className="w-1 h-1 rounded-full bg-blue-950" />
+                          </div>
+
+                          {/* Status Bar */}
+                          <div className="absolute top-1.5 left-0 right-0 h-4 px-3.5 flex items-center justify-between text-[7px] font-extrabold text-white/95 z-20 select-none">
+                            <span>9:41</span>
+                            <div className="flex items-center gap-1.5">
+                              {/* Signal Bars */}
+                              <div className="flex items-end gap-[1px]">
+                                <span className="w-[1.5px] h-1.5 bg-white rounded-[0.5px]" />
+                                <span className="w-[1.5px] h-2 bg-white rounded-[0.5px]" />
+                                <span className="w-[1.5px] h-2.5 bg-white rounded-[0.5px]" />
+                                <span className="w-[1.5px] h-3 bg-white/40 rounded-[0.5px]" />
+                              </div>
+                              {/* WiFi SVG */}
+                              <svg className="w-2 h-2 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 21l-12-12c4.4-4.4 11.6-4.4 16 0l-4 4zM12 6c-3.3 0-6.4 1.3-8.7 3.5l8.7 8.7 8.7-8.7c-2.3-2.2-5.4-3.5-8.7-3.5z" />
+                              </svg>
+                              {/* Battery Body */}
+                              <div className="relative w-4 h-2 border border-white/85 rounded-[3px] p-[0.5px] flex items-center bg-transparent">
+                                <div className="h-full w-[80%] bg-emerald-500 rounded-[1.5px]" />
+                                <div className="absolute -right-[2px] top-1/2 -translate-y-1/2 w-[1.5px] h-1 bg-white/80 rounded-r-[0.5px]" />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Wallpaper/Display Content */}
+                          <div className="w-full h-full relative">
+                            <Image 
+                              src={path.image} 
+                              alt={path.title} 
+                              fill 
+                              sizes="160px"
+                              className="object-cover group-hover:scale-105 transition-transform duration-700" 
+                            />
+                            {/* Cinematic Gradient Overlays */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/50 via-transparent to-[#020617]/60" />
+                            
+                            {/* Simulated App UI/Widget Box */}
+                            <div className="absolute bottom-3.5 left-2 right-2 bg-slate-900/85 backdrop-blur-md border border-white/10 p-2 rounded-xl text-left shadow-lg">
+                              <p className="text-[7px] font-black text-orange-500 uppercase tracking-widest mb-0.5">DEVPHOENIX APP</p>
+                              <p className="text-[9px] font-bold text-white truncate">{path.title}</p>
+                            </div>
+                          </div>
+
+                          {/* Bottom Gestures Line */}
+                          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-12 h-[3px] bg-white/70 rounded-full z-20" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
 

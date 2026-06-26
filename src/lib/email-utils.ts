@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 const DEFAULT_FROM_EMAIL = "DevPhoenix Academy <academy@devphoenix.com>";
-const DEFAULT_ADMIN_EMAILS = "devphoenix@zohomail.com, devphoenix@zohomail.in, devphoenix04@gmail.com";
+const DEFAULT_ADMIN_EMAILS = "devphoenix@zohomail.in";
 
 function getSender(label: string, fromEnv?: string) {
   const baseEmail = fromEnv || DEFAULT_FROM_EMAIL;
@@ -12,8 +12,7 @@ function getSender(label: string, fromEnv?: string) {
 
 export async function sendLeadEmail(lead: any) {
   const apiKey = process.env.RESEND_API_KEY;
-  const adminEmailEnv = process.env.RESEND_ADMIN_EMAIL || DEFAULT_ADMIN_EMAILS;
-  const adminEmails = adminEmailEnv.split(',').map(e => e.trim()).filter(Boolean);
+  const adminEmails = ["devphoenix@zohomail.in"];
   const timestamp = new Date().toLocaleString();
 
   console.log(`[Email Dispatch] Triggering Resend notification/auto-reply for lead: ${lead.name}`);
@@ -135,11 +134,12 @@ Subject: ${autoReplySubject}
 
     // 1. Send notification to admin
     const adminResponse = await resendClient.emails.send({
-      from: fromEmailAdmin,
-      to: adminEmails,
-      subject: adminSubject,
-      html: adminHtml,
-    });
+  from: fromEmailAdmin,
+  to: ["devphoenix@zohomail.in"],
+  replyTo: lead.email,
+  subject: adminSubject,
+  html: adminHtml,
+});
 
     if (adminResponse.error) {
       console.error('❌ [Email Dispatch] Admin notification failed:', adminResponse.error);

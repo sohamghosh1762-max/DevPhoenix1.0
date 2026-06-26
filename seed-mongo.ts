@@ -92,7 +92,7 @@ async function seed() {
       { 
         $set: {
           hero: {},
-          contact: { email: "contact@devphoenix.com", phone: "+91 9734876490" },
+          contact: { email: "devphoenix@zohomail.in", phone: "+91 9734876490" },
           socials: {
             instagram: "https://www.instagram.com/devphoenix_technologies/",
             linkedin: "https://www.linkedin.com/company/112698008/",
@@ -124,7 +124,7 @@ async function seed() {
                 { label: "Certifications", href: "/programs" },
                 { label: "Student Projects", href: "/showcase" },
                 { label: "FAQs", href: "/#faq" },
-                { label: "Contact", href: "mailto:contact@devphoenix.com" },
+                { label: "Contact", href: "mailto:devphoenix@zohomail.in" },
               ],
             },
           ],
