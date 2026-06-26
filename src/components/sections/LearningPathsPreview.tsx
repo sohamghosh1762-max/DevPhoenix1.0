@@ -104,7 +104,7 @@ export function LearningPathsPreview() {
 
                 {path.image && (
                   <div className="w-full flex justify-center mb-6 z-10">
-                    <div className="relative w-[160px] h-[280px] select-none pointer-events-none drop-shadow-[0_12px_24px_rgba(249,115,22,0.12)] group-hover:drop-shadow-[0_16px_32px_rgba(249,115,22,0.22)] group-hover:scale-[1.03] group-hover:rotate-1 transition-all duration-500">
+                    <div className="relative w-[180px] h-[315px] sm:w-[210px] sm:h-[368px] md:w-[160px] md:h-[280px] lg:w-[160px] lg:h-[280px] xl:w-[190px] xl:h-[332px] select-none pointer-events-none drop-shadow-[0_12px_24px_rgba(249,115,22,0.12)] group-hover:drop-shadow-[0_16px_32px_rgba(249,115,22,0.22)] group-hover:scale-[1.03] group-hover:rotate-1 transition-all duration-500">
                       {/* Device Chassis / Bezel */}
                       <div className="absolute inset-0 bg-[#0F172A] rounded-[2.2rem] p-[7px] shadow-2xl ring-1 ring-white/15">
                         {/* Screen Glass */}
@@ -112,30 +112,25 @@ export function LearningPathsPreview() {
                           {/* Speaker / Dynamic Island */}
                           <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-14 h-4 bg-[#020617] rounded-full z-30 flex items-center justify-between px-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-slate-900 border border-slate-800" />
-                            <span className="w-1 h-1 rounded-full bg-blue-950" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-950" />
                           </div>
 
                           {/* Status Bar */}
-                          <div className="absolute top-1.5 left-0 right-0 h-4 px-3.5 flex items-center justify-between text-[7px] font-extrabold text-white/95 z-20 select-none">
-                            <span>9:41</span>
-                            <div className="flex items-center gap-1.5">
-                              {/* Signal Bars */}
-                              <div className="flex items-end gap-[1px]">
-                                <span className="w-[1.5px] h-1.5 bg-white rounded-[0.5px]" />
-                                <span className="w-[1.5px] h-2 bg-white rounded-[0.5px]" />
-                                <span className="w-[1.5px] h-2.5 bg-white rounded-[0.5px]" />
-                                <span className="w-[1.5px] h-3 bg-white/40 rounded-[0.5px]" />
-                              </div>
-                              {/* WiFi SVG */}
-                              <svg className="w-2 h-2 fill-current" viewBox="0 0 24 24">
-                                <path d="M12 21l-12-12c4.4-4.4 11.6-4.4 16 0l-4 4zM12 6c-3.3 0-6.4 1.3-8.7 3.5l8.7 8.7 8.7-8.7c-2.3-2.2-5.4-3.5-8.7-3.5z" />
-                              </svg>
-                              {/* Battery Body */}
-                              <div className="relative w-4 h-2 border border-white/85 rounded-[3px] p-[0.5px] flex items-center bg-transparent">
-                                <div className="h-full w-[80%] bg-emerald-500 rounded-[1.5px]" />
-                                <div className="absolute -right-[2px] top-1/2 -translate-y-1/2 w-[1.5px] h-1 bg-white/80 rounded-r-[0.5px]" />
-                              </div>
-                            </div>
+                          <div className="absolute top-1 left-0 right-0 h-5 px-1.5 z-20 select-none">
+                            <svg className="w-full h-full text-white/95 fill-current" viewBox="0 0 150 20">
+                              <text x="12" y="13" fontFamily="-apple-system, BlinkMacSystemFont, sans-serif" fontSize="8.5" fontWeight="800" fill="currentColor">9:41</text>
+                              
+                              <rect x="106" y="10" width="1.5" height="3" rx="0.5" fill="currentColor" />
+                              <rect x="109" y="8" width="1.5" height="5" rx="0.5" fill="currentColor" />
+                              <rect x="112" y="6" width="1.5" height="7" rx="0.5" fill="currentColor" />
+                              <rect x="115" y="4" width="1.5" height="9" rx="0.5" fill="currentColor" opacity="0.4" />
+                              
+                              <path d="M122 13a1 1 0 1 0 2 0 1 1 0 0 0-2 0zm-2.5-2.5a4.5 4.5 0 0 1 7 0M117 8a8 8 0 0 1 12 0" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                              
+                              <rect x="133" y="6" width="12" height="6.5" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1" />
+                              <rect x="134.5" y="7.5" width="7" height="3.5" rx="0.5" fill="#10b981" />
+                              <path d="M146 7.5v3.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+                            </svg>
                           </div>
 
                           {/* Wallpaper/Display Content */}
@@ -144,7 +139,7 @@ export function LearningPathsPreview() {
                               src={path.image} 
                               alt={path.title} 
                               fill 
-                              sizes="160px"
+                              sizes="(max-width: 640px) 180px, (max-width: 768px) 210px, (max-width: 1024px) 160px, 190px"
                               className="object-cover group-hover:scale-105 transition-transform duration-700" 
                             />
                             {/* Cinematic Gradient Overlays */}
