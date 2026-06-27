@@ -17,8 +17,9 @@ export function ProgramPricing({ program }: ProgramPricingProps) {
   const [expired, setExpired] = useState(false);
 
   useEffect(() => {
-    const TARGET_DATE = new Date("2026-07-02T23:59:00+05:30").getTime();
+    const TARGET_DATE = new Date("2026-07-04T23:59:00+05:30").getTime();
     if (Date.now() >= TARGET_DATE) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpired(true);
     }
   }, []);
@@ -38,9 +39,6 @@ export function ProgramPricing({ program }: ProgramPricingProps) {
     `Hi DevPhoeniX Team! 👋\n\nI'm interested in enrolling in the *${program.title}* program.\n\nCould you please share enrollment details and any ongoing offers?\n\n#FollowTheRise 🔥`
   );
 
-  const scrollToForm = () => {
-    document.getElementById('program-lead-form')?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   return (
     <section id="program-pricing" className="py-24 bg-slate-50 border-t border-slate-200">
@@ -54,7 +52,7 @@ export function ProgramPricing({ program }: ProgramPricingProps) {
               whileInView={designSystem.motion.fadeInUp.whileInView}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-extrabold text-slate-900 mb-3">What's Included</h2>
+              <h2 className="text-3xl font-extrabold text-slate-900 mb-3">What&apos;s Included</h2>
               <p className="text-slate-500 text-lg mb-8 leading-relaxed">
                 Everything you need to go from learner to industry-ready builder. No hidden fees.
               </p>
@@ -121,12 +119,14 @@ export function ProgramPricing({ program }: ProgramPricingProps) {
                 </div>
               </div>
 
-              <button
-                onClick={scrollToForm}
-                className="w-full py-4 rounded-xl bg-slate-900 text-white font-bold text-lg hover:bg-orange-500 transition-all duration-200 shadow-lg hover:shadow-orange-500/25 mb-3"
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfSpJIKE0kfnNi4D6Q16tDb4u_8EzICHtPkqDIKeEsv7rll9w/viewform"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 rounded-xl bg-slate-900 text-white font-bold text-lg hover:bg-orange-500 transition-all duration-200 shadow-lg hover:shadow-orange-500/25 mb-3 text-center flex items-center justify-center"
               >
                 Enroll Now
-              </button>
+              </a>
 
               <a
                 href={`https://wa.me/${WA_NUMBER}?text=${waMsg}`}

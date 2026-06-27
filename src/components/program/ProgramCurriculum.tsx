@@ -15,7 +15,7 @@ export function ProgramCurriculum({ program }: ProgramCurriculumProps) {
     : [];
 
   return (
-    <section className="py-20 bg-slate-50 border-t border-slate-200">
+    <section id="program-curriculum" className="py-20 bg-slate-50 border-t border-slate-200">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-4xl font-extrabold text-slate-900 mb-4">Complete Program Syllabus</h2>
@@ -84,7 +84,7 @@ export function ProgramCurriculum({ program }: ProgramCurriculumProps) {
   );
 }
 
-function ClockIcon(props: any) {
+function ClockIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>

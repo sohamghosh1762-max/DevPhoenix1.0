@@ -9,10 +9,21 @@ import { Program } from "@/types";
 interface ProgramHeroProps {
   program: Program;
   onScrollToCurriculum?: () => void;
-  onEnroll?: () => void;
 }
 
-export function ProgramHero({ program, onScrollToCurriculum, onEnroll }: ProgramHeroProps) {
+const CURRICULUM_PDFS: Record<string, string> = {
+  'ai-prompt-engineering': '/ai-prompt-engineering-curriculum.pdf',
+  'cloud-devops-engineering': '/cloud-devops-curriculum.pdf',
+  'data-science-machine-learning-generative-ai': '/data-science-curriculum.pdf',
+  'full-stack-mern-development': '/full-stack-curriculum.pdf',
+  'startup-entrepreneurship': '/startup-curriculum.pdf',
+  'dsa-python': '/dsa-python-curriculum.pdf',
+  'data-analytics-business-intelligence': '/data-analytics-curriculum.pdf',
+  'digital-marketing-growth-strategy': '/digital-marketing-curriculum.pdf',
+  'advanced-excel-business-analytics': '/excel-analytics-curriculum.pdf',
+};
+
+export function ProgramHero({ program, onScrollToCurriculum }: ProgramHeroProps) {
   return (
     <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden bg-[#0A0C10]">
       {/* Background Effects */}
@@ -84,7 +95,7 @@ export function ProgramHero({ program, onScrollToCurriculum, onEnroll }: Program
                 <Users className="w-5 h-5 text-orange-500" />
                 <div>
                   <p className="text-xs text-slate-400 uppercase font-bold tracking-wider">Practical</p>
-                  <p className="text-sm font-semibold text-white">{program.practical_hours || (program as any).practicalHours}</p>
+                  <p className="text-sm font-semibold text-white">{program.practical_hours || (program as unknown as { practicalHours?: string }).practicalHours}</p>
                 </div>
               </div>
             </motion.div>
@@ -96,18 +107,37 @@ export function ProgramHero({ program, onScrollToCurriculum, onEnroll }: Program
               transition={{ delay: 0.4 }}
               className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
             >
-              <button 
-                onClick={onEnroll}
+              <a 
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfSpJIKE0kfnNi4D6Q16tDb4u_8EzICHtPkqDIKeEsv7rll9w/viewform"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-8 py-4 rounded-xl bg-orange-500 text-white font-bold text-lg hover:bg-orange-600 hover:shadow-[0_0_20px_rgba(249,115,22,0.4)] transition-all flex items-center justify-center gap-2"
               >
                 Enroll Now <ArrowRight className="w-5 h-5" />
-              </button>
-              <button 
-                onClick={onScrollToCurriculum}
-                className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2"
-              >
-                View Curriculum <Download className="w-5 h-5" />
-              </button>
+              </a>
+              {CURRICULUM_PDFS[program.slug] ? (
+                <a 
+                  href={CURRICULUM_PDFS[program.slug]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                >
+                  View Curriculum <Download className="w-5 h-5" />
+                </a>
+              ) : (
+                <button 
+                  onClick={() => {
+                    if (onScrollToCurriculum) {
+                      onScrollToCurriculum();
+                    } else {
+                      document.getElementById('program-curriculum')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                  className="px-8 py-4 rounded-xl bg-white/5 border border-white/10 text-white font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                >
+                  View Curriculum <Download className="w-5 h-5" />
+                </button>
+              )}
             </motion.div>
           </div>
 

@@ -57,17 +57,17 @@ function TypewriterCode() {
   }, [currentCharIndex, currentLineIndex]);
 
   return (
-    <div className="font-mono text-sm md:text-base leading-loose">
+    <div className="font-mono text-xs sm:text-sm md:text-base leading-loose overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
       {lines.map((line, i) => (
-        <div key={i} className="flex">
-          <span className="text-slate-600 select-none w-6 text-right mr-4">{i + 1}</span>
-          <span dangerouslySetInnerHTML={{ __html: highlight(line) }} />
+        <div key={i} className="flex whitespace-nowrap">
+          <span className="text-slate-600 select-none w-6 text-right mr-4 shrink-0">{i + 1}</span>
+          <span className="shrink-0" dangerouslySetInnerHTML={{ __html: highlight(line) }} />
         </div>
       ))}
       {currentLineIndex < CODE_LINES.length && (
-        <div className="flex">
-          <span className="text-slate-600 select-none w-6 text-right mr-4">{lines.length + 1}</span>
-          <span>
+        <div className="flex whitespace-nowrap">
+          <span className="text-slate-600 select-none w-6 text-right mr-4 shrink-0">{lines.length + 1}</span>
+          <span className="shrink-0">
             <span dangerouslySetInnerHTML={{ __html: highlight(CODE_LINES[currentLineIndex].substring(0, currentCharIndex)) }} />
             <span className="animate-pulse bg-orange-500 w-2.5 h-5 inline-block ml-1 align-middle" />
           </span>
@@ -86,20 +86,20 @@ const ctaTrustChips = [
 
 export function CtaSection() {
   return (
-    <section className="relative w-full max-w-[1400px] mx-auto px-8 pt-24 pb-12 z-10 overflow-hidden">
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] overflow-hidden relative">
+    <section className="relative w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-20 md:pt-24 pb-12 z-10 overflow-hidden">
+      <div className="bg-white rounded-3xl md:rounded-[3rem] border border-slate-100 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] overflow-hidden relative">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.08),transparent_70%)] pointer-events-none -translate-y-1/2 translate-x-1/4" />
         
         <div className="grid lg:grid-cols-2 min-h-[600px]">
-          <div className="p-10 lg:p-16 xl:p-20 flex flex-col justify-center relative z-10">
+          <div className="p-6 sm:p-10 lg:p-16 xl:p-20 flex flex-col justify-center relative z-10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 border border-orange-100 mb-8 self-start"
+              className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-orange-50 border border-orange-100 mb-8 self-start max-w-full"
             >
-              <Sparkles className="w-4 h-4 text-orange-500" />
-              <span className="text-xs font-bold text-orange-600 tracking-widest uppercase">YOUR BUILD JOURNEY STARTS HERE</span>
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500 shrink-0" />
+              <span className="text-[10px] sm:text-xs font-bold text-orange-600 tracking-wider sm:tracking-widest uppercase break-words">YOUR BUILD JOURNEY STARTS HERE</span>
             </motion.div>
 
             <motion.h2
@@ -107,9 +107,10 @@ export function CtaSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-[1.1] tracking-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 leading-[1.15] tracking-tight"
             >
-              Don&apos;t Just Learn Technology.<br />
+              Don&apos;t Just Learn Technology.{" "}
+              <br className="hidden sm:inline" />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500 drop-shadow-sm">Build</span> With It.
             </motion.h2>
 
@@ -118,7 +119,7 @@ export function CtaSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="text-lg text-slate-600 mb-10 leading-relaxed max-w-lg"
+              className="text-base md:text-lg text-slate-600 mb-8 md:mb-10 leading-relaxed max-w-lg"
             >
               Go beyond passive learning. Build real-world systems, ship impactful projects, collaborate with builders, and grow into the future-ready creator you&apos;re meant to become.
             </motion.p>

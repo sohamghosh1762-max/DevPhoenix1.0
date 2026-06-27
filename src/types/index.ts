@@ -206,3 +206,18 @@ export interface ProjectShowcase {
   category?: string;
   created_at?: string;
 }
+
+export interface LearningPathBuildItem {
+  icon: string;
+  text: string;
+}
+
+export interface LearningPath {
+  id: string | number;
+  title: string;
+  description: string;
+  image?: string;
+  tags?: string[];
+  included?: string[];
+  build?: LearningPathBuildItem[];
+}

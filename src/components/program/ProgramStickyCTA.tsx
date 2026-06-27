@@ -28,9 +28,6 @@ export function ProgramStickyCTA({ program }: ProgramStickyCTAProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const scrollToForm = () => {
-    document.getElementById('program-lead-form')?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const waMsg = encodeURIComponent(
     `Hi DevPhoeniX! 👋\n\nI'm interested in the *${program.title}* program.\n\nCould you share details about enrollment?\n\n#FollowTheRise 🔥`
@@ -63,12 +60,14 @@ export function ProgramStickyCTA({ program }: ProgramStickyCTAProps) {
 
         {/* CTA buttons */}
         <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={scrollToForm}
-            className="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-orange-500 transition-colors"
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLSfSpJIKE0kfnNi4D6Q16tDb4u_8EzICHtPkqDIKeEsv7rll9w/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-1.5 py-3 rounded-xl bg-slate-900 text-white font-bold text-sm hover:bg-orange-500 transition-colors text-center"
           >
             Apply Now <ChevronRight className="w-4 h-4" />
-          </button>
+          </a>
           <a
             href={`https://wa.me/${WA_NUMBER}?text=${waMsg}`}
             target="_blank"

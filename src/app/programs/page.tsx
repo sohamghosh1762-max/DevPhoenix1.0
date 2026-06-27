@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Zap, Award } from "lucide-react";
+import { Zap } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { SectionWrapper } from "@/components/sections/SectionWrapper";
@@ -11,9 +11,10 @@ import { designSystem } from "@/lib/design-system";
 import { ProgramCard } from "@/components/cards/ProgramCard";
 import { CardSkeleton } from "@/components/ui/Skeleton";
 import { CountdownTimer } from "@/components/ui/CountdownTimer";
+import { Program } from "@/types";
 
 export default function ProgramsPage() {
-  const [programs, setPrograms] = useState<any[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [expired, setExpired] = useState(false);
 
@@ -37,8 +38,8 @@ export default function ProgramsPage() {
         ];
 
         const sorted = orderSlugs
-          .map(slug => raw.find((p: any) => p.slug === slug || p.id === slug))
-          .filter(Boolean);
+          .map(slug => raw.find((p: Program) => p.slug === slug || p.id === slug))
+          .filter((p): p is Program => !!p);
 
         setPrograms(sorted);
         setLoading(false);
@@ -48,8 +49,9 @@ export default function ProgramsPage() {
         setLoading(false);
       });
 
-    const TARGET_DATE = new Date("2026-07-02T23:59:00+05:30").getTime();
+    const TARGET_DATE = new Date("2026-07-04T23:59:00+05:30").getTime();
     if (Date.now() >= TARGET_DATE) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpired(true);
     }
   }, []);
@@ -103,10 +105,18 @@ export default function ProgramsPage() {
               <div className="flex flex-col items-center md:items-start text-center md:text-left">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Flat Enrollment Fee</span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-extrabold text-slate-900">₹1,249</span>
-                  <span className="text-slate-400 line-through text-sm font-semibold">₹6,999</span>
+                  {expired ? (
+                    <span className="text-3xl font-extrabold text-slate-900">₹6,999</span>
+                  ) : (
+                    <>
+                      <span className="text-3xl font-extrabold text-slate-900">₹1,249</span>
+                      <span className="text-slate-400 line-through text-sm font-semibold">₹6,999</span>
+                    </>
+                  )}
                 </div>
-                <span className="text-xs font-semibold text-orange-600 mt-1">Offer Valid Till: 2 July 2026</span>
+                {!expired && (
+                  <span className="text-xs font-semibold text-orange-600 mt-1">Offer Valid Till: 4 July 2026</span>
+                )}
               </div>
               <div className="w-full md:w-auto min-w-[200px]">
                 <CountdownTimer onExpire={() => setExpired(true)} />

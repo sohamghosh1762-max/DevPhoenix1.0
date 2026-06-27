@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const TARGET_DATE = new Date("2026-07-02T23:59:00+05:30").getTime();
+const TARGET_DATE = new Date("2026-07-04T23:59:00+05:30").getTime();
 
 interface TimeRemaining {
   days: string;
@@ -23,6 +23,7 @@ export function CountdownTimer({ onExpire }: { onExpire?: () => void }) {
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
 
     const calculateTime = () => {

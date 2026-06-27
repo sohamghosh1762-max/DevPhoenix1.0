@@ -17,8 +17,9 @@ export function ProgramCard({ program, ctaText }: ProgramCardProps) {
   const [expired, setExpired] = useState(false);
 
   useEffect(() => {
-    const TARGET_DATE = new Date("2026-07-02T23:59:00+05:30").getTime();
+    const TARGET_DATE = new Date("2026-07-04T23:59:00+05:30").getTime();
     if (Date.now() >= TARGET_DATE) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpired(true);
     }
   }, []);
