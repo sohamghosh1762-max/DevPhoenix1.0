@@ -135,7 +135,7 @@ export function CtaSection() {
                 <Rocket className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 Start Building
               </button>
-              <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 hover:border-orange-200 hover:bg-orange-50 transition-colors duration-300 flex items-center justify-center gap-2 group">
+              <a href="https://wa.me/919734876490?text=Hi%20DevPhoeniX%21%20I%20want%20to%20enquire%20about%20your%20programs." target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto px-8 py-4 bg-white text-slate-700 font-bold rounded-2xl border border-slate-200 hover:border-orange-200 hover:bg-orange-50 transition-colors duration-300 flex items-center justify-center gap-2 group">
                 WhatsApp Inquiry
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform text-orange-500" />
               </a>
