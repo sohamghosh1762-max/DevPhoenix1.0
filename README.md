@@ -1,37 +1,194 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+<img src="https://www.image2url.com/r2/default/images/1782665076394-b0021724-27bf-4f04-9c5f-2d33513c0548.png" alt="DEVPHOENIX Academy Logo" width="180"/>
 
-First, run the development server:
+# DEVPHOENIX Academy
+### Build Skills. Build Confidence. Build Your Future.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+[Visit Website](https://academy.devphoenix.com) • [DEVPHOENIX Technologies](https://devphoenix.com)
+
+![Status](https://img.shields.io/badge/Status-Live-success?style=flat-square)
+![Training](https://img.shields.io/badge/Training-Industry_Ready-orange?style=flat-square)
+![Learning](https://img.shields.io/badge/Learning-Project_Based-blue?style=flat-square)
+![Certification](https://img.shields.io/badge/Certification-Professional-green?style=flat-square)
+
+</div>
+
+---
+
+## About DEVPHOENIX Academy
+
+DEVPHOENIX Academy is the learning and skill development platform of **DEVPHOENIX TECHNOLOGIES LLP**, dedicated to bridging the gap between academic education and industry requirements.
+
+Our programs focus on practical learning, hands-on projects, mentorship, and career-oriented training that equips students and professionals with future-ready skills and real-world experience.
+
+---
+
+## Vision
+
+To create a world-class learning ecosystem that empowers learners with practical knowledge, innovation, and the confidence to build successful careers in technology.
+
+---
+
+## Mission
+
+- Deliver industry-oriented education and training.
+- Promote project-based and experiential learning.
+- Develop problem-solving and innovation capabilities.
+- Prepare learners for professional and entrepreneurial success.
+- Build a community of skilled and future-ready professionals.
+
+---
+
+## Why Choose DEVPHOENIX Academy
+
+- Industry-Oriented Curriculum
+- Project-Based Learning
+- Expert Mentorship
+- Portfolio Development
+- Internship Opportunities
+- Professional Certifications
+- Career Guidance and Support
+- Real-World Problem Solving
+
+---
+
+## Training Programs
+
+### Artificial Intelligence & Prompt Engineering
+- Artificial Intelligence Fundamentals
+- Prompt Engineering
+- Generative AI
+- Large Language Models (LLMs)
+- AI Applications and Automation
+
+### Full Stack MERN Development
+- HTML5 and CSS3
+- JavaScript (ES6+)
+- React.js
+- Node.js
+- Express.js
+- MongoDB
+- REST APIs and Deployment
+
+### Cloud Computing & DevOps
+- Linux Fundamentals
+- Git and GitHub
+- Docker
+- CI/CD Pipelines
+- Cloud Fundamentals
+- Deployment Strategies
+
+### Data Science, Machine Learning & Generative AI
+- Python Programming
+- Data Analysis
+- Data Visualization
+- Machine Learning
+- Deep Learning
+- Generative AI Applications
+
+### Data Analytics & Business Intelligence
+- Advanced Excel
+- SQL
+- Python for Analytics
+- Power BI
+- Tableau
+- Dashboard Development
+
+### Data Structures & Algorithms
+- Arrays and Linked Lists
+- Stacks and Queues
+- Trees and Graphs
+- Searching and Sorting Algorithms
+- Problem Solving Techniques
+
+### Digital Marketing & Growth Strategy
+- Search Engine Optimization (SEO)
+- Social Media Marketing
+- Content Strategy
+- Performance Marketing
+- Analytics and Growth
+
+### Startup & Entrepreneurship
+- Startup Fundamentals
+- Business Model Development
+- Market Research
+- Product Development
+- Innovation and Leadership
+
+---
+
+## Learning Methodology
+
+```text
+Learn → Build → Practice → Create → Deploy → Showcase → Grow
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What You'll Gain
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Practical Technical Skills
+- Industry Exposure
+- Real-World Project Experience
+- Professional Mentorship
+- Portfolio Development
+- Internship Opportunities
+- Career Growth Support
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Who Can Join
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Undergraduate Students
+- Engineering Students
+- Graduates
+- Working Professionals
+- Entrepreneurs
+- Career Switchers
+- Technology Enthusiasts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## About DEVPHOENIX TECHNOLOGIES LLP
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+DEVPHOENIX TECHNOLOGIES LLP is an innovation-driven technology company focused on building intelligent digital ecosystems through:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Artificial Intelligence
+- Software Development
+- Cloud Solutions
+- Automation Systems
+- Digital Transformation
+- Technology Education
+- Innovation Programs
 
+---
+
+## Official Links
+
+**Academy Website:** https://academy.devphoenix.com
+
+**Company Website:** https://devphoenix.com
+
+**LinkedIn:** https://www.linkedin.com/company/devphoenix-technologies
+
+---
+
+## Contact
+
+**Email:** contact@devphoenix.com
+
+**Website:** https://academy.devphoenix.com
+
+---
+
+<div align="center">
+
+<img src="https://www.image2url.com/r2/default/images/1782665076394-b0021724-27bf-4f04-9c5f-2d33513c0548.png" alt="DEVPHOENIX Logo" width="100"/>
+
+**DEVPHOENIX Academy**  
+Build Skills. Build Confidence. Build Your Future.
+
+© 2026 DEVPHOENIX TECHNOLOGIES LLP. All Rights Reserved.
+
+</div>
