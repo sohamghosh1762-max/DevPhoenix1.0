@@ -1,4 +1,5 @@
 import { HeroSection } from "@/components/sections/HeroSection";
+import { CatalogSection } from "@/components/sections/CatalogSection";
 import { JourneyPreview } from "@/components/sections/JourneyPreview";
 import { LearningPathsPreview } from "@/components/sections/LearningPathsPreview";
 import { ProgramsPreview } from "@/components/sections/ProgramsPreview";
@@ -16,6 +17,7 @@ export default function Home() {
       <Navbar />
       <div className="flex flex-col min-h-screen">
         <HeroSection />
+        <CatalogSection />
         <JourneyPreview />
         <LearningPathsPreview />
         <ProgramsPreview />

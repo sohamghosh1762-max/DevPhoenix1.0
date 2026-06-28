@@ -187,7 +187,7 @@ export function Footer() {
               )}
               <li>
                 <a
-                  href="http://www.devphoenix.com"
+                  href="https://devphoenix.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-slate-400 text-sm hover:text-orange-400 transition-colors group"
