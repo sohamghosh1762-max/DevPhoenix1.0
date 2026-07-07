@@ -15,7 +15,7 @@ const FALLBACK = {
   headline2: "Succeed.",
   subheadline: "Empowering minds with the skills, knowledge, and confidence to build a better tomorrow.",
   primaryCta: { text: "Explore Programs", href: "/programs" },
-  secondaryCta: { text: "How It Works", href: "/learning-paths" },
+  secondaryCta: { text: "Submission Form", href: "/payment-submission" },
   mascotImage: "/learning.png",
   glowColor: "orange",
   floatingCard1Title: "Your Journey",
@@ -104,7 +104,7 @@ export function HeroSection() {
   const headline2 = hero.headline2 || FALLBACK.headline2;
   const subheadline = hero.subheadline || FALLBACK.subheadline;
   const primaryCta = hero.primaryCta || FALLBACK.primaryCta;
-  const secondaryCta = hero.secondaryCta || FALLBACK.secondaryCta;
+  const secondaryCta = { text: "Submission Form", href: "/payment-submission" };
   
   const mascotImage = mascotBlock?.image_url || hero.mascotImage || FALLBACK.mascotImage;
   const glowColor = hero.glowColor || FALLBACK.glowColor;
@@ -202,15 +202,15 @@ export function HeroSection() {
                 </motion.button>
               </Link>
 
-              <Link href={secondaryCta.href || '/learning-paths'}>
+              <Link href={secondaryCta.href}>
                 <motion.button
                   whileHover={{ scale: 1.02, translateY: -2 }}
                   whileTap={{ scale: 0.98 }}
                   className="px-8 py-4 bg-white/80 backdrop-blur-md text-slate-700 font-semibold rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-slate-200/60 flex items-center gap-3 hover:border-orange-200 hover:text-orange-600 hover:shadow-[0_10px_25px_rgba(249,115,22,0.06)] transition-all duration-300 cursor-pointer group"
                 >
-                  {secondaryCta.text || 'How It Works'}
+                  {secondaryCta.text}
                   <div className="w-6 h-6 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center shadow-sm group-hover:bg-orange-500 group-hover:text-white transition-all duration-300">
-                    <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
                   </div>
                 </motion.button>
               </Link>

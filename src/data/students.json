@@ -1,0 +1,921 @@
+[
+  {
+    "id": "student-1",
+    "studentCode": "DP-AIML-4096",
+    "password": "password123",
+    "name": "Soham Ghosh",
+    "email": "soham.ghosh@devphoenix.com",
+    "phone": "+91 98765 43210",
+    "courseId": "ai-ml-industrial",
+    "courseName": "AI & ML Industrial Training Program",
+    "batch": "AI & ML Cohort 4",
+    "mentorName": "Arindam Roy",
+    "mentorRole": "ML Research Engineer",
+    "mentorEmail": "arindam@devphoenix.com",
+    "mentorAvatar": "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=150&auto=format&fit=crop",
+    "joiningDate": "15 January 2026",
+    "certificateStatus": "In Progress (Module 5 Pending)",
+    "skillsProgress": [
+      {
+        "skill": "Python for ML",
+        "progress": 100
+      },
+      {
+        "skill": "Scikit-Learn & ML",
+        "progress": 85
+      },
+      {
+        "skill": "PyTorch & Deep Learning",
+        "progress": 50
+      },
+      {
+        "skill": "NLP & Transformers",
+        "progress": 30
+      },
+      {
+        "skill": "Computer Vision",
+        "progress": 10
+      }
+    ],
+    "overallProgress": 65,
+    "points": 320,
+    "badges": 12,
+    "certificatesCount": 4,
+    "level": 4,
+    "nextLevelPoints": 500,
+    "attendancePercentage": 85,
+    "assignmentsSubmittedCount": 12,
+    "notesAvailableCount": 28,
+    "projectProgressPercentage": 60,
+    "nextLiveClass": {
+      "title": "Machine Learning Fundamentals",
+      "mentor": "Arindam Roy",
+      "date": "Today",
+      "time": "07:00 PM - 08:30 PM (IST)",
+      "dateTimeIso": "2026-07-05T19:00:00+05:30",
+      "duration": "1.5 Hrs",
+      "meetLink": "https://meet.google.com/abc-defg-hij"
+    },
+    "liveClasses": [
+      {
+        "id": "class-1",
+        "title": "Machine Learning Fundamentals",
+        "mentor": "Arindam Roy",
+        "date": "Today",
+        "time": "07:00 PM - 08:30 PM (IST)",
+        "duration": "1.5 Hours",
+        "meetLink": "https://meet.google.com/abc-defg-hij",
+        "status": "Live",
+        "recordingAvailable": false
+      },
+      {
+        "id": "class-2",
+        "title": "Deep Learning & Artificial Neural Networks",
+        "mentor": "Arindam Roy",
+        "date": "08 July 2026",
+        "time": "07:00 PM - 09:00 PM (IST)",
+        "duration": "2.0 Hours",
+        "meetLink": "https://meet.google.com/xyz-qpr-mno",
+        "status": "Upcoming",
+        "recordingAvailable": false
+      },
+      {
+        "id": "class-3",
+        "title": "Python Programming & Pandas Mastery",
+        "mentor": "Arindam Roy",
+        "date": "02 July 2026",
+        "time": "07:00 PM - 08:30 PM (IST)",
+        "duration": "1.5 Hours",
+        "meetLink": "https://meet.google.com/pqr-stuv-wxy",
+        "status": "Completed",
+        "recordingAvailable": true,
+        "recordingUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      },
+      {
+        "id": "class-4",
+        "title": "Data Preprocessing & Data Cleaning",
+        "mentor": "Arindam Roy",
+        "date": "28 June 2026",
+        "time": "07:00 PM - 08:30 PM (IST)",
+        "duration": "1.5 Hours",
+        "meetLink": "https://meet.google.com/lmn-opqr-stu",
+        "status": "Completed",
+        "recordingAvailable": true,
+        "recordingUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      }
+    ],
+    "notes": [
+      {
+        "id": "note-1",
+        "title": "Linear Regression and Cost Functions",
+        "module": "Machine Learning Fundamentals",
+        "type": "pdf",
+        "size": "2.4 MB",
+        "uploadedAt": "2 hours ago",
+        "downloadUrl": "#"
+      },
+      {
+        "id": "note-2",
+        "title": "Gradient Descent Optimization Script",
+        "module": "Machine Learning Fundamentals",
+        "type": "code",
+        "size": "45 KB",
+        "uploadedAt": "1 day ago",
+        "downloadUrl": "#"
+      },
+      {
+        "id": "note-3",
+        "title": "Python NumPy & Pandas Cheat Sheet",
+        "module": "Python for ML",
+        "type": "pdf",
+        "size": "1.1 MB",
+        "uploadedAt": "5 days ago",
+        "downloadUrl": "#"
+      },
+      {
+        "id": "note-4",
+        "title": "Housing Prices Dataset (CSV)",
+        "module": "Machine Learning Fundamentals",
+        "type": "dataset",
+        "size": "4.8 MB",
+        "uploadedAt": "1 week ago",
+        "downloadUrl": "#"
+      },
+      {
+        "id": "note-5",
+        "title": "Deep Learning Basics Slide Deck",
+        "module": "Deep Learning Basics",
+        "type": "presentation",
+        "size": "8.2 MB",
+        "uploadedAt": "3 days ago",
+        "downloadUrl": "#"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "notif-1",
+        "title": "New Class Link Shared",
+        "message": "Class link for 'ML Fundamentals' is now live: meet.google.com/abc-defg-hij",
+        "type": "meet",
+        "timestamp": "10 minutes ago",
+        "isRead": true
+      },
+      {
+        "id": "notif-2",
+        "title": "New Notes Uploaded",
+        "message": "Linear Regression slide deck has been uploaded by Arindam Roy.",
+        "type": "notes",
+        "timestamp": "2 hours ago",
+        "isRead": true
+      },
+      {
+        "id": "notif-3",
+        "title": "Assignment Deadline Approaching",
+        "message": "Data Preprocessing assignment is due on 25 JUN at 11:59 PM.",
+        "type": "assignment",
+        "timestamp": "5 hours ago",
+        "isRead": true
+      },
+      {
+        "id": "notif-4",
+        "title": "Doubt Resolved",
+        "message": "Your question regarding matrix vector multiplication has been answered by Arindam Roy.",
+        "type": "announcement",
+        "timestamp": "1 day ago",
+        "isRead": true
+      },
+      {
+        "id": "notif-5",
+        "title": "Attendance Updated",
+        "message": "Your attendance for the July 2nd session has been marked as Present.",
+        "type": "attendance",
+        "timestamp": "2 days ago",
+        "isRead": true
+      }
+    ],
+    "announcements": [
+      {
+        "id": "announce-1",
+        "title": "New Notes Uploaded: Linear Regression",
+        "message": "Linear Regression note file and sample training datasets are uploaded. Review them before tonight's class.",
+        "author": "Arindam Roy",
+        "timestamp": "2 hours ago"
+      },
+      {
+        "id": "announce-2",
+        "title": "Assignment Deadline Extended",
+        "message": "Due to network issues reported by some trainees, the final deadline for Mini Project Proposal is extended to 05 July.",
+        "author": "System Admin",
+        "timestamp": "5 hours ago"
+      },
+      {
+        "id": "announce-3",
+        "title": "Guest Session: NLP & Large Language Models",
+        "message": "We have a guest speaker from OpenAI coming tomorrow at 07:00 PM to talk about NLP Fundamentals. Don't miss it!",
+        "author": "Arindam Roy",
+        "timestamp": "1 day ago"
+      }
+    ],
+    "modules": [
+      {
+        "id": "mod-1",
+        "moduleNumber": "01",
+        "title": "Python for ML",
+        "progress": 100,
+        "status": "Completed",
+        "topics": [
+          "Python Basics",
+          "Variables & Types",
+          "Data Structures",
+          "Functions",
+          "NumPy Libraries",
+          "Pandas & Dataframes",
+          "Matplotlib Data Visualization",
+          "OOP Concepts"
+        ],
+        "resourcesCount": 6
+      },
+      {
+        "id": "mod-2",
+        "moduleNumber": "02",
+        "title": "Machine Learning Fundamentals",
+        "progress": 75,
+        "status": "In Progress",
+        "topics": [
+          "Supervised vs Unsupervised",
+          "Linear Regression",
+          "Logistic Regression",
+          "Cost Functions & Gradient Descent",
+          "Regularization (L1/L2)",
+          "Decision Trees & Random Forests",
+          "Hyperparameter Tuning"
+        ],
+        "resourcesCount": 8
+      },
+      {
+        "id": "mod-3",
+        "moduleNumber": "03",
+        "title": "Deep Learning Basics",
+        "progress": 45,
+        "status": "In Progress",
+        "topics": [
+          "Introduction to Neural Networks",
+          "Activation Functions",
+          "Backpropagation Algorithm",
+          "PyTorch Core Concepts",
+          "Convolutional Neural Networks (CNNs)",
+          "Recurrent Neural Networks (RNNs)"
+        ],
+        "resourcesCount": 5
+      },
+      {
+        "id": "mod-4",
+        "moduleNumber": "04",
+        "title": "NLP Fundamentals",
+        "progress": 20,
+        "status": "In Progress",
+        "topics": [
+          "Text Preprocessing",
+          "Tokenization & Embeddings",
+          "RNNs & LSTMs for Text",
+          "Attention Mechanisms",
+          "Introduction to Transformers",
+          "Fine-tuning HuggingFace models"
+        ],
+        "resourcesCount": 4
+      },
+      {
+        "id": "mod-5",
+        "moduleNumber": "05",
+        "title": "Computer Vision",
+        "progress": 0,
+        "status": "Not Started",
+        "topics": [
+          "Image Processing Basics",
+          "CNN Architectures (ResNet, VGG)",
+          "Object Detection (YOLO)",
+          "Image Segmentation",
+          "Generative Adversarial Networks (GANs)",
+          "Diffusion Models"
+        ],
+        "resourcesCount": 0
+      }
+    ],
+    "attendance": {
+      "presentCount": 17,
+      "absentCount": 3,
+      "totalClasses": 20,
+      "calendar": [
+        {
+          "day": 1,
+          "status": "Present"
+        },
+        {
+          "day": 2,
+          "status": "Present"
+        },
+        {
+          "day": 3,
+          "status": "Absent"
+        },
+        {
+          "day": 5,
+          "status": "Present"
+        },
+        {
+          "day": 8,
+          "status": "Present"
+        },
+        {
+          "day": 10,
+          "status": "Present"
+        },
+        {
+          "day": 12,
+          "status": "Absent"
+        },
+        {
+          "day": 15,
+          "status": "Present"
+        },
+        {
+          "day": 16,
+          "status": "Present"
+        },
+        {
+          "day": 19,
+          "status": "Present"
+        },
+        {
+          "day": 20,
+          "status": "Present"
+        },
+        {
+          "day": 22,
+          "status": "Present"
+        },
+        {
+          "day": 23,
+          "status": "Present"
+        },
+        {
+          "day": 24,
+          "status": "Absent"
+        },
+        {
+          "day": 26,
+          "status": "Present"
+        },
+        {
+          "day": 28,
+          "status": "Present"
+        },
+        {
+          "day": 29,
+          "status": "Present"
+        },
+        {
+          "day": 30,
+          "status": "Present"
+        }
+      ],
+      "history": [
+        {
+          "date": "2026-07-05",
+          "subject": "Machine Learning Fundamentals",
+          "mentor": "Arindam Roy",
+          "status": "Present"
+        },
+        {
+          "date": "2026-07-02",
+          "subject": "Python Programming & Pandas Mastery",
+          "mentor": "Arindam Roy",
+          "status": "Present"
+        },
+        {
+          "date": "2026-06-28",
+          "subject": "Data Preprocessing & Data Cleaning",
+          "mentor": "Arindam Roy",
+          "status": "Present"
+        },
+        {
+          "date": "2026-06-25",
+          "subject": "Data Visualisation with Matplotlib",
+          "mentor": "Arindam Roy",
+          "status": "Present"
+        },
+        {
+          "date": "2026-06-22",
+          "subject": "Introduction to NumPy Arrays",
+          "mentor": "Arindam Roy",
+          "status": "Present"
+        },
+        {
+          "date": "2026-06-18",
+          "subject": "Python Control Flow & Loops",
+          "mentor": "Arindam Roy",
+          "status": "Absent"
+        }
+      ]
+    },
+    "assignments": [
+      {
+        "id": "assign-1",
+        "title": "Data Preprocessing & Cleaning Assignment",
+        "description": "Clean a dirty credit-scoring dataset using Pandas. Handle missing values, outliers, and categorical encoding.",
+        "deadline": "25 Jun 2026, 11:59 PM",
+        "status": "Submitted",
+        "submissionDate": "2026-06-24",
+        "marks": "9.5 / 10",
+        "feedback": "Excellent clean implementation. The handling of missing values using median imputation grouped by education level was outstanding."
+      },
+      {
+        "id": "assign-2",
+        "title": "Linear Regression from Scratch",
+        "description": "Implement linear regression with gradient descent using only NumPy. Plot the cost function convergence.",
+        "deadline": "02 Jul 2026, 11:59 PM",
+        "status": "Submitted",
+        "submissionDate": "2026-07-01",
+        "marks": "10 / 10",
+        "feedback": "Perfect implementation. Great code comments explaining the learning rate tuning."
+      },
+      {
+        "id": "assign-3",
+        "title": "Neural Network Classifier with PyTorch",
+        "description": "Build a Multi-Layer Perceptron in PyTorch to classify handwritten digits (MNIST dataset). Achieve >97% accuracy.",
+        "deadline": "12 Jul 2026, 11:59 PM",
+        "status": "Pending",
+        "submissionDate": null,
+        "marks": "N/A",
+        "feedback": null
+      },
+      {
+        "id": "assign-4",
+        "title": "NLP Text Classification Pipeline",
+        "description": "Perform sentiment analysis using TF-IDF + Logistic Regression vs. Word2Vec + LSTM. Compare accuracies.",
+        "deadline": "20 Jul 2026, 11:59 PM",
+        "status": "Pending",
+        "submissionDate": null,
+        "marks": "N/A",
+        "feedback": null
+      }
+    ],
+    "project": {
+      "title": "AI-Powered Autonomous Agent Workspace",
+      "description": "Build an enterprise-grade agentic pipeline utilizing LangChain, Next.js, and n8n to automate complex customer onboarding, data retrieval, and validation logic.",
+      "teamMembers": [
+        "Soham Ghosh (Lead)",
+        "Rohit Sen (AI Engineer)"
+      ],
+      "mentorRemarks": "Fabulous design. Focus on making the reflection loops stable and handling API rate limits gracefully.",
+      "progress": 60,
+      "deadline": "15 August 2026",
+      "submissionStatus": "Under Review",
+      "finalReportUrl": null,
+      "milestones": [
+        {
+          "id": "m-1",
+          "title": "Project Proposal & Architecture Design",
+          "status": "completed",
+          "desc": "System architecture diagram, wireframes, database schemas, and tool definitions approved by mentor."
+        },
+        {
+          "id": "m-2",
+          "title": "API Integrations & Agent Logic",
+          "status": "completed",
+          "desc": "Integrate LLM API calls, set up system prompts, vector database embeddings, and build tools."
+        },
+        {
+          "id": "m-3",
+          "title": "Frontend Workspace UI Development",
+          "status": "active",
+          "desc": "Build a premium light-theme chat workspace, history logs, and data visualization cards."
+        },
+        {
+          "id": "m-4",
+          "title": "Final Testing & Deployment",
+          "status": "upcoming",
+          "desc": "Stress test agent loops, deploy server to Vercel/Docker, and compile final industrial report."
+        }
+      ]
+    }
+  },
+  {
+    "id": "student-2",
+    "studentCode": "DP-FS-2026",
+    "password": "password123",
+    "name": "Ananya Sharma",
+    "email": "ananya@devphoenix.com",
+    "phone": "+91 97777 88888",
+    "courseId": "fullstack-dev",
+    "courseName": "Full-Stack Development Masterclass",
+    "batch": "Full-Stack Cohort 3",
+    "mentorName": "Vikram Mehta",
+    "mentorRole": "Senior SDE @ Amazon",
+    "mentorEmail": "vikram@devphoenix.com",
+    "mentorAvatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop",
+    "joiningDate": "01 February 2026",
+    "certificateStatus": "Locked (Incomplete Syllabus)",
+    "skillsProgress": [
+      {
+        "skill": "HTML/CSS & Tailwind",
+        "progress": 100
+      },
+      {
+        "skill": "React & State Management",
+        "progress": 90
+      },
+      {
+        "skill": "Next.js & Server Components",
+        "progress": 60
+      },
+      {
+        "skill": "Database Architecture",
+        "progress": 40
+      },
+      {
+        "skill": "DevOps & Cloud Deployments",
+        "progress": 10
+      }
+    ],
+    "overallProgress": 40,
+    "points": 280,
+    "badges": 8,
+    "certificatesCount": 2,
+    "level": 3,
+    "nextLevelPoints": 400,
+    "attendancePercentage": 90,
+    "assignmentsSubmittedCount": 9,
+    "notesAvailableCount": 22,
+    "projectProgressPercentage": 35,
+    "nextLiveClass": {
+      "title": "Next.js 15 Server Actions & Mutations",
+      "mentor": "Vikram Mehta",
+      "date": "Tomorrow",
+      "time": "08:00 PM - 09:30 PM (IST)",
+      "dateTimeIso": "2026-07-06T20:00:00+05:30",
+      "duration": "1.5 Hrs",
+      "meetLink": "https://meet.google.com/cde-fghi-jkl"
+    },
+    "liveClasses": [
+      {
+        "id": "class-5",
+        "title": "Next.js 15 Server Actions & Mutations",
+        "mentor": "Vikram Mehta",
+        "date": "Tomorrow",
+        "time": "08:00 PM - 09:30 PM (IST)",
+        "duration": "1.5 Hours",
+        "meetLink": "https://meet.google.com/cde-fghi-jkl",
+        "status": "Upcoming",
+        "recordingAvailable": false
+      },
+      {
+        "id": "class-6",
+        "title": "React State Management: Redux vs Context",
+        "mentor": "Vikram Mehta",
+        "date": "03 July 2026",
+        "time": "08:00 PM - 09:30 PM (IST)",
+        "duration": "1.5 Hours",
+        "meetLink": "https://meet.google.com/ijk-lmno-pqr",
+        "status": "Completed",
+        "recordingAvailable": true,
+        "recordingUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      },
+      {
+        "id": "class-7",
+        "title": "Database Schema Design & Relations",
+        "mentor": "Vikram Mehta",
+        "date": "29 June 2026",
+        "time": "08:00 PM - 09:30 PM (IST)",
+        "duration": "1.5 Hours",
+        "meetLink": "https://meet.google.com/abc-xyz-pqr",
+        "status": "Completed",
+        "recordingAvailable": true,
+        "recordingUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      }
+    ],
+    "notes": [
+      {
+        "id": "note-6",
+        "title": "React Hooks & Performance Optimization Guide",
+        "module": "React & State Management",
+        "type": "pdf",
+        "size": "1.8 MB",
+        "uploadedAt": "4 hours ago",
+        "downloadUrl": "#"
+      },
+      {
+        "id": "note-7",
+        "title": "Next.js Routing Boilerplate",
+        "module": "Next.js & Server Components",
+        "type": "code",
+        "size": "12 KB",
+        "uploadedAt": "2 days ago",
+        "downloadUrl": "#"
+      },
+      {
+        "id": "note-8",
+        "title": "Tailwind Grid vs Flexbox Cheat Sheet",
+        "module": "HTML/CSS & Tailwind",
+        "type": "pdf",
+        "size": "950 KB",
+        "uploadedAt": "1 week ago",
+        "downloadUrl": "#"
+      }
+    ],
+    "notifications": [
+      {
+        "id": "notif-6",
+        "title": "Class Schedule Update",
+        "message": "Next.js Server Actions class is scheduled for tomorrow at 8:00 PM.",
+        "type": "class",
+        "timestamp": "1 hour ago",
+        "isRead": false
+      },
+      {
+        "id": "notif-7",
+        "title": "New Notes Uploaded",
+        "message": "React Hooks Optimization notes uploaded by Vikram Mehta.",
+        "type": "notes",
+        "timestamp": "4 hours ago",
+        "isRead": false
+      },
+      {
+        "id": "notif-8",
+        "title": "Assignment Deadline Approaching",
+        "message": "SaaS E-Commerce Database schema is due on 30 JUN.",
+        "type": "assignment",
+        "timestamp": "1 day ago",
+        "isRead": true
+      }
+    ],
+    "announcements": [
+      {
+        "id": "announce-4",
+        "title": "Final Milestone Reminder",
+        "message": "All trainees must submit their database design schema by the end of this month for grading.",
+        "author": "Vikram Mehta",
+        "timestamp": "1 day ago"
+      },
+      {
+        "id": "announce-5",
+        "title": "Hackathon Registrations Open",
+        "message": "DevPhoenix Annual Builder Hackathon is now open. Register in teams of 2 to win exciting prizes.",
+        "author": "System Admin",
+        "timestamp": "3 days ago"
+      }
+    ],
+    "modules": [
+      {
+        "id": "mod-6",
+        "moduleNumber": "01",
+        "title": "HTML/CSS & Tailwind",
+        "progress": 100,
+        "status": "Completed",
+        "topics": [
+          "Semantic HTML",
+          "CSS Box Model",
+          "Flexbox & Grid Layouts",
+          "Responsive Media Queries",
+          "Tailwind CSS Utility Framework",
+          "Building Static Landing Pages"
+        ],
+        "resourcesCount": 4
+      },
+      {
+        "id": "mod-7",
+        "moduleNumber": "02",
+        "title": "React & State Management",
+        "progress": 90,
+        "status": "Completed",
+        "topics": [
+          "React Components & JSX",
+          "Props & State",
+          "useEffect & Lifecycle",
+          "Custom Hooks",
+          "Context API State",
+          "Zustand / Redux Foundations"
+        ],
+        "resourcesCount": 6
+      },
+      {
+        "id": "mod-8",
+        "moduleNumber": "03",
+        "title": "Next.js & Server Components",
+        "progress": 60,
+        "status": "In Progress",
+        "topics": [
+          "App Router File Routing",
+          "Server vs Client Components",
+          "Data Fetching & Caching",
+          "Server Actions & Mutations",
+          "Static/Dynamic Rendering"
+        ],
+        "resourcesCount": 5
+      },
+      {
+        "id": "mod-9",
+        "moduleNumber": "04",
+        "title": "Database Architecture",
+        "progress": 40,
+        "status": "In Progress",
+        "topics": [
+          "Relational vs Non-Relational",
+          "PostgreSQL Schemas",
+          "Prisma/Mongoose ORM",
+          "CRUD API Endpoints",
+          "Authentication (JWT & Cookies)",
+          "Middleware & Guards"
+        ],
+        "resourcesCount": 4
+      },
+      {
+        "id": "mod-10",
+        "moduleNumber": "05",
+        "title": "DevOps & Cloud Deployments",
+        "progress": 10,
+        "status": "In Progress",
+        "topics": [
+          "Git & GitHub Actions",
+          "Docker Containers",
+          "AWS S3 & EC2 Hosting",
+          "Vercel & Netlify Deployments",
+          "CI/CD Automations",
+          "DNS & SSL Configuration"
+        ],
+        "resourcesCount": 3
+      }
+    ],
+    "attendance": {
+      "presentCount": 18,
+      "absentCount": 2,
+      "totalClasses": 20,
+      "calendar": [
+        {
+          "day": 1,
+          "status": "Present"
+        },
+        {
+          "day": 2,
+          "status": "Present"
+        },
+        {
+          "day": 4,
+          "status": "Present"
+        },
+        {
+          "day": 7,
+          "status": "Present"
+        },
+        {
+          "day": 9,
+          "status": "Absent"
+        },
+        {
+          "day": 11,
+          "status": "Present"
+        },
+        {
+          "day": 14,
+          "status": "Present"
+        },
+        {
+          "day": 16,
+          "status": "Present"
+        },
+        {
+          "day": 18,
+          "status": "Present"
+        },
+        {
+          "day": 20,
+          "status": "Present"
+        },
+        {
+          "day": 22,
+          "status": "Absent"
+        },
+        {
+          "day": 23,
+          "status": "Present"
+        },
+        {
+          "day": 25,
+          "status": "Present"
+        },
+        {
+          "day": 26,
+          "status": "Present"
+        },
+        {
+          "day": 28,
+          "status": "Present"
+        },
+        {
+          "day": 29,
+          "status": "Present"
+        },
+        {
+          "day": 30,
+          "status": "Present"
+        }
+      ],
+      "history": [
+        {
+          "date": "2026-07-03",
+          "subject": "React State Management: Redux vs Context",
+          "mentor": "Vikram Mehta",
+          "status": "Present"
+        },
+        {
+          "date": "2026-06-29",
+          "subject": "Database Schema Design & Relations",
+          "mentor": "Vikram Mehta",
+          "status": "Present"
+        },
+        {
+          "date": "2026-06-26",
+          "subject": "SQL Joins and Queries",
+          "mentor": "Vikram Mehta",
+          "status": "Present"
+        },
+        {
+          "date": "2026-06-22",
+          "subject": "Git Branching and Workflows",
+          "mentor": "Vikram Mehta",
+          "status": "Absent"
+        }
+      ]
+    },
+    "assignments": [
+      {
+        "id": "assign-5",
+        "title": "React Dashboard Layout",
+        "description": "Construct a responsive dashboard page using Tailwind CSS, showing charts and activity grids.",
+        "deadline": "15 Jun 2026, 11:59 PM",
+        "status": "Submitted",
+        "submissionDate": "2026-06-14",
+        "marks": "9 / 10",
+        "feedback": "Perfect layout responsiveness. Sidebar hides correctly on mobile screens."
+      },
+      {
+        "id": "assign-6",
+        "title": "SaaS E-Commerce Database Schema",
+        "description": "Design an SQL schema with Users, Products, Orders, OrderItems and Payments. Write relation queries.",
+        "deadline": "30 Jun 2026, 11:59 PM",
+        "status": "Submitted",
+        "submissionDate": "2026-06-29",
+        "marks": "Pending Review",
+        "feedback": null
+      },
+      {
+        "id": "assign-7",
+        "title": "Server Actions Form Submission",
+        "description": "Create a form that submits data using Next.js Server Actions. Display interactive loading and validation states.",
+        "deadline": "10 Jul 2026, 11:59 PM",
+        "status": "Pending",
+        "submissionDate": null,
+        "marks": "N/A",
+        "feedback": null
+      }
+    ],
+    "project": {
+      "title": "Premium E-Commerce SaaS Platform",
+      "description": "Design and build a multi-tenant subscription e-commerce engine with storefront management, Stripe checkout, invoices, and sales dashboards.",
+      "teamMembers": [
+        "Ananya Sharma (Solo)"
+      ],
+      "mentorRemarks": "Ambitious project. Be careful with multi-tenant subdomain configurations in Next.js middleware.",
+      "progress": 35,
+      "deadline": "31 August 2026",
+      "submissionStatus": "Not Submitted",
+      "finalReportUrl": null,
+      "milestones": [
+        {
+          "id": "m-5",
+          "title": "Architecture & DB Relations Design",
+          "status": "completed",
+          "desc": "Create relational models, configure Postgres database connections, and finalize project scope document."
+        },
+        {
+          "id": "m-6",
+          "title": "API Routes & Auth Implementation",
+          "status": "active",
+          "desc": "Build multi-tenant authentication, signup routes, product upload endpoints, and checkout actions."
+        },
+        {
+          "id": "m-7",
+          "title": "Storefront Dashboard UI",
+          "status": "upcoming",
+          "desc": "Build merchant admin dashboard, storefront template layouts, custom domain routing, and order logs."
+        },
+        {
+          "id": "m-8",
+          "title": "Stripe Integrations & Deployments",
+          "status": "upcoming",
+          "desc": "Configure Stripe webhooks, subscription billing logic, unit tests, and production deploy to Vercel."
+        }
+      ]
+    }
+  }
+]

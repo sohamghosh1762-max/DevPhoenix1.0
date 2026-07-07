@@ -7,7 +7,7 @@ import { FloatingEnquiryCTA } from '@/components/cta/FloatingEnquiryCTA';
 
 export default function PublicChrome() {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith('/admin');
+  const isExcluded = pathname.startsWith('/admin') || pathname.startsWith('/dashboard') || pathname.startsWith('/login');
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -23,7 +23,7 @@ export default function PublicChrome() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  if (isAdmin) return null;
+  if (isExcluded) return null;
   return (
     <>
       <Navbar />

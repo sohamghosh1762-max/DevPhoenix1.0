@@ -5,5 +5,6 @@ export const navItems = [
   { label: "Showcase", href: "/showcase" },
   { label: "Community", href: "/community" },
   { label: "Blog", href: "/blog" },
-  { label: "About", href: "/about" }
+  { label: "About", href: "/about" },
+  { label: "Student Portal", href: "/login" }
 ];

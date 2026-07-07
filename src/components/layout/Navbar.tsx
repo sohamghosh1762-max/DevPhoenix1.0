@@ -35,6 +35,7 @@ export default function Navbar() {
     { label: "Showcase", href: "/showcase" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
+    { label: "Student Portal", href: "/login" },
   ];
 
   const [items, setItems] = useState(defaultNavItems);

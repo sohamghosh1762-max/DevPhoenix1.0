@@ -595,3 +595,58 @@ export const visualBlocksService = {
     }
   },
 };
+
+// ==========================================
+// STUDENTS
+// ==========================================
+export const studentsService = {
+  async getAll(): Promise<any[]> {
+    console.log('FETCHING: All students');
+    try {
+      const db = await getDb();
+      const docs = await db.collection('students').find({}).toArray();
+      return stripIds(docs);
+    } catch (e) {
+      handleError(e);
+      return [];
+    }
+  },
+
+  async getByCode(studentCode: string): Promise<any | null> {
+    console.log(`FETCHING: Student by code = ${studentCode}`);
+    try {
+      const db = await getDb();
+      const doc = await db.collection('students').findOne({ studentCode });
+      return doc ? stripId(doc) : null;
+    } catch (e) {
+      handleError(e);
+      return null;
+    }
+  },
+
+  async create(student: any): Promise<any> {
+    console.log('CREATING: Student', student.studentCode);
+    try {
+      const db = await getDb();
+      await db.collection('students').insertOne({ ...student });
+      return student;
+    } catch (e) {
+      handleError(e);
+      return student;
+    }
+  },
+
+  async update(studentCode: string, studentData: any): Promise<any> {
+    console.log(`UPDATING: Student code = ${studentCode}`);
+    try {
+      const db = await getDb();
+      await db.collection('students').updateOne({ studentCode }, { $set: studentData });
+      const updated = await db.collection('students').findOne({ studentCode });
+      return stripId(updated);
+    } catch (e) {
+      handleError(e);
+      return studentData;
+    }
+  },
+};
+
