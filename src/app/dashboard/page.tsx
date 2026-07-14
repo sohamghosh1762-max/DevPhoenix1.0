@@ -8,7 +8,7 @@ import {
   CheckCircle2, Circle, Clock, Terminal, LogOut, Menu, X, Search,
   MessageSquare, User, Settings, Briefcase, Award, Users, ChevronDown,
   ChevronRight, CalendarDays, UploadCloud, AlertCircle, Sparkles, Send,
-  FileText, ShieldCheck
+  FileText, ShieldCheck, Eye
 } from 'lucide-react';
 import { showToast } from '@/components/ui/PremiumToast';
 
@@ -96,6 +96,21 @@ export default function StudentDashboard() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Fetch student verifications/documents
+  const [studentDocuments, setStudentDocuments] = useState<any[]>([]);
+  useEffect(() => {
+    if (activeSection === 'documents' && student?.id) {
+      fetch(`/api/verification/student/${student.id}`)
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.success && json.data) {
+            setStudentDocuments(json.data);
+          }
+        })
+        .catch((err) => console.error('Fetch student documents failed:', err));
+    }
+  }, [activeSection, student?.id]);
 
   if (loading) {
     return (
@@ -262,7 +277,7 @@ export default function StudentDashboard() {
       <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white flex flex-col border-r border-slate-800 transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         
         {/* Sidebar Logo */}
-        <div className="p-6 flex items-center justify-between border-b border-slate-800">
+        <div className="p-6 flex items-center justify-between border-b border-slate-800 shrink-0">
           <LinkToHome className="flex items-center gap-2 cursor-pointer">
             <div className="w-8 h-8 rounded-lg bg-[#FF5A1F] flex items-center justify-center shadow-md shadow-orange-500/20">
               <FlameIcon className="w-5 h-5 text-white" />
@@ -277,45 +292,51 @@ export default function StudentDashboard() {
           </button>
         </div>
 
-        {/* Sidebar Navigation */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 scrollbar-thin scrollbar-thumb-slate-800">
-          <SidebarTab active={activeSection === 'dashboard'} label="Dashboard" icon={Zap} onClick={() => { setActiveSection('dashboard'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'modules'} label="My Course" icon={BookOpen} onClick={() => { setActiveSection('modules'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'live-classes'} label="Live Classes" icon={Calendar} onClick={() => { setActiveSection('live-classes'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'notes-resources'} label="Notes & Resources" icon={FileText} onClick={() => { setActiveSection('notes-resources'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'assignments'} label="Assignments" icon={Briefcase} onClick={() => { setActiveSection('assignments'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'attendance'} label="Attendance" icon={CalendarDays} onClick={() => { setActiveSection('attendance'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'projects'} label="Projects" icon={Award} onClick={() => { setActiveSection('projects'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'notifications'} label="Notifications" icon={Bell} badge={unreadNotifications.length} onClick={() => { setActiveSection('notifications'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'messages'} label="Messages" icon={MessageSquare} badge={1} onClick={() => { setActiveSection('messages'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'my-profile'} label="My Profile" icon={User} onClick={() => { setActiveSection('my-profile'); setSidebarOpen(false); }} />
-          <SidebarTab active={activeSection === 'settings'} label="Settings" icon={Settings} onClick={() => { setActiveSection('settings'); setSidebarOpen(false); }} />
-        </nav>
+        {/* Scrollable Container for Sidebar Elements */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800 flex flex-col justify-between">
+          <div>
+            {/* Sidebar Navigation */}
+            <nav className="py-4 px-3 space-y-1">
+              <SidebarTab active={activeSection === 'dashboard'} label="Dashboard" icon={Zap} onClick={() => { setActiveSection('dashboard'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'modules'} label="My Course" icon={BookOpen} onClick={() => { setActiveSection('modules'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'live-classes'} label="Live Classes" icon={Calendar} onClick={() => { setActiveSection('live-classes'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'notes-resources'} label="Notes & Resources" icon={FileText} onClick={() => { setActiveSection('notes-resources'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'assignments'} label="Assignments" icon={Briefcase} onClick={() => { setActiveSection('assignments'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'attendance'} label="Attendance" icon={CalendarDays} onClick={() => { setActiveSection('attendance'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'projects'} label="Projects" icon={Award} onClick={() => { setActiveSection('projects'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'documents'} label="Documents" icon={ShieldCheck} onClick={() => { setActiveSection('documents'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'notifications'} label="Notifications" icon={Bell} badge={unreadNotifications.length} onClick={() => { setActiveSection('notifications'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'messages'} label="Messages" icon={MessageSquare} badge={1} onClick={() => { setActiveSection('messages'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'my-profile'} label="My Profile" icon={User} onClick={() => { setActiveSection('my-profile'); setSidebarOpen(false); }} />
+              <SidebarTab active={activeSection === 'settings'} label="Settings" icon={Settings} onClick={() => { setActiveSection('settings'); setSidebarOpen(false); }} />
+            </nav>
 
-        {/* Sidebar Upgrade Block */}
-        <div className="p-4 border-t border-slate-800">
-          <div className="bg-gradient-to-br from-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-4 text-center relative overflow-hidden shadow-md shadow-black/10">
-            <div className="absolute -top-12 -right-12 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
-            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center mx-auto mb-3">
-              <Sparkles className="w-5 h-5 text-orange-400" />
+            {/* Sidebar Upgrade Block */}
+            <div className="p-4 border-t border-slate-800">
+              <div className="bg-gradient-to-br from-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-4 text-center relative overflow-hidden shadow-md shadow-black/10">
+                <div className="absolute -top-12 -right-12 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center mx-auto mb-3">
+                  <Sparkles className="w-5 h-5 text-orange-400" />
+                </div>
+                <h4 className="text-xs font-extrabold text-white">Upgrade Your Skills</h4>
+                <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Unlock advanced modules, exclusive workshops & more.</p>
+                <button
+                  onClick={() => showToast('Advanced modules are coming soon!', 'success')}
+                  className="mt-3 w-full py-2 bg-gradient-to-r from-orange-500 to-[#FF5A1F] hover:from-orange-600 hover:to-[#E04D15] text-white text-[10px] font-black rounded-lg uppercase tracking-wider transition-all shadow-md shadow-orange-500/10 cursor-pointer"
+                >
+                  Upgrade Now
+                </button>
+              </div>
             </div>
-            <h4 className="text-xs font-extrabold text-white">Upgrade Your Skills</h4>
-            <p className="text-[10px] text-slate-400 mt-1 leading-relaxed">Unlock advanced modules, exclusive workshops & more.</p>
-            <button
-              onClick={() => showToast('Advanced modules are coming soon!', 'success')}
-              className="mt-3 w-full py-2 bg-gradient-to-r from-orange-500 to-[#FF5A1F] hover:from-orange-600 hover:to-[#E04D15] text-white text-[10px] font-black rounded-lg uppercase tracking-wider transition-all shadow-md shadow-orange-500/10 cursor-pointer"
-            >
-              Upgrade Now
-            </button>
           </div>
-        </div>
 
-        {/* Sidebar Logout */}
-        <div className="p-4 border-t border-slate-800 flex items-center justify-between text-slate-400 text-xs">
-          <button onClick={handleLogout} className="flex items-center gap-2 hover:text-white font-bold transition-colors cursor-pointer">
-            <LogOut className="w-4 h-4 text-orange-500" /> Logout Workspace
-          </button>
-          <span className="text-[9px] font-bold text-slate-600 uppercase">v1.2.6</span>
+          {/* Sidebar Logout */}
+          <div className="p-4 border-t border-slate-800 mt-auto flex items-center justify-between text-slate-400 text-xs shrink-0">
+            <button onClick={handleLogout} className="flex items-center gap-2 hover:text-white font-bold transition-colors cursor-pointer">
+              <LogOut className="w-4 h-4 text-orange-500" /> Logout Workspace
+            </button>
+            <span className="text-[9px] font-bold text-slate-600 uppercase">v1.2.6</span>
+          </div>
         </div>
       </aside>
 
@@ -390,7 +411,7 @@ export default function StudentDashboard() {
         </header>
 
         {/* ==================== MAIN DASHBOARD LAYOUTS ==================== */}
-        <main className="flex-1 p-6 md:p-8 space-y-8">
+        <main className="flex-1 p-6 md:p-8 pb-24 md:pb-32 space-y-8">
           
           <AnimatePresence mode="wait">
             <motion.div
@@ -1469,6 +1490,14 @@ export default function StudentDashboard() {
                 </div>
               )}
 
+              {/* -------------------- 10B. DOCUMENTS VIEW -------------------- */}
+              {activeSection === 'documents' && (
+                <StudentDocumentsSection 
+                  student={student} 
+                  documents={studentDocuments} 
+                />
+              )}
+
               {/* -------------------- 11. SETTINGS VIEW -------------------- */}
               {activeSection === 'settings' && (
                 <div className="max-w-2xl mx-auto space-y-8 text-left">
@@ -1691,3 +1720,193 @@ function FlameSpinnerGlow() {
     </div>
   );
 }
+
+// ─── Student Documents Component ─────────────────────────────────────────────
+
+interface StudentDocumentsSectionProps {
+  student: any;
+  documents: any[];
+}
+
+function StudentDocumentsSection({ student, documents }: StudentDocumentsSectionProps) {
+  const documentTypes = [
+    { key: 'offer-letter', label: 'Offer Letter', desc: 'Official Industrial Training Offer Letter issued by DevPhoenix.', possibleNames: ['Industrial Training Offer Letter', 'Internship Offer Letter'] },
+    { key: 'training-cert', label: 'Training Certificate', desc: 'Certificate verifying completion of industrial cohort syllabus.', possibleNames: ['Training Certificate'] },
+    { key: 'internship-cert', label: 'Internship Certificate', desc: 'Certificate for work contributions on active development codebases.', possibleNames: ['Internship Certificate'] },
+    { key: 'experience-letter', label: 'Experience Letter', desc: 'Professional experience letter documenting tenure & modules completed.', possibleNames: ['Experience Letter'] },
+    { key: 'completion-cert', label: 'Completion Certificate', desc: 'Verification of absolute program milestones & final capstone.', possibleNames: ['Completion Certificate'] },
+  ];
+
+  const [selectedQRRecord, setSelectedQRRecord] = useState<any | null>(null);
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-8 text-left">
+      <div>
+        <h2 className="text-2xl font-black text-slate-900 leading-tight">My Documents</h2>
+        <p className="text-slate-500 text-sm mt-1">
+          Access, verify, and download your official industrial training credentials.
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-12 gap-8 items-start">
+        
+        {/* Documents list */}
+        <div className="md:col-span-8 space-y-4">
+          {documentTypes.map((docType) => {
+            const matchedRecord = documents.find(d => 
+              docType.possibleNames.includes(d.documentType)
+            );
+
+            return (
+              <div 
+                key={docType.key}
+                className={`bg-white border rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition-all hover:shadow-md ${
+                  matchedRecord ? 'border-slate-100' : 'border-slate-200/60 opacity-65 bg-slate-50/50'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 border ${
+                    matchedRecord 
+                      ? 'bg-orange-50 border-orange-100 text-orange-500' 
+                      : 'bg-slate-100 border-slate-200 text-slate-400'
+                  }`}>
+                    {matchedRecord ? <ShieldCheck className="w-6 h-6" /> : <X className="w-5 h-5" />}
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-extrabold text-sm text-slate-800 leading-snug">{docType.label}</h3>
+                    <p className="text-[11px] text-slate-400 font-semibold mt-1 leading-relaxed max-w-sm">{docType.desc}</p>
+                    
+                    {matchedRecord ? (
+                      <div className="mt-3 flex flex-wrap gap-2.5 items-center text-[10px] font-bold text-slate-500">
+                        <span className="font-mono bg-slate-50 border border-slate-100 rounded px-1.5 py-0.5 text-[9px] uppercase">
+                          ID: {matchedRecord.verificationId}
+                        </span>
+                        <span>&bull;</span>
+                        <span>Issued: {new Date(matchedRecord.issueDate).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                      </div>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-bold italic mt-3 inline-block">Not Issued</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex sm:flex-col gap-2 w-full sm:w-auto shrink-0 border-t sm:border-t-0 border-slate-50 pt-4 sm:pt-0">
+                  {matchedRecord ? (
+                    <>
+                      <a
+                        href={`/api/verification/pdf/${matchedRecord.verificationId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 sm:w-36 py-2 px-3 bg-slate-900 hover:bg-[#FF5A1F] text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <Eye className="w-3.5 h-3.5" /> View Online
+                      </a>
+                      
+                      <div className="flex gap-2">
+                        <a
+                          href={`/api/verification/pdf/${matchedRecord.verificationId}`}
+                          download
+                          className="flex-1 py-2 px-3 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" /> PDF
+                        </a>
+                        <button
+                          onClick={() => setSelectedQRRecord(matchedRecord)}
+                          className="py-2 px-3 border border-slate-200 hover:bg-slate-50 text-slate-500 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          QR
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full sm:w-36 py-2 bg-slate-100 text-slate-400 border border-slate-200 rounded-xl text-[10px] font-black uppercase tracking-wider cursor-not-allowed text-center"
+                    >
+                      Locked 🔒
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Side panel */}
+        <div className="md:col-span-4 space-y-6">
+          <div className="bg-slate-900 border border-slate-800 text-white rounded-3xl p-6 shadow-md shadow-black/10 relative overflow-hidden text-center">
+            <div className="absolute -top-12 -right-12 w-24 h-24 bg-orange-500/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mx-auto mb-3">
+              <ShieldCheck className="w-5 h-5 text-orange-400" />
+            </div>
+            <h4 className="text-xs font-extrabold">Instant Public Audit</h4>
+            <p className="text-[10px] text-slate-400 mt-2 leading-relaxed">
+              Every document contains a dynamic QR code redirecting to our public registry, validating signatures and credentials instantly for employers or recruiters.
+            </p>
+          </div>
+          
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm text-left">
+            <h4 className="font-extrabold text-xs text-slate-700 uppercase tracking-wider mb-2">Need Corrections?</h4>
+            <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
+              If your name, program parameters, or internship duration has typos, please contact your cohort coordinator via the support chat in the Messages panel.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      {/* QR Code Modal Overlay */}
+      <AnimatePresence>
+        {selectedQRRecord && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSelectedQRRecord(null)}
+              className="fixed inset-0 bg-black/50 z-50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 m-auto w-full max-w-sm h-fit bg-white border border-slate-100 shadow-2xl rounded-3xl p-6 z-55 text-center flex flex-col items-center"
+            >
+              <div className="flex items-center justify-between w-full border-b border-slate-100 pb-3 mb-4">
+                <h3 className="font-extrabold text-sm text-slate-800 uppercase tracking-wider text-left">Document Verification QR</h3>
+                <button onClick={() => setSelectedQRRecord(null)} className="text-slate-400 hover:text-slate-600">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl mb-4">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(
+                    window.location.origin + '/verify?id=' + selectedQRRecord.verificationId
+                  )}`}
+                  alt="Verification QR Code"
+                  className="w-36 h-36 mx-auto object-contain border border-slate-200 bg-white p-2 rounded-xl"
+                />
+              </div>
+
+              <div className="text-xs space-y-1.5 text-slate-500 font-semibold">
+                <p className="font-bold text-slate-800">{selectedQRRecord.documentType}</p>
+                <p className="font-mono text-slate-400 font-bold bg-slate-50 px-2 py-0.5 rounded border border-slate-100 inline-block">
+                  {selectedQRRecord.verificationId}
+                </p>
+                <p className="text-[10px] leading-relaxed pt-2">
+                  Scan this QR code with a mobile device to instantly verify this document on the public portal.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedQRRecord(null)}
+                className="mt-6 w-full py-2.5 bg-slate-900 hover:bg-orange-500 text-white rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer"
+              >
+                Close
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+

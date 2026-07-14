@@ -116,7 +116,10 @@ export default function Navbar() {
                      opacity-20 filter blur-md pointer-events-none
                      transition-all duration-300 ease-out
                      group-hover:opacity-40 group-hover:blur-lg group-hover:-m-2"></div>
-       <button className="relative z-10 px-6 py-2.5 sm:px-5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-md hover:shadow-lg transition-all duration-200 w-full sm:w-auto transform hover:-translate-y-0.5 block cursor-pointer">
+       <button
+         suppressHydrationWarning={true}
+         className="relative z-10 px-6 py-2.5 sm:px-5 text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full shadow-md hover:shadow-lg transition-all duration-200 w-full sm:w-auto transform hover:-translate-y-0.5 block cursor-pointer"
+       >
          Join Now
        </button>
     </div>
@@ -184,7 +187,12 @@ export default function Navbar() {
               {renderSignupButton()}
             </div>
 
-            <button className="lg:hidden flex items-center justify-center w-10 h-10 text-slate-700 bg-white/50 rounded-full border border-slate-100 focus:outline-none z-50" onClick={toggleMenu} aria-label={isOpen ? 'Close Menu' : 'Open Menu'}>
+            <button
+              suppressHydrationWarning={true}
+              className="lg:hidden flex items-center justify-center w-10 h-10 text-slate-700 bg-white/50 rounded-full border border-slate-100 focus:outline-none z-50"
+              onClick={toggleMenu}
+              aria-label={isOpen ? 'Close Menu' : 'Open Menu'}
+            >
               {isOpen ? (
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
               ) : (

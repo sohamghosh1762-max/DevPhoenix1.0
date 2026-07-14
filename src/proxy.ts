@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'devphoenix2025';
-const COOKIE_NAME = 'dp-admin-auth';
+const ADMIN_COOKIE_NAME = 'dp-admin-auth';
+const STUDENT_COOKIE_NAME = 'dp-student-auth';
 const SALT = process.env.JWT_SECRET || 'devphoenix-salt-2025';
 
 async function sha256(message: string): Promise<string> {
@@ -11,7 +12,7 @@ async function sha256(message: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Handle explicit /admin/login attempts and redirect to the correct page
@@ -21,7 +22,7 @@ export async function middleware(req: NextRequest) {
 
   // Protect all /admin/* routes except /admin-login
   if (pathname.startsWith('/admin') && !pathname.startsWith('/admin-login')) {
-    const authCookie = req.cookies.get(COOKIE_NAME);
+    const authCookie = req.cookies.get(ADMIN_COOKIE_NAME);
     const expectedHash = await sha256(ADMIN_PASSWORD + SALT);
     if (!authCookie || authCookie.value !== expectedHash) {
       const loginUrl = new URL('/admin-login', req.url);
@@ -30,9 +31,35 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // Protect all student dashboard routes
+  if (pathname.startsWith('/dashboard')) {
+    const authCookie = req.cookies.get(STUDENT_COOKIE_NAME);
+    if (!authCookie || !authCookie.value) {
+      const loginUrl = new URL('/login', req.url);
+      loginUrl.searchParams.set('from', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Redirect logged-in student away from login page
+  if (pathname === '/login') {
+    const authCookie = req.cookies.get(STUDENT_COOKIE_NAME);
+    if (authCookie && authCookie.value) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: [
+    '/admin',
+    '/admin/:path*',
+    '/admin-login',
+    '/admin/login',
+    '/dashboard',
+    '/dashboard/:path*',
+    '/login',
+  ],
 };

@@ -1,0 +1,285 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String          @id @default(uuid())
+  email          String          @unique
+  password       String
+  role           String          @default("STUDENT") // STUDENT, MENTOR, ADMIN
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  studentProfile StudentProfile?
+  mentorProfile  Mentor?
+  adminProfile   AdminUser?
+}
+
+model StudentProfile {
+  id                    String                 @id @default(uuid())
+  userId                String                 @unique
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentCode           String                 @unique // e.g. "DP-AIML-4096"
+  name                  String
+  phone                 String?
+  whatsapp              String?
+  address               String?
+  bio                   String?
+  skills                String[]               @default([])
+  avatar                String?
+  batch                 String?
+  points                Int                    @default(0)
+  badges                Int                    @default(0)
+  level                 Int                    @default(1)
+  joiningDate           String?
+  certificateStatus     String?
+  enrollments           Enrollment[]
+  moduleProgress        ModuleProgress[]
+  assignmentSubmissions AssignmentSubmission[]
+  projects              Project[]
+  notifications         Notification[]
+  certificates          Certificate[]
+  paymentSubmissions    PaymentSubmission[]
+  attendance            Attendance[]
+  activityLogs          StudentActivityLog[]
+  verifications         Verification[]
+}
+
+model Mentor {
+  id         String   @id @default(uuid())
+  name       String
+  role       String
+  email      String?  @unique
+  avatar     String?
+  status     String   @default("online")
+  tags       String[] @default([])
+  isVerified Boolean  @default(true)
+  followers  Int      @default(0)
+  userId     String?  @unique
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  role      String   @default("editor") // super_admin, editor, content_manager
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Program {
+  id             String        @id // e.g. "ai-ml-industrial"
+  slug           String        @unique
+  title          String
+  description    String
+  overview       String?
+  category       String
+  level          String
+  duration       String
+  type           String
+  price          String
+  practicalHours String
+  tags           String[]      @default([])
+  image          String
+  outcomes       String[]      @default([])
+  projectsCount  Int           @default(0)
+  curriculum     Json?         // Curriculum schema JSON
+  faqs           Json?         // FAQ list JSON
+  pricingDetails Json?         // Pricing outline JSON
+  tools          String[]      @default([])
+  certifications String[]      @default([])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  enrollments    Enrollment[]
+  courseModules  CourseModule[]
+  certificates   Certificate[]
+  announcements  Announcement[]
+  liveClasses    LiveClass[]
+}
+
+model Enrollment {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  programId        String
+  program          Program        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  enrolledAt       DateTime       @default(now())
+  status           String         @default("ACTIVE") // ACTIVE, COMPLETED, SUSPENDED
+}
+
+model CourseModule {
+  id             String           @id @default(uuid())
+  programId      String
+  program        Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  moduleNumber   String           // e.g. "01"
+  title          String
+  topics         String[]         @default([])
+  resourcesCount Int              @default(0)
+  progress       ModuleProgress[]
+  assignments    Assignment[]
+  resources      Resource[]
+}
+
+model ModuleProgress {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  courseModuleId   String
+  courseModule     CourseModule   @relation(fields: [courseModuleId], references: [id], onDelete: Cascade)
+  progress         Int            @default(0)
+  status           String         @default("Not Started") // "Completed", "In Progress", "Not Started"
+  updatedAt        DateTime       @updatedAt
+}
+
+model Assignment {
+  id             String                 @id @default(uuid())
+  courseModuleId String
+  courseModule   CourseModule           @relation(fields: [courseModuleId], references: [id], onDelete: Cascade)
+  title          String
+  description    String
+  deadline       String
+  submissions    AssignmentSubmission[]
+}
+
+model AssignmentSubmission {
+  id               String         @id @default(uuid())
+  assignmentId     String
+  assignment       Assignment     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  status           String         @default("Submitted") // Submitted, Pending, Graded
+  submissionDate   String
+  submittedFile    String?
+  marks            String?
+  feedback         String?
+}
+
+model Project {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  title            String
+  description      String
+  teamMembers      String[]       @default([])
+  mentorRemarks    String?
+  progress         Int            @default(0)
+  deadline         String
+  submissionStatus String         @default("Not Submitted")
+  finalReportUrl   String?
+  milestones       Json?          // Array of milestones JSON
+}
+
+model Notification {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  title            String
+  message          String
+  type             String
+  isRead           Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+}
+
+model Certificate {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  programId        String
+  program          Program        @relation(fields: [programId], references: [id], onDelete: Cascade)
+  certificateUrl   String
+  issuedAt         DateTime       @default(now())
+}
+
+model PaymentSubmission {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  amountPaid       String
+  transactionId    String
+  screenshotUrl    String
+  status           String         @default("Pending Verification")
+  createdAt        DateTime       @default(now())
+}
+
+model Attendance {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  date             String
+  subject          String
+  mentorName       String
+  status           String         // Present, Absent, Leave
+}
+
+model Resource {
+  id             String       @id @default(uuid())
+  courseModuleId String
+  courseModule   CourseModule @relation(fields: [courseModuleId], references: [id], onDelete: Cascade)
+  title          String
+  type           String       // pdf, code, dataset, presentation, link
+  size           String
+  downloadUrl    String
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  programId String
+  program   Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  author    String
+  createdAt DateTime @default(now())
+}
+
+model LiveClass {
+  id                 String   @id @default(uuid())
+  programId          String
+  program            Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  title              String
+  mentorName         String
+  date               String
+  time               String
+  duration           String
+  meetLink           String
+  status             String   @default("Upcoming") // Live, Upcoming, Completed
+  recordingAvailable Boolean  @default(false)
+  recordingUrl       String?
+}
+
+model StudentActivityLog {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  action           String
+  details          String
+  createdAt        DateTime       @default(now())
+}
+
+model Verification {
+  id               String         @id @default(uuid())
+  studentProfileId String
+  studentProfile   StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  studentName      String
+  verificationId   String         @unique
+  email            String
+  phone            String?
+  course           String
+  courseCode       String
+  documentType     String         // e.g. Offer Letter, Training Certificate, Internship Certificate, Experience Letter, Completion Certificate
+  issueDate        DateTime       @default(now())
+  startDate        DateTime?
+  endDate          DateTime?
+  duration         String?
+  status           String         @default("Valid") // Valid, Revoked, Expired
+  generatedBy      String         @default("Admin")
+  pdfUrl           String?
+  qrCodeUrl        String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}

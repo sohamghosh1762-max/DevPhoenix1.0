@@ -9,7 +9,7 @@ import {
   Briefcase, PenSquare, MessageSquare, Inbox, Settings,
   Globe, Link2, ChevronLeft, ChevronRight, LogOut, Home,
   Image as ImageIcon, Target, Trophy, Menu, ShieldAlert,
-  ChevronDown, Zap
+  ChevronDown, Zap, ShieldCheck
 } from 'lucide-react';
 
 const navGroups = [
@@ -23,8 +23,9 @@ const navGroups = [
     label: 'CRM',
     items: [
       { href: '/admin/leads', icon: Inbox, label: 'Leads' },
-      { href: '/admin/contacts', icon: Users, label: 'Contacts' },
+      { href: '/admin/students', icon: Users, label: 'Students' },
       { href: '/admin/opportunities', icon: Target, label: 'Opportunities' },
+      { href: '/admin/verification', icon: ShieldCheck, label: 'Verification' },
     ],
   },
   {
@@ -145,6 +146,7 @@ export default function AdminSidebar() {
         {/* Logout */}
         <button
           onClick={handleLogout}
+          suppressHydrationWarning={true}
           className={`w-full flex items-center gap-3 px-4 py-3 mt-2 rounded-[14px] text-sm font-semibold text-slate-500 hover:bg-red-50 hover:text-red-500 transition-all ${collapsed ? 'justify-center' : ''}`}
         >
           <LogOut className="w-5 h-5 shrink-0 text-slate-400" />
@@ -166,6 +168,7 @@ export default function AdminSidebar() {
         {/* Collapse toggle button */}
         <button
           onClick={() => setCollapsed(!collapsed)}
+          suppressHydrationWarning={true}
           className="absolute -right-3 top-7 w-6 h-6 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all z-50 shadow-md cursor-pointer"
         >
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { studentsService } from '@/services/mongodb/db.service';
-import { hasMongoConfig } from '@/services/mongodb/client';
-import { apiResponse, getLocalCacheHelper } from '@/lib/api-utils';
+import bcrypt from 'bcrypt';
+import { prisma } from '@/lib/prisma';
+import { apiResponse } from '@/lib/api-utils';
+import { signToken, verifyToken } from '@/lib/jwt';
+import { getStudentDashboardData } from '@/lib/student-db';
 
 export const dynamic = 'force-dynamic';
 
 const COOKIE_NAME = 'dp-student-auth';
-const cache = getLocalCacheHelper<any>('students.json');
 
 // GET currently logged-in student session
 export async function GET(req: NextRequest) {
@@ -16,29 +17,22 @@ export async function GET(req: NextRequest) {
       return apiResponse.error('Not authenticated', 'UNAUTHORIZED', null, 401);
     }
 
-    const studentCode = authCookie.value;
-    let student = null;
-
-    if (hasMongoConfig) {
-      try {
-        student = await studentsService.getByCode(studentCode);
-      } catch (err) {
-        console.error('MongoDB student query error, falling back:', err);
-      }
+    const payload = verifyToken(authCookie.value);
+    if (!payload || payload.role !== 'STUDENT') {
+      const res = apiResponse.error('Invalid session token', 'UNAUTHORIZED', null, 401);
+      res.cookies.set(COOKIE_NAME, '', { path: '/', maxAge: -1 });
+      return res;
     }
 
-    if (!student) {
-      const students = cache.read();
-      student = students.find((s: any) => s.studentCode.toUpperCase() === studentCode.toUpperCase());
+    // Fetch dynamic student portal data from PostgreSQL
+    const data = await getStudentDashboardData(payload.studentCode);
+    if (!data) {
+      const res = apiResponse.notFound('Trainee profile not found');
+      res.cookies.set(COOKIE_NAME, '', { path: '/', maxAge: -1 });
+      return res;
     }
 
-    if (!student) {
-      return apiResponse.notFound('Student not found');
-    }
-
-    // Return profile without sensitive password field
-    const { password, ...profile } = student;
-    return apiResponse.success(profile);
+    return apiResponse.success(data);
   } catch (error: any) {
     console.error('Student session GET error:', error);
     return apiResponse.error(error.message || 'Server error', 'SERVER_ERROR');
@@ -54,33 +48,41 @@ export async function POST(req: NextRequest) {
       return apiResponse.badRequest('Student Code and Password are required', 'MISSING_REQUIRED_FIELDS');
     }
 
-    let student = null;
+    const trimmedCode = studentCode.trim().toUpperCase();
 
-    if (hasMongoConfig) {
-      try {
-        student = await studentsService.getByCode(studentCode);
-      } catch (err) {
-        console.error('MongoDB student query error, falling back:', err);
-      }
-    }
+    // Query trainee profile from PostgreSQL
+    const profile = await prisma.studentProfile.findUnique({
+      where: { studentCode: trimmedCode },
+      include: { user: true }
+    });
 
-    if (!student) {
-      const students = cache.read();
-      student = students.find(
-        (s: any) =>
-          s.studentCode.toUpperCase() === studentCode.trim().toUpperCase()
-      );
-    }
-
-    if (!student || student.password !== password) {
+    if (!profile) {
       return apiResponse.error('Invalid Student Code or Password', 'UNAUTHORIZED', null, 401);
     }
 
-    // Set cookie on response
-    const { password: _, ...profile } = student;
-    const res = apiResponse.success(profile);
+    // Verify hashed password using bcrypt
+    const passwordMatch = await bcrypt.compare(password, profile.user.password);
+    if (!passwordMatch) {
+      return apiResponse.error('Invalid Student Code or Password', 'UNAUTHORIZED', null, 401);
+    }
+
+    // Fetch aggregated dashboard data
+    const dashboardData = await getStudentDashboardData(trimmedCode);
+    if (!dashboardData) {
+      return apiResponse.error('Profile aggregation failed', 'SERVER_ERROR', null, 500);
+    }
+
+    // Generate secure JWT token
+    const token = signToken({
+      studentCode: profile.studentCode,
+      id: profile.id,
+      role: 'STUDENT'
+    });
+
+    const res = apiResponse.success(dashboardData);
     
-    res.cookies.set(COOKIE_NAME, student.studentCode, {
+    // Set secure HttpOnly cookie
+    res.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',

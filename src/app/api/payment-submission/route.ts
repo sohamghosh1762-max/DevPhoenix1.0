@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
       console.log(`
 --- SIMULATED ADMIN PAYMENT EMAIL ---
 From: ${fromEmailAdmin}
-To: devphoenix@zoho.in
+To: devphoenix@zohomail.in
 Reply-To: ${emailAddress}
 Subject: New Payment Submission | DEVPHOENIX Academy
 Attachment Name: ${file.name}
@@ -130,7 +130,7 @@ Subject: Payment Submission Received | DEVPHOENIX Academy
     // 4. Send admin notification email with the screenshot attached
     const adminEmailResult = await resend.emails.send({
       from: fromEmailAdmin,
-      to: ["devphoenix@zoho.in"],
+      to: ["devphoenix@zohomail.in"],
       replyTo: emailAddress,
       subject: `New Payment Submission | DEVPHOENIX Academy`,
       html: adminHtml,
