@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 const FILE_PATH = join(process.cwd(), 'src/data/community-dynamic.json');
 
 const INITIAL_SEED = {

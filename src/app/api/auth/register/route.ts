@@ -5,6 +5,9 @@ import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
 import { sendRegistrationConfirmation, sendAdminRegistrationAlert } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),

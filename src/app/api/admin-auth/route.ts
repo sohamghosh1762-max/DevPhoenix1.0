@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'devphoenix2025';
 const COOKIE_NAME = 'dp-admin-auth';
 const SALT = process.env.JWT_SECRET || 'devphoenix-salt-2025';

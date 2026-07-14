@@ -5,6 +5,9 @@ import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
 import { signToken } from '@/lib/jwt';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
