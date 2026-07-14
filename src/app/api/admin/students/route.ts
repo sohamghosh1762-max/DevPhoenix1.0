@@ -3,6 +3,8 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -37,6 +39,20 @@ export async function GET(req: NextRequest) {
         joiningDate: 'desc'
       }
     });
+
+    // Fallback to local static students if database returns empty
+    if (!students || students.length === 0) {
+      try {
+        const filePath = join(process.cwd(), 'src/data/students.json');
+        const fileContent = readFileSync(filePath, 'utf8');
+        const staticData = JSON.parse(fileContent);
+        if (Array.isArray(staticData)) {
+          return apiResponse.success(staticData);
+        }
+      } catch (err) {
+        console.error('Failed to load students.json fallback:', err);
+      }
+    }
 
     const formattedStudents = students.map(s => {
       const enrollment = s.enrollments[0];
