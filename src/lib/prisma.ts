@@ -39,4 +39,8 @@ const mockPrisma: any = new Proxy({}, {
   }
 });
 
-export const prisma = (process.env.DATABASE_URL ? rawPrisma : mockPrisma) as PrismaClient;
+const isDatabaseConfigured = 
+  !!process.env.DATABASE_URL && 
+  (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
+
+export const prisma = (isDatabaseConfigured ? rawPrisma : mockPrisma) as PrismaClient;
