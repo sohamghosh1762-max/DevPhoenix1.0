@@ -3,6 +3,8 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -37,6 +39,62 @@ export async function PUT(
 
     const { name, email, password, studentCode, phone, whatsapp, address, bio, skills, batch, courseId, certificateStatus } = result.data;
     const trimmedCode = studentCode.trim().toUpperCase();
+
+    // Check if database is configured
+    const isDatabaseConfigured = 
+      !!process.env.DATABASE_URL && 
+      (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
+
+    if (!isDatabaseConfigured) {
+      const filePath = join(process.cwd(), 'src/data/students.json');
+      let localStudents: any[] = [];
+      try {
+        const fileContent = readFileSync(filePath, 'utf8');
+        localStudents = JSON.parse(fileContent);
+      } catch (err) {
+        console.error('Failed to read students.json:', err);
+      }
+
+      const studentIdx = localStudents.findIndex(s => s.id === id);
+      if (studentIdx === -1) {
+        return apiResponse.notFound('Student profile not found');
+      }
+
+      if (localStudents.some((s, idx) => idx !== studentIdx && (s.email === email || s.studentCode === trimmedCode))) {
+        return apiResponse.badRequest('Another student with this email or student code already exists', 'CONFLICT');
+      }
+
+      const student = localStudents[studentIdx];
+      student.name = name;
+      student.email = email;
+      if (password && password.trim() !== '') {
+        student.password = password;
+      }
+      student.studentCode = trimmedCode;
+      student.phone = phone || '';
+      student.whatsapp = whatsapp || phone || '';
+      student.address = address || '';
+      student.bio = bio || '';
+      student.skills = skills || [];
+      student.batch = batch || '';
+      student.certificateStatus = certificateStatus || '';
+      student.courseId = courseId;
+
+      try {
+        const progPath = join(process.cwd(), 'src/data/programs-static.json');
+        const progContent = readFileSync(progPath, 'utf8');
+        const progs = JSON.parse(progContent);
+        const match = progs.find((p: any) => p.id === courseId);
+        if (match) {
+          student.courseName = match.title;
+        }
+      } catch (err) {
+        console.error('Failed to resolve program name:', err);
+      }
+
+      writeFileSync(filePath, JSON.stringify(localStudents, null, 2), 'utf8');
+      return apiResponse.success(student);
+    }
 
     // Check if student exists
     const profile = await prisma.studentProfile.findUnique({
@@ -158,6 +216,32 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
+
+    // Check if database is configured
+    const isDatabaseConfigured = 
+      !!process.env.DATABASE_URL && 
+      (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
+
+    if (!isDatabaseConfigured) {
+      const filePath = join(process.cwd(), 'src/data/students.json');
+      let localStudents: any[] = [];
+      try {
+        const fileContent = readFileSync(filePath, 'utf8');
+        localStudents = JSON.parse(fileContent);
+      } catch (err) {
+        console.error('Failed to read students.json:', err);
+      }
+
+      const studentIdx = localStudents.findIndex(s => s.id === id);
+      if (studentIdx === -1) {
+        return apiResponse.notFound('Student profile not found');
+      }
+
+      const updatedStudents = localStudents.filter(s => s.id !== id);
+      writeFileSync(filePath, JSON.stringify(updatedStudents, null, 2), 'utf8');
+      return apiResponse.success({ success: true });
+    }
+
     const profile = await prisma.studentProfile.findUnique({
       where: { id }
     });

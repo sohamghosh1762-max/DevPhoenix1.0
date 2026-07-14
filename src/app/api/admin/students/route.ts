@@ -97,6 +97,65 @@ export async function POST(req: NextRequest) {
     const { name, email, password, studentCode, phone, whatsapp, address, bio, skills, batch, courseId, certificateStatus } = result.data;
     const trimmedCode = studentCode.trim().toUpperCase();
 
+    // Check if database is configured
+    const isDatabaseConfigured = 
+      !!process.env.DATABASE_URL && 
+      (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
+
+    if (!isDatabaseConfigured) {
+      const filePath = join(process.cwd(), 'src/data/students.json');
+      let localStudents: any[] = [];
+      try {
+        const fileContent = readFileSync(filePath, 'utf8');
+        localStudents = JSON.parse(fileContent);
+      } catch (err) {
+        console.error('Failed to read students.json:', err);
+      }
+
+      if (localStudents.some(s => s.email === email || s.studentCode === trimmedCode)) {
+        return apiResponse.badRequest('A student with this email or student code already exists', 'USER_ALREADY_EXISTS');
+      }
+
+      const newStudent = {
+        id: `student-${Date.now()}`,
+        userId: `user-${Date.now()}`,
+        studentCode: trimmedCode,
+        password: password || 'password123',
+        name,
+        email,
+        phone: phone || '',
+        whatsapp: whatsapp || phone || '',
+        address: address || 'DevPhoenix Workspace, Sector V, Salt Lake, Kolkata',
+        bio: bio || 'Trainee at DevPhoenix Academy.',
+        skills: skills || [],
+        batch: batch || 'Batch 2026',
+        points: 10,
+        badges: 0,
+        level: 1,
+        joiningDate: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'long', year: 'numeric' }),
+        certificateStatus: certificateStatus || 'Locked (Incomplete Syllabus)',
+        courseId: courseId,
+        courseName: 'Course Program'
+      };
+
+      try {
+        const progPath = join(process.cwd(), 'src/data/programs-static.json');
+        const progContent = readFileSync(progPath, 'utf8');
+        const progs = JSON.parse(progContent);
+        const match = progs.find((p: any) => p.id === courseId);
+        if (match) {
+          newStudent.courseName = match.title;
+        }
+      } catch (err) {
+        console.error('Failed to resolve program name:', err);
+      }
+
+      localStudents.push(newStudent);
+      const fs = require('fs');
+      fs.writeFileSync(filePath, JSON.stringify(localStudents, null, 2), 'utf8');
+      return apiResponse.success(newStudent, 201);
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
