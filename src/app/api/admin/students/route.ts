@@ -3,6 +3,7 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
+import { readStudentsJson, writeStudentsJson } from '@/lib/student-json-db';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -42,15 +43,9 @@ export async function GET(req: NextRequest) {
 
     // Fallback to local static students if database returns empty
     if (!students || students.length === 0) {
-      try {
-        const filePath = join(process.cwd(), 'src/data/students.json');
-        const fileContent = readFileSync(filePath, 'utf8');
-        const staticData = JSON.parse(fileContent);
-        if (Array.isArray(staticData)) {
-          return apiResponse.success(staticData);
-        }
-      } catch (err) {
-        console.error('Failed to load students.json fallback:', err);
+      const staticData = readStudentsJson();
+      if (staticData && staticData.length > 0) {
+        return apiResponse.success(staticData);
       }
     }
 
@@ -103,14 +98,7 @@ export async function POST(req: NextRequest) {
       (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
 
     if (!isDatabaseConfigured) {
-      const filePath = join(process.cwd(), 'src/data/students.json');
-      let localStudents: any[] = [];
-      try {
-        const fileContent = readFileSync(filePath, 'utf8');
-        localStudents = JSON.parse(fileContent);
-      } catch (err) {
-        console.error('Failed to read students.json:', err);
-      }
+      const localStudents = readStudentsJson();
 
       if (localStudents.some(s => s.email === email || s.studentCode === trimmedCode)) {
         return apiResponse.badRequest('A student with this email or student code already exists', 'USER_ALREADY_EXISTS');
@@ -151,8 +139,7 @@ export async function POST(req: NextRequest) {
       }
 
       localStudents.push(newStudent);
-      const fs = require('fs');
-      fs.writeFileSync(filePath, JSON.stringify(localStudents, null, 2), 'utf8');
+      writeStudentsJson(localStudents);
       return apiResponse.success(newStudent, 201);
     }
 

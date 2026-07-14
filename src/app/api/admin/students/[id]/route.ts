@@ -3,7 +3,8 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
-import { readFileSync, writeFileSync } from 'fs';
+import { readStudentsJson, writeStudentsJson } from '@/lib/student-json-db';
+import { readFileSync } from 'fs';
 import { join } from 'path';
 
 export const dynamic = 'force-dynamic';
@@ -46,14 +47,7 @@ export async function PUT(
       (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
 
     if (!isDatabaseConfigured) {
-      const filePath = join(process.cwd(), 'src/data/students.json');
-      let localStudents: any[] = [];
-      try {
-        const fileContent = readFileSync(filePath, 'utf8');
-        localStudents = JSON.parse(fileContent);
-      } catch (err) {
-        console.error('Failed to read students.json:', err);
-      }
+      const localStudents = readStudentsJson();
 
       const studentIdx = localStudents.findIndex(s => s.id === id);
       if (studentIdx === -1) {
@@ -92,7 +86,7 @@ export async function PUT(
         console.error('Failed to resolve program name:', err);
       }
 
-      writeFileSync(filePath, JSON.stringify(localStudents, null, 2), 'utf8');
+      writeStudentsJson(localStudents);
       return apiResponse.success(student);
     }
 
@@ -223,14 +217,7 @@ export async function DELETE(
       (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
 
     if (!isDatabaseConfigured) {
-      const filePath = join(process.cwd(), 'src/data/students.json');
-      let localStudents: any[] = [];
-      try {
-        const fileContent = readFileSync(filePath, 'utf8');
-        localStudents = JSON.parse(fileContent);
-      } catch (err) {
-        console.error('Failed to read students.json:', err);
-      }
+      const localStudents = readStudentsJson();
 
       const studentIdx = localStudents.findIndex(s => s.id === id);
       if (studentIdx === -1) {
@@ -238,7 +225,7 @@ export async function DELETE(
       }
 
       const updatedStudents = localStudents.filter(s => s.id !== id);
-      writeFileSync(filePath, JSON.stringify(updatedStudents, null, 2), 'utf8');
+      writeStudentsJson(updatedStudents);
       return apiResponse.success({ success: true });
     }
 
