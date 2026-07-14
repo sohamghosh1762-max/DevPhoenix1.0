@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
 import { isAdminAuthenticated } from '@/lib/admin-auth-helper';
+import { readVerificationsJson } from '@/lib/verification-json-db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -20,6 +21,11 @@ export async function GET(req: NextRequest) {
         createdAt: 'desc'
       }
     });
+
+    if (!records || records.length === 0) {
+      const fallbackRecords = readVerificationsJson();
+      return apiResponse.success(fallbackRecords);
+    }
 
     return apiResponse.success(records);
   } catch (error: any) {

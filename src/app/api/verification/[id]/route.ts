@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
 import { isAdminAuthenticated } from '@/lib/admin-auth-helper';
+import { readVerificationsJson, writeVerificationsJson } from '@/lib/verification-json-db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -28,6 +29,11 @@ export async function GET(
     }
 
     if (!record) {
+      const localRecords = readVerificationsJson();
+      record = localRecords.find(v => v.verificationId === decodedId || v.id === decodedId);
+    }
+
+    if (!record) {
       return apiResponse.notFound(`Document with verification ID "${decodedId}" does not exist.`);
     }
 
@@ -50,6 +56,22 @@ export async function DELETE(
     const authenticated = await isAdminAuthenticated(req);
     if (!authenticated) {
       return apiResponse.error('Not authenticated as Administrator', 'UNAUTHORIZED', null, 401);
+    }
+
+    // Check if database is configured
+    const isDatabaseConfigured = 
+      !!process.env.DATABASE_URL && 
+      (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
+
+    if (!isDatabaseConfigured) {
+      const localRecords = readVerificationsJson();
+      const recordIdx = localRecords.findIndex(v => v.id === id || v.verificationId === id);
+      if (recordIdx === -1) {
+        return apiResponse.notFound(`Document verification record with ID "${id}" not found`);
+      }
+      const updated = localRecords.filter((_, idx) => idx !== recordIdx);
+      writeVerificationsJson(updated);
+      return apiResponse.success({ success: true, message: 'Document verification record deleted successfully.' });
     }
 
     // 2. Find record

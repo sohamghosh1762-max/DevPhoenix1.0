@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
 import { verifyToken } from '@/lib/jwt';
 import { isAdminAuthenticated } from '@/lib/admin-auth-helper';
+import { readVerificationsJson } from '@/lib/verification-json-db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -34,6 +35,17 @@ export async function GET(
 
     if (!authorized) {
       return apiResponse.error('Not authorized to access these documents', 'UNAUTHORIZED', null, 403);
+    }
+
+    // Check if database is configured
+    const isDatabaseConfigured = 
+      !!process.env.DATABASE_URL && 
+      (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
+
+    if (!isDatabaseConfigured) {
+      const localRecords = readVerificationsJson();
+      const studentRecords = localRecords.filter(v => v.studentProfileId === studentId);
+      return apiResponse.success(studentRecords);
     }
 
     // 2. Fetch student verifications

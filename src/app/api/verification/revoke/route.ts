@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
 import { isAdminAuthenticated } from '@/lib/admin-auth-helper';
+import { readVerificationsJson, writeVerificationsJson } from '@/lib/verification-json-db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -26,6 +27,24 @@ export async function PUT(req: NextRequest) {
       return apiResponse.badRequest('Invalid status value. Must be: Valid, Revoked, or Expired', 'INVALID_STATUS');
     }
 
+    // Check if database is configured
+    const isDatabaseConfigured = 
+      !!process.env.DATABASE_URL && 
+      (process.env.DATABASE_URL.startsWith('postgresql://') || process.env.DATABASE_URL.startsWith('postgres://'));
+
+    if (!isDatabaseConfigured) {
+      const localRecords = readVerificationsJson();
+      const recordIdx = localRecords.findIndex(v => v.id === id || v.verificationId === id);
+      if (recordIdx === -1) {
+        return apiResponse.notFound(`Document verification record with ID "${id}" not found`);
+      }
+      const record = localRecords[recordIdx];
+      record.status = status;
+      record.updatedAt = new Date().toISOString();
+      writeVerificationsJson(localRecords);
+      return apiResponse.success(record);
+    }
+
     // 3. Find and update the Verification record
     const record = await prisma.verification.findUnique({
       where: { id }
@@ -44,23 +63,27 @@ export async function PUT(req: NextRequest) {
     });
 
     // Create Notification in student portal
-    await prisma.notification.create({
-      data: {
-        studentProfileId: record.studentProfileId,
-        title: `Document Status Updated ⚠️`,
-        message: `Your ${record.documentType} (${record.verificationId}) status has been updated to ${status}.`,
-        type: 'class'
-      }
-    });
+    try {
+      await prisma.notification.create({
+        data: {
+          studentProfileId: record.studentProfileId,
+          title: `Document Status Updated ⚠️`,
+          message: `Your ${record.documentType} (${record.verificationId}) status has been updated to ${status}.`,
+          type: 'class'
+        }
+      });
 
-    // Log student activity
-    await prisma.studentActivityLog.create({
-      data: {
-        studentProfileId: record.studentProfileId,
-        action: 'DOCUMENT_STATUS_CHANGED',
-        details: `Document status for ${record.verificationId} updated to ${status}`
-      }
-    });
+      // Log student activity
+      await prisma.studentActivityLog.create({
+        data: {
+          studentProfileId: record.studentProfileId,
+          action: 'DOCUMENT_STATUS_CHANGED',
+          details: `Document status for ${record.verificationId} updated to ${status}`
+        }
+      });
+    } catch (dbErr) {
+      console.warn('Non-blocking log/notification write error:', dbErr);
+    }
 
     return apiResponse.success(updatedRecord);
   } catch (error: any) {
