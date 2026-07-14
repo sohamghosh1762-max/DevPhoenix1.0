@@ -42,6 +42,29 @@ export async function GET(
       return new NextResponse('Verification ID not found', { status: 404 });
     }
 
+    // Proxy custom PDF if it points to a Cloudinary or other external link
+    if (record.pdfUrl && !record.pdfUrl.includes(`/api/verification/pdf/`)) {
+      try {
+        console.log(`🔗 Proxying PDF from custom URL: ${record.pdfUrl}`);
+        const response = await fetch(record.pdfUrl);
+        if (response.ok) {
+          const buffer = await response.arrayBuffer();
+          return new NextResponse(buffer as any, {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/pdf',
+              'Content-Disposition': `inline; filename="${record.verificationId}.pdf"`,
+              'Cache-Control': 'no-store, max-age=0, must-revalidate'
+            }
+          });
+        } else {
+          console.warn(`Failed to fetch custom PDF: ${response.status} ${response.statusText}`);
+        }
+      } catch (err) {
+        console.error('Error fetching custom PDF URL:', err);
+      }
+    }
+
     // 2. Create PDF Document
     const pdfDoc = await PDFDocument.create();
     

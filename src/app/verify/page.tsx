@@ -274,7 +274,7 @@ function VerifyPortalContent() {
               {/* Action buttons (View Offer Letter) */}
               <div className="flex flex-col sm:flex-row gap-3 pt-3 border-t border-white/5">
                 <a
-                  href={result.pdfUrl || `/api/verification/pdf/${result.verificationId}`}
+                  href={`/api/verification/pdf/${result.verificationId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-grow px-4 py-3 bg-gradient-to-r from-orange-500 to-[#FF5A1F] hover:from-orange-600 hover:to-[#E04D15] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
