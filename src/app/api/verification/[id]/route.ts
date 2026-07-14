@@ -4,6 +4,7 @@ import { apiResponse } from '@/lib/api-utils';
 import { isAdminAuthenticated } from '@/lib/admin-auth-helper';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // GET verification by verificationId or UUID (Publicly accessible)
 export async function GET(

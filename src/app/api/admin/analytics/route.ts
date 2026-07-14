@@ -5,6 +5,7 @@ import { apiResponse, getLocalCacheHelper } from "@/lib/api-utils";
 import { Lead } from "@/types";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 const cache = getLocalCacheHelper<Lead>("leads.json");
 

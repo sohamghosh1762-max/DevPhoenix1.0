@@ -5,6 +5,7 @@ import { verifyToken } from '@/lib/jwt';
 import { isAdminAuthenticated } from '@/lib/admin-auth-helper';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(
   req: NextRequest,

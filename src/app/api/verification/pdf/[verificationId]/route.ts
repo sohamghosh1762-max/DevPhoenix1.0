@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // Helper to format dates nicely for the PDF
 function formatDate(date: Date | null | undefined): string {
