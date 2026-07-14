@@ -4,14 +4,16 @@ import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import qrCode from 'qrcode';
 import fs from 'fs';
 import path from 'path';
+import { readVerificationsJson } from '@/lib/verification-json-db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 // Helper to format dates nicely for the PDF
-function formatDate(date: Date | null | undefined): string {
+function formatDate(date: Date | string | null | undefined): string {
   if (!date) return 'N/A';
-  return date.toLocaleDateString('en-US', {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleDateString('en-US', {
     day: '2-digit',
     month: 'long',
     year: 'numeric'
@@ -27,9 +29,14 @@ export async function GET(
     const decodedId = decodeURIComponent(verificationId).trim();
 
     // 1. Fetch verification details from database
-    const record = await prisma.verification.findUnique({
+    let record = await prisma.verification.findUnique({
       where: { verificationId: decodedId }
     });
+
+    if (!record) {
+      const localRecords = readVerificationsJson();
+      record = localRecords.find(v => v.verificationId === decodedId || v.id === decodedId);
+    }
 
     if (!record) {
       return new NextResponse('Verification ID not found', { status: 404 });
