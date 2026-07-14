@@ -3,12 +3,14 @@ import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { ensureProgramsSeeded } from '@/lib/student-json-db';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 export async function GET() {
   try {
+    await ensureProgramsSeeded();
     let programs = await prisma.program.findMany({
       select: {
         id: true,

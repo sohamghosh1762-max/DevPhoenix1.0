@@ -3,7 +3,7 @@ import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/api-utils';
-import { readStudentsJson, writeStudentsJson } from '@/lib/student-json-db';
+import { readStudentsJson, writeStudentsJson, ensureProgramsSeeded } from '@/lib/student-json-db';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -142,6 +142,8 @@ export async function POST(req: NextRequest) {
       writeStudentsJson(localStudents);
       return apiResponse.success(newStudent, 201);
     }
+
+    await ensureProgramsSeeded();
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
