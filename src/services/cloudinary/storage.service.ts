@@ -41,13 +41,14 @@ export const cloudinaryService = {
     const dataURI = `data:${mime};base64,${b64}`;
 
     const cleanFolder = `devphoenix/${folder}`.replace(/\/+/g, '/');
+    const isPdf = file.name.toLowerCase().endsWith('.pdf') || mime === 'application/pdf';
 
-    console.log(`☁️ CLOUDINARY UPLOAD: ${file.name} → folder="${cleanFolder}"`);
+    console.log(`☁️ CLOUDINARY UPLOAD: ${file.name} → folder="${cleanFolder}", isPdf=${isPdf}`);
 
     try {
       const result = await cloudinary.uploader.upload(dataURI, {
         folder: cleanFolder,
-        resource_type: 'auto',
+        resource_type: isPdf ? 'raw' : 'auto',
         use_filename: true,
         unique_filename: true,
       });
@@ -75,7 +76,10 @@ export const cloudinaryService = {
         return;
       }
 
-      const result = await cloudinary.uploader.destroy(publicId);
+      const isRaw = publicUrl.includes('/raw/upload/');
+      const result = await cloudinary.uploader.destroy(publicId, {
+        resource_type: isRaw ? 'raw' : 'image'
+      });
       console.log(`☁️ CLOUDINARY DELETE RESULT:`, result);
     } catch (err: any) {
       console.error('☁️ CLOUDINARY DELETE ERROR:', err);
@@ -105,6 +109,11 @@ function extractPublicId(url: string): string | null {
     }
 
     const publicIdWithExt = pathParts.slice(startIdx).join('/');
+    
+    // For raw files, publicId includes the file extension
+    const isRaw = url.includes('/raw/upload/');
+    if (isRaw) return publicIdWithExt;
+
     // Remove file extension
     const lastDot = publicIdWithExt.lastIndexOf('.');
     return lastDot > 0 ? publicIdWithExt.substring(0, lastDot) : publicIdWithExt;
