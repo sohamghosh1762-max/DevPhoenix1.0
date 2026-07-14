@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextRequest } from "next/server";
 import { leadsService } from "@/services/mongodb/db.service";
 import { hasMongoConfig, getDb } from "@/services/mongodb/client";

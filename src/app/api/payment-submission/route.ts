@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextRequest } from "next/server";
 import { paymentSubmissionSchema } from "@/lib/validation";
 import { resend } from "@/lib/resend";

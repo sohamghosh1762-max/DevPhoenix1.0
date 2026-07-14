@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextRequest } from "next/server";
 import { blogPosts } from "@/data/blog";
 import { blogsService } from "@/services/mongodb/db.service";
