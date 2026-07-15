@@ -64,6 +64,10 @@ export default function VerificationAdminPage() {
   const [formStartDate, setFormStartDate] = useState('');
   const [formEndDate, setFormEndDate] = useState('');
   const [formDuration, setFormDuration] = useState('6 Months');
+  const [formIssueDate, setFormIssueDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  });
   const [formTrainingType, setFormTrainingType] = useState('TTP');
   const [formCourse, setFormCourse] = useState('');
   const [formCourseCode, setFormCourseCode] = useState('');
@@ -171,6 +175,10 @@ export default function VerificationAdminPage() {
       setFormCourseCode('');
       setFormStartDate('');
       setFormEndDate('');
+      setFormIssueDate(() => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+      });
       setAttachedPdfUrl('');
       setIsUploadingPdf(false);
     }
@@ -199,7 +207,8 @@ export default function VerificationAdminPage() {
       endDate: formEndDate || null,
       duration: formDuration.trim(),
       trainingType: formTrainingType,
-      pdfUrl: attachedPdfUrl || null
+      pdfUrl: attachedPdfUrl || null,
+      issueDate: formIssueDate || null
     };
 
     try {
@@ -671,17 +680,32 @@ export default function VerificationAdminPage() {
                   </div>
                 </div>
 
-                {/* Duration */}
-                <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Duration description</label>
-                  <input
-                    type="text"
-                    value={formDuration}
-                    onChange={(e) => setFormDuration(e.target.value)}
-                    required
-                    placeholder="e.g. 6 Months, 12 Weeks"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 focus:border-orange-300 rounded-xl text-xs focus:outline-none"
-                  />
+                {/* Duration & Date of Issue */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Duration description</label>
+                    <input
+                      type="text"
+                      value={formDuration}
+                      onChange={(e) => setFormDuration(e.target.value)}
+                      required
+                      placeholder="e.g. 6 Months, 12 Weeks"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 focus:border-orange-300 rounded-xl text-xs focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Date of Issue</label>
+                    <div className="relative">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
+                      <input
+                        type="date"
+                        value={formIssueDate}
+                        onChange={(e) => setFormIssueDate(e.target.value)}
+                        required
+                        className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 focus:border-orange-300 rounded-xl text-xs focus:outline-none cursor-pointer"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Start & End Dates */}

@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
       endDate,
       duration,
       trainingType,
-      pdfUrl
+      pdfUrl,
+      issueDate
     } = body;
 
     if (!studentId || !studentName || !email || !course || !courseCode || !documentType || !duration) {
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
       const newRec = {
         id: `verify-${Date.now()}`,
         ...recordData,
-        issueDate: new Date().toISOString()
+        issueDate: issueDate ? new Date(issueDate).toISOString() : new Date().toISOString()
       };
       
       const idx = localVerifications.findIndex(v => v.verificationId === verificationId);
@@ -106,8 +107,8 @@ export async function POST(req: NextRequest) {
 
     const verifyRecord = await prisma.verification.upsert({
       where: { verificationId },
-      update: { ...recordData, issueDate: new Date() },
-      create: { ...recordData, issueDate: new Date() }
+      update: { ...recordData, issueDate: issueDate ? new Date(issueDate) : new Date() },
+      create: { ...recordData, issueDate: issueDate ? new Date(issueDate) : new Date() }
     });
 
     // Create Notification in student portal
