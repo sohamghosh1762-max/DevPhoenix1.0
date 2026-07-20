@@ -1,0 +1,82 @@
+[
+  {
+    "id": "log-1784137111592",
+    "timestamp": "2026-07-15T17:38:31.592Z",
+    "status": "success",
+    "importedCount": 0,
+    "error": null,
+    "details": "Sync completed [Demo Mode (401 Fallback)]. Processed 4 rows: 0 new leads imported, 4 existing leads updated."
+  },
+  {
+    "id": "log-1784136809805",
+    "timestamp": "2026-07-15T17:33:29.805Z",
+    "status": "success",
+    "importedCount": 0,
+    "error": null,
+    "details": "Sync completed [Demo Mode (401 Fallback)]. Processed 4 rows: 0 new leads imported, 4 existing leads updated."
+  },
+  {
+    "id": "log-1784135410971",
+    "timestamp": "2026-07-15T17:10:10.956Z",
+    "status": "success",
+    "importedCount": 0,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 0 mock leads (4 duplicates skipped). Please make the sheet public."
+  },
+  {
+    "id": "log-1784129351313",
+    "timestamp": "2026-07-15T15:29:11.313Z",
+    "status": "success",
+    "importedCount": 4,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 4 mock leads (0 duplicates skipped). Please make the sheet public."
+  },
+  {
+    "id": "log-1784129292612",
+    "timestamp": "2026-07-15T15:28:12.612Z",
+    "status": "success",
+    "importedCount": 1,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 1 mock leads (3 duplicates skipped). Please make the sheet public."
+  },
+  {
+    "id": "log-1784128794704",
+    "timestamp": "2026-07-15T15:19:54.703Z",
+    "status": "success",
+    "importedCount": 0,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 0 mock leads (4 duplicates skipped). Please make the sheet public."
+  },
+  {
+    "id": "log-1784128673110",
+    "timestamp": "2026-07-15T15:17:53.099Z",
+    "status": "success",
+    "importedCount": 0,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 0 mock leads (4 duplicates skipped). Please make the sheet public."
+  },
+  {
+    "id": "log-1784128417318",
+    "timestamp": "2026-07-15T15:13:37.318Z",
+    "status": "success",
+    "importedCount": 0,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 0 mock leads (4 duplicates skipped). Please make the sheet public."
+  },
+  {
+    "id": "log-1784127962082",
+    "timestamp": "2026-07-15T15:06:02.081Z",
+    "status": "success",
+    "importedCount": 0,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 0 mock leads (4 duplicates skipped). Please make the sheet public."
+  },
+  {
+    "id": "log-1784127787768",
+    "timestamp": "2026-07-15T15:03:07.768Z",
+    "status": "success",
+    "importedCount": 4,
+    "error": null,
+    "details": "Demo Mode Fallback: google sheet was restricted, so imported 4 mock leads (0 duplicates skipped). Please make the sheet public."
+  }
+]

@@ -157,6 +157,13 @@ export const sanitizePayload = {
       enrollment_date: trimString(body.enrollment_date || body.enrollmentDate, "Enrollment Date") || null,
       payment_status: trimString(body.payment_status || body.paymentStatus, "Payment Status") || null,
       payment_amount: body.payment_amount !== undefined && body.payment_amount !== null ? Number(body.payment_amount) : (body.paymentAmount !== undefined && body.paymentAmount !== null ? Number(body.paymentAmount) : null),
+      lead_source: trimString(body.lead_source || body.leadSource, "Lead Source") || "Manual",
+      whatsapp: trimString(body.whatsapp, "WhatsApp Number") || "",
+      city: trimString(body.city, "City") || "",
+      state: trimString(body.state, "State") || "",
+      referral_source: trimString(body.referral_source || body.referralSource, "Referral Source") || "",
+      is_archived: typeof body.is_archived === "boolean" ? body.is_archived : (typeof body.isArchived === "boolean" ? body.isArchived : false),
+      custom_fields: body.custom_fields || body.customFields || {},
     };
   },
 

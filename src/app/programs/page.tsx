@@ -49,7 +49,7 @@ export default function ProgramsPage() {
         setLoading(false);
       });
 
-    const TARGET_DATE = new Date("2026-07-16T23:59:00+05:30").getTime();
+    const TARGET_DATE = new Date("2026-07-26T23:59:00+05:30").getTime();
     if (Date.now() >= TARGET_DATE) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpired(true);
@@ -115,7 +115,7 @@ export default function ProgramsPage() {
                   )}
                 </div>
                 {!expired && (
-                  <span className="text-xs font-semibold text-orange-600 mt-1">Offer Valid Till: 16 July 2026</span>
+                  <span className="text-xs font-semibold text-orange-600 mt-1">Offer Valid Till: 26 July 2026</span>
                 )}
               </div>
               <div className="w-full md:w-auto min-w-[200px]">

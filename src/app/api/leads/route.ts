@@ -21,9 +21,34 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get("sortBy") || "newest";
     const program = searchParams.get("program") || "All";
     const source = searchParams.get("source") || "All";
+    const leadSource = searchParams.get("leadSource") || "All";
+    const assignment = searchParams.get("assignment") || "All";
+    const showArchived = searchParams.get("archived") === "true";
     const startDate = searchParams.get("startDate") || "";
     const endDate = searchParams.get("endDate") || "";
     const downloadAll = searchParams.get("downloadAll") === "true";
+
+    // Auto-trigger background synchronization if enabled
+    try {
+      const configCache = getLocalCacheHelper<any>("google-sheets-config.json");
+      const configList = configCache.read();
+      const config = configList && configList.length > 0 ? configList[0] : null;
+      if (config && config.enabled && config.url) {
+        const lastSync = config.lastSyncTime ? new Date(config.lastSyncTime).getTime() : 0;
+        const fiveMinutes = 5 * 60 * 1000;
+        if (Date.now() - lastSync > fiveMinutes) {
+          console.log("[Auto-Sync] Triggering background sync on GET request...");
+          const host = req.headers.get("host") || "localhost:3000";
+          const protocol = req.url.startsWith("https") ? "https" : "http";
+          fetch(`${protocol}://${host}/api/leads/google-sheets`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+          }).catch(e => console.error("[Auto-Sync] Error during background sync:", e));
+        }
+      }
+    } catch (e) {
+      console.error("[Auto-Sync] Failed to check/trigger auto sync:", e);
+    }
 
     let leads: Lead[] = [];
     let totalCount = 0;
@@ -43,8 +68,10 @@ export async function GET(req: NextRequest) {
         const db = await getDb();
         const collection = db.collection("leads");
 
-        // Status counts over the entire DB
+        // Status counts over the entire DB (excluding archived)
+        const countQuery: any = { is_archived: { $ne: true } };
         const statusCounts = await collection.aggregate([
+          { $match: countQuery },
           { $group: { _id: "$status", count: { $sum: 1 } } }
         ]).toArray();
 
@@ -58,9 +85,28 @@ export async function GET(req: NextRequest) {
 
         // Build query
         const query: any = {};
-        if (status && status !== "All") {
-          query.status = status;
+        if (!showArchived) {
+          query.is_archived = { $ne: true };
+        } else {
+          query.is_archived = true;
         }
+
+        if (status && status !== "All") {
+          if (status === "Pending") {
+            query.status = { $nin: ["Converted", "Closed", "Lost"] };
+          } else {
+            query.status = status;
+          }
+        }
+        if (leadSource && leadSource !== "All") {
+          query.lead_source = leadSource;
+        }
+        if (assignment === "Assigned") {
+          query.assigned_admin = { $ne: null };
+        } else if (assignment === "Unassigned") {
+          query.$or = [{ assigned_admin: null }, { assigned_admin: "" }];
+        }
+
         if (search) {
           const regex = new RegExp(search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), "i");
           query.$or = [
@@ -106,7 +152,6 @@ export async function GET(req: NextRequest) {
 
       } catch (err) {
         console.error("MongoDB leads GET error, falling back to local cache:", err);
-        // Fallback code if MongoDB query fails
         const fallback = runFallbackGET();
         leads = fallback.leads;
         totalCount = fallback.totalCount;
@@ -123,9 +168,28 @@ export async function GET(req: NextRequest) {
       let list = cache.read();
 
       // Apply JS filters
-      if (status && status !== "All") {
-        list = list.filter((l) => l.status === status);
+      if (!showArchived) {
+        list = list.filter((l) => !l.is_archived);
+      } else {
+        list = list.filter((l) => l.is_archived === true);
       }
+
+      if (status && status !== "All") {
+        if (status === "Pending") {
+          list = list.filter((l) => l.status !== "Converted" && l.status !== "Closed" && l.status !== "Lost");
+        } else {
+          list = list.filter((l) => l.status === status);
+        }
+      }
+      if (leadSource && leadSource !== "All") {
+        list = list.filter((l) => (l.lead_source || "Manual") === leadSource);
+      }
+      if (assignment === "Assigned") {
+        list = list.filter((l) => l.assigned_admin !== null && l.assigned_admin !== undefined && l.assigned_admin !== "");
+      } else if (assignment === "Unassigned") {
+        list = list.filter((l) => !l.assigned_admin);
+      }
+
       if (search) {
         const q = search.toLowerCase();
         list = list.filter(
@@ -158,8 +222,8 @@ export async function GET(req: NextRequest) {
 
       const total = list.length;
 
-      // Status counts over uncut list
-      const uncut = cache.read();
+      // Status counts over uncut list (excluding archived)
+      const uncut = cache.read().filter((l) => !l.is_archived);
       const fallbackCounts: Record<string, number> = {
         All: uncut.length,
         New: 0,
@@ -216,13 +280,18 @@ export async function POST(req: NextRequest) {
 
     const newLead: Lead = {
       ...sanitized,
-      status: "New",
-      created_at: new Date().toISOString(),
+      status: sanitized.status || "New",
+      lead_source: sanitized.lead_source || "Manual",
+      created_at: sanitized.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
     // Dispatch email notification to stakeholders
-    await sendLeadEmail(newLead);
+    try {
+      await sendLeadEmail(newLead);
+    } catch (emailErr) {
+      console.error("[LEADS API POST EMAIL ERROR]", emailErr);
+    }
 
     if (!hasMongoConfig) {
       console.log("[LEADS API local cache save]", newLead.id);
@@ -239,7 +308,7 @@ export async function POST(req: NextRequest) {
       console.log("[LEADS API POST SUCCESS]", JSON.stringify(result, null, 2));
       return apiResponse.success(result, 201);
     } catch (dbErr: any) {
-      console.error("[LEADS API POST SUPABASE ERROR]", dbErr);
+      console.error("[LEADS API POST MONGO ERROR]", dbErr);
       return apiResponse.error(dbErr.message || "Database insert operation failed", "DATABASE_INSERT_FAILED", dbErr);
     }
   } catch (error: any) {
@@ -273,7 +342,6 @@ export async function PUT(req: NextRequest) {
           updated_at: new Date().toISOString(),
         };
       } else {
-        // Sanitize other updates to strictly match schema fields
         let sanitized: Lead;
         try {
           const merged = { ...found, ...body };
@@ -298,7 +366,7 @@ export async function PUT(req: NextRequest) {
         console.log("[LEADS API PUT SUCCESS]", JSON.stringify(result, null, 2));
         return apiResponse.success(result);
       } catch (dbErr: any) {
-        console.error("[LEADS API PUT SUPABASE ERROR]", dbErr);
+        console.error("[LEADS API PUT MONGO ERROR]", dbErr);
         return apiResponse.error(dbErr.message || "Database update operation failed", "DATABASE_UPDATE_FAILED", dbErr);
       }
     }
@@ -365,7 +433,7 @@ export async function DELETE(req: NextRequest) {
       console.log("[LEADS API DELETE SUCCESS]");
       return apiResponse.success({ success: true });
     } catch (dbErr: any) {
-      console.error("[LEADS API DELETE SUPABASE ERROR]", dbErr);
+      console.error("[LEADS API DELETE MONGO ERROR]", dbErr);
       return apiResponse.error(dbErr.message || "Database delete operation failed", "DATABASE_DELETE_FAILED", dbErr);
     }
   } catch (error: any) {

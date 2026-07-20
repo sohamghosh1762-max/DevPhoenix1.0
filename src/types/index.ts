@@ -137,6 +137,13 @@ export interface Lead {
   enrollment_date?: string;
   payment_status?: string;
   payment_amount?: number;
+  lead_source?: 'Manual' | 'Google Form';
+  whatsapp?: string;
+  city?: string;
+  state?: string;
+  referral_source?: string;
+  is_archived?: boolean;
+  custom_fields?: Record<string, any>;
 }
 
 export type OpportunityStage = 'Discovery' | 'Proposal' | 'Negotiation' | 'Won' | 'Lost';
