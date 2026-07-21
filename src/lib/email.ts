@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 const resendKey = process.env.RESEND_API_KEY;
 const resend = new Resend(resendKey || 're_dummykeyforbuildtypecheck');
@@ -13,27 +14,113 @@ function getSender(label: string) {
   return `${label} <${email}>`;
 }
 
-export async function sendEmail({ to, subject, html, text }: { to: string; subject: string; html: string; text?: string }) {
-  if (!resendKey) {
-    console.log(`[Email Simulation] To: ${to} | Subject: ${subject}`);
+export async function sendEmail({
+  to,
+  subject,
+  html,
+  text,
+  attachments,
+  replyTo
+}: {
+  to: string | string[];
+  subject: string;
+  html: string;
+  text?: string;
+  attachments?: Array<{ filename: string; content: Buffer }>;
+  replyTo?: string;
+}) {
+  const recipientList = Array.isArray(to) ? to : [to];
+  const useSMTP = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+
+  if (useSMTP) {
+    try {
+      console.log(`[Email Dispatch] Sending via SMTP to: ${recipientList.join(', ')}`);
+      const host = process.env.SMTP_HOST || 'smtp.zoho.in';
+      const port = parseInt(process.env.SMTP_PORT || '465', 10);
+      const secure = process.env.SMTP_SECURE !== 'false';
+      
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: {
+          user: process.env.SMTP_USER,
+          pass: process.env.SMTP_PASS,
+        },
+      });
+
+      const fromLabel = 'DevPhoenix Academy';
+      const smtpFrom = `"${fromLabel}" <${process.env.SMTP_USER}>`;
+
+      const mailOptions = {
+        from: smtpFrom,
+        to: recipientList.join(', '),
+        replyTo: replyTo || process.env.SMTP_USER,
+        subject,
+        html,
+        text: text || '',
+        attachments: attachments || [],
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log('✅ Email sent via SMTP successfully:', info.messageId);
+      return { success: true, messageId: info.messageId };
+    } catch (error: any) {
+      console.error('❌ SMTP email dispatch failed:', error);
+      return { success: false, error };
+    }
+  }
+
+  // Fallback to Resend
+  if (!resendKey || resendKey === 're_placeholder') {
+    console.log(`[Email Simulation] To: ${recipientList.join(', ')} | Subject: ${subject}`);
     return { success: true, simulated: true };
   }
+
   try {
     const from = getSender('DevPhoenix Academy');
-    const { data, error } = await resend.emails.send({
+    const resendAttachments = attachments?.map(att => ({
+      filename: att.filename,
+      content: att.content,
+    }));
+
+    let response = await resend.emails.send({
       from,
-      to,
+      to: recipientList,
+      replyTo,
       subject,
       html,
       text: text || '',
+      attachments: resendAttachments,
     });
-    if (error) {
-      console.error('Resend email error:', error);
-      return { success: false, error };
+
+    const isDomainError = response.error && (
+      response.error.message.toLowerCase().includes("not verified") ||
+      response.error.message.toLowerCase().includes("verify your domain") ||
+      response.error.message.toLowerCase().includes("unverified")
+    );
+
+    if (isDomainError) {
+      console.warn("⚠️ Domain not verified on Resend. Retrying using onboarding@resend.dev fallback...");
+      const fallbackFrom = `DevPhoenix Academy <onboarding@resend.dev>`;
+      response = await resend.emails.send({
+        from: fallbackFrom,
+        to: recipientList,
+        replyTo,
+        subject: `[Fallback] ${subject}`,
+        html,
+        text: text || '',
+        attachments: resendAttachments,
+      });
     }
-    return { success: true, data };
+
+    if (response.error) {
+      console.error('Resend email error:', response.error);
+      return { success: false, error: response.error };
+    }
+    return { success: true, data: response.data };
   } catch (error) {
-    console.error('Email dispatch failed:', error);
+    console.error('Resend email dispatch failed:', error);
     return { success: false, error };
   }
 }

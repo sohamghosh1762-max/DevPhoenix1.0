@@ -1,7 +1,7 @@
 export const runtime = 'nodejs';
 import { NextRequest } from "next/server";
 import { paymentSubmissionSchema } from "@/lib/validation";
-import { resend } from "@/lib/resend";
+import { sendEmail } from "@/lib/email";
 import { getAdminEmailHtml, getAdminEmailText, getStudentEmailHtml } from "@/lib/emailTemplates";
 import { apiResponse } from "@/lib/api-utils";
 import { ALLOWED_FILE_TYPES, MAX_FILE_SIZE } from "@/lib/validation";
@@ -14,16 +14,6 @@ import { Lead } from "@/types";
 export const dynamic = "force-dynamic";
 
 const cache = getLocalCacheHelper<Lead>("leads.json");
-
-const DEFAULT_FROM_EMAIL = "DevPhoenix Academy <academy@devphoenix.com>";
-
-
-function getSender(label: string, fromEnv?: string) {
-  const baseEmail = fromEnv || DEFAULT_FROM_EMAIL;
-  const emailMatch = baseEmail.match(/<([^>]+)>/) || [null, baseEmail];
-  const email = (emailMatch[1] || baseEmail).trim();
-  return `${label} <${email}>`;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -164,16 +154,14 @@ export async function POST(req: NextRequest) {
     const adminText = getAdminEmailText(emailData);
     const studentHtml = getStudentEmailHtml(emailData);
     
-    // Get sender email identity configured in Resend console
-    const fromEmailAdmin = getSender("DevPhoeniX Alerts", process.env.RESEND_FROM_EMAIL);
-    const fromEmailUser = getSender("DEVPHOENIX Team", process.env.RESEND_FROM_EMAIL);
+    const hasSmtp = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
+    const hasResend = !!(process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== "re_placeholder");
     
-    // Check if Resend API key is present
-    if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === "re_placeholder") {
-      console.warn("⚠️ RESEND_API_KEY is not configured or placeholder. Running email dispatch in simulated mode.");
+    // Check if we are in simulated mode
+    if (!hasSmtp && !hasResend) {
+      console.warn("⚠️ Neither SMTP nor Resend is configured. Running email dispatch in simulated mode.");
       console.log(`
 --- SIMULATED ADMIN PAYMENT EMAIL ---
-From: ${fromEmailAdmin}
 To: devphoenix@zohomail.in
 Reply-To: ${emailAddress}
 Subject: New Payment Submission | DEVPHOENIX Academy
@@ -184,7 +172,6 @@ ${adminText}
 -------------------------------------
 
 --- SIMULATED STUDENT EMAIL ---
-From: ${fromEmailUser}
 To: ${emailAddress}
 Subject: Payment Submission Received | DEVPHOENIX Academy
 -------------------------------
@@ -198,9 +185,8 @@ Subject: Payment Submission Received | DEVPHOENIX Academy
     }
     
     // 4. Send admin notification email with the screenshot attached
-    let adminEmailResult = await resend.emails.send({
-      from: fromEmailAdmin,
-      to: ["devphoenix@zohomail.in"],
+    const adminEmailResult = await sendEmail({
+      to: "devphoenix@zohomail.in",
       replyTo: emailAddress,
       subject: `New Payment Submission | DEVPHOENIX Academy`,
       html: adminHtml,
@@ -213,51 +199,27 @@ Subject: Payment Submission Received | DEVPHOENIX Academy
       ],
     });
     
-    // Fallback: Check if unverified domain error occurred
-    const isDomainError = adminEmailResult.error && (
-      adminEmailResult.error.message.toLowerCase().includes("not verified") ||
-      adminEmailResult.error.message.toLowerCase().includes("verify your domain") ||
-      adminEmailResult.error.message.toLowerCase().includes("unverified")
-    );
-
-    if (isDomainError) {
-      console.warn("⚠️ Domain not verified on Resend. Retrying admin notification using onboarding@resend.dev fallback...");
-      const fallbackFromEmailAdmin = getSender("DevPhoeniX Alerts", "onboarding@resend.dev");
-      adminEmailResult = await resend.emails.send({
-        from: fallbackFromEmailAdmin,
-        to: ["devphoenix@zohomail.in"],
-        replyTo: emailAddress,
-        subject: `[Unverified Sender Fallback] New Payment Submission | DEVPHOENIX Academy`,
-        html: adminHtml,
-        text: adminText,
-        attachments: [
-          {
-            filename: file.name,
-            content: buffer,
-          },
-        ],
-      });
-    }
-
-    if (adminEmailResult.error) {
+    if (!adminEmailResult.success) {
       console.error("❌ Admin Email notification failed:", adminEmailResult.error);
       // We do not fail the request if the email fails, as we have already persisted the lead to MongoDB/cache and uploaded the screenshot.
+    } else {
+      console.log("✅ Admin Email notification sent successfully:", adminEmailResult);
     }
     
     // 5. Send confirmation auto-reply email to the student
     let studentEmailId: string | undefined;
     try {
-      const studentEmailResult = await resend.emails.send({
-        from: fromEmailUser,
-        to: [emailAddress],
+      const studentEmailResult = await sendEmail({
+        to: emailAddress,
         subject: `Payment Submission Received | DEVPHOENIX Academy`,
         html: studentHtml,
       });
       
-      if (studentEmailResult.error) {
+      if (!studentEmailResult.success) {
         console.error("❌ Student confirmation Email failed to send:", studentEmailResult.error);
       } else {
-        studentEmailId = studentEmailResult.data?.id;
+        console.log("✅ Student confirmation Email sent successfully:", studentEmailResult);
+        studentEmailId = (studentEmailResult as any).data?.id || (studentEmailResult as any).messageId;
       }
     } catch (studentErr) {
       console.error("❌ Student confirmation Email exception:", studentErr);
@@ -265,7 +227,7 @@ Subject: Payment Submission Received | DEVPHOENIX Academy
     
     return apiResponse.success({
       message: "Payment submission received and registered successfully.",
-      adminEmailId: adminEmailResult.data?.id,
+      adminEmailId: (adminEmailResult as any).data?.id || (adminEmailResult as any).messageId,
       studentEmailId,
     });
     
