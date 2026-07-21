@@ -114,6 +114,27 @@ export async function sendEmail({
       });
     }
 
+    const isSandboxError = response.error && (
+      response.error.message.includes("You can only send testing emails to your own email address")
+    );
+
+    if (isSandboxError && response.error) {
+      const match = response.error.message.match(/to your own email address \(([^)]+)\)/);
+      const ownerEmail = match ? match[1] : null;
+      if (ownerEmail && !recipientList.includes(ownerEmail)) {
+        console.warn(`⚠️ Resend is in Sandbox mode. Redirecting email from unverified recipients to account owner: ${ownerEmail}`);
+        response = await resend.emails.send({
+          from: `DevPhoenix Academy <onboarding@resend.dev>`,
+          to: [ownerEmail],
+          replyTo,
+          subject: `[Sandbox Redirect] ${subject}`,
+          html,
+          text: text || '',
+          attachments: resendAttachments,
+        });
+      }
+    }
+
     if (response.error) {
       console.error('Resend email error:', response.error);
       return { success: false, error: response.error };
