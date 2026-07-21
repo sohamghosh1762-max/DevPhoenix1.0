@@ -512,10 +512,25 @@ function LeadDetailPanel({ lead, onClose, onUpdate, onTriggerEdit }: {
                     // Skip standard fields that are already displayed cleanly to avoid clutter
                     if (['Full Name', 'Email address', 'Mobile Number', 'College / University Name', 'Which training program are you interested in?'].includes(key)) return null;
                     if (val === null || val === undefined || val === '') return null;
+                    
+                    const valStr = String(val);
+                    const isUrlOrPath = valStr.startsWith('/') || valStr.startsWith('http://') || valStr.startsWith('https://');
+                    
                     return (
                       <div key={key} className="text-xs border-b border-slate-100/60 pb-1.5 last:border-0 last:pb-0">
                         <p className="text-slate-400 font-bold">{key}</p>
-                        <p className="font-semibold text-slate-800 break-words mt-0.5">{String(val)}</p>
+                        {isUrlOrPath ? (
+                          <a
+                            href={valStr}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 font-bold text-orange-500 hover:text-orange-600 transition-colors mt-0.5 hover:underline"
+                          >
+                            <FolderOpen className="w-3.5 h-3.5" /> View Attachment
+                          </a>
+                        ) : (
+                          <p className="font-semibold text-slate-800 break-words mt-0.5">{valStr}</p>
+                        )}
                       </div>
                     );
                   })}
